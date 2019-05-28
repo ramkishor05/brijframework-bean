@@ -1,14 +1,16 @@
-package org.brijframework.data;
+package org.brijframework.data.asm;
 
+import org.brijframework.data.DataInfo;
 import org.brijframework.meta.reflect.ClassMeta;
 import org.brijframework.util.asserts.Assertion;
 
-public class ModelDataInfo implements DataInfo {
+public class ObjectData implements DataInfo {
 	
 	private ClassMeta owner;
+	private String id;
 	private Object scopeObject;
 	
-	public ModelDataInfo(ClassMeta owner) {
+	public ObjectData(ClassMeta owner) {
 		this.owner=owner;
 	}
 	
@@ -22,7 +24,15 @@ public class ModelDataInfo implements DataInfo {
 	}
 
 	public String getId() {
-		return owner.getId();
+		return id;
+	}
+	
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	public void setOwner(ClassMeta owner) {
+		this.owner = owner;
 	}
 	
 	public void setScopeObject(Object scopeObject) {
