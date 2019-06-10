@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.brijframework.meta.factories.asm.PropertyMetaFactoryImpl;
 import org.brijframework.meta.impl.PropertyMeta;
+import org.brijframework.model.ModelBean;
 import org.brijframework.util.accessor.PropertyAccessorUtil;
 import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.casting.CastingUtil;
@@ -105,18 +106,9 @@ public class DataBuilderUtil {
 		if(_value==null &&  isDefault) {
 			Class<?> targetClass=property!=null?getTargetClass(field,property.getType()):getTargetClass(field,field.getType());
 			_value=InstanceUtil.getInstance(targetClass);
-			PropertyAccessorUtil.setProperty(instance, property.getTarget(), _value);
+			PropertyAccessorUtil.setProperty(instance, field, _value);
 		}
 		return (T) _value;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public static  <T> T findCurrentFromMap(Map<String, Object> map ,String key, boolean isDefault) {
-		Assertion.notEmpty(key, "Key should not be null or empty");
-		if (!map.containsKey(key) && isDefault) {
-			
-		}
-		return (T) map.getOrDefault(key, null);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -284,9 +276,48 @@ public class DataBuilderUtil {
 	public static  <T> T getPropertyObject(Object object,Access access,String key ) {
 		return PropertyAccessorUtil.getProperty(object, key,access);
 	}
+	
+	public static Boolean containsPathKey(Object model, String _keyPath, boolean isDefault) {
+		return null;
+	}
 	/*
 	 * End Object
 	 */
+
+	public static Boolean containsPathValue(Object modelBean, String _keyPath, boolean b) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Class<?> typeOfPropertyPath(Object currentInstance, String _keyPath, boolean b) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Map<String, ?> setPropertiesPath(Object currentInstance, String[] _keyPaths, Object[] _values,
+			boolean b) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Map<String, ?> setPropertiesPath(Object currentInstance, String _keys, Object[] _values, boolean b) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Map<String, ?> setSafeProperties(Object currentInstance, String _keyPath, Object[] _values,
+			boolean b) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Map<String, ?> setSafePropertiesPath(Object currentInstance, String _keyPath, Object[] _values,
+			boolean b) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
 	
 	/*
 	
