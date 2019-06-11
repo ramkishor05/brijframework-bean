@@ -1,6 +1,8 @@
 package org.brijframework.data.util;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -27,6 +29,37 @@ import org.brijframework.util.support.Access;
 import org.brijframework.util.support.Constants;
 
 public class DataBuilderUtil {
+	private static final String KEY = "KEY";
+	private static final String VAL = "VAL";
+	/**
+	 * Find implement class from given class for create object
+	 * 
+	 * @param field
+	 * @param type
+	 * @return Class
+	 */
+	public static Class<?> getTargetClass(Method field, Class<?> type) {
+		if (type == null) {
+			return null;
+		}
+		if (!type.getName().equals(Type.class.getName())&& !(type.isInterface() || Modifier.isAbstract(type.getModifiers()))) {
+			return type;
+		}
+		if (Map.class.isAssignableFrom(type)) {
+			return HashMap.class;
+		} else if (List.class.isAssignableFrom(type)) {
+			return ArrayList.class;
+		} else if (Set.class.isAssignableFrom(type)) {
+			return HashSet.class;
+		} else if (Collection.class.isAssignableFrom(type)) {
+			return ArrayList.class;
+		}
+		if (type.getName().equals(Type.class.getName())) {
+			return field.getReturnType();
+		}
+		return type;
+	}
+	
 	/**
 	 * Find implement class from given class for create object
 	 * 
@@ -38,8 +71,7 @@ public class DataBuilderUtil {
 		if (type == null) {
 			return null;
 		}
-		if (!type.getName().equals(Type.class.getName())
-				&& !(type.isInterface() || Modifier.isAbstract(type.getModifiers()))) {
+		if (!type.getName().equals(Type.class.getName())&& !(type.isInterface() || Modifier.isAbstract(type.getModifiers()))) {
 			return type;
 		}
 		if (Map.class.isAssignableFrom(type)) {
@@ -57,96 +89,19 @@ public class DataBuilderUtil {
 		return type;
 	}
 
-	/**
-	 * Find current object for field if default is true than create object if its
-	 * not found
-	 * 
-	 * @param instance
-	 * @param index
-	 * @param field
-	 * @param isDefault
-	 * @return
-	 */
-	private static Object findCurrentObject(Object instance, Integer index, Field field, boolean isDefault) {
-		Object paramObject = getPropertyArray(instance, index, Access.PRIVATE);
-		if (paramObject == null && isDefault) {
-			Class<?> paramClass = ClassUtil.collectionParamType(field);
-			paramObject = InstanceUtil.getInstance(paramClass);
-			setPropertyArray(instance, index, Access.PRIVATE, paramObject);
-		}
-		return paramObject;
-	}
-
-	/***
-	 * Find collection object
-	 * 
-	 * @param instance
-	 * @param key
-	 * @param index
-	 * @param isDefault
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private static <T> T findCurrentFromList(Object instance, String key, Integer index, boolean isDefault) {
-		Assertion.notEmpty(key, "Key should not be null or empty");
-		PropertyMeta property = PropertyMetaFactoryImpl.getFactory()
-				.getPropertyInfo(instance.getClass().getSimpleName() + "_" + key);
-		Field field = property != null ? property.getTargetAsField()
-				: FieldUtil.getField(instance.getClass(), key, Access.PRIVATE);
-		Class<?> targetClass = property != null ? getTargetClass(field, property.getType())
-				: getTargetClass(field, field.getType());
-		Object collection = PropertyAccessorUtil.getProperty(instance, key, Access.PRIVATE);
-		if (collection == null && targetClass != null && isDefault) {
-			collection = InstanceUtil.getInstance(targetClass);
-			PropertyAccessorUtil.setProperty(instance, field, collection);
-		}
-		if (collection == null) {
-			return null;
-		}
-		return (T) findCurrentObject(collection, index, field, isDefault);
-	}
 
 	@SuppressWarnings("unchecked")
 	private static <T> T findCurrentFromObject(Object instance, String _keyPath, boolean isDefault) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
-		PropertyMeta property = PropertyMetaFactoryImpl.getFactory()
-				.getPropertyInfo(instance.getClass().getSimpleName() + "_" + _keyPath);
-		Field field = property != null ? property.getTargetAsField()
-				: FieldUtil.getField(instance.getClass(), _keyPath, Access.PRIVATE);
+		PropertyMeta property = PropertyMetaFactoryImpl.getFactory().getPropertyInfo(instance.getClass().getSimpleName() , _keyPath);
+		Field field = property != null ? property.getTargetAsField(): FieldUtil.getField(instance.getClass(), _keyPath, Access.PRIVATE);
 		Object _value = PropertyAccessorUtil.getProperty(instance, field, Access.PRIVATE);
 		if (_value == null && isDefault) {
-			Class<?> targetClass = property != null ? getTargetClass(field, property.getType())
-					: getTargetClass(field, field.getType());
+			Class<?> targetClass = property != null ? getTargetClass(field, property.getType()): getTargetClass(field, field.getType());
 			_value = InstanceUtil.getInstance(targetClass);
 			PropertyAccessorUtil.setProperty(instance, field, _value);
 		}
 		return (T) _value;
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <T> T getCurrentObject(Object instance, String[] keyArray, boolean isDefault) {
-		Object current = instance;
-		StringBuffer point = new StringBuffer();
-		Field field = null;
-		for (int i = 0; i < keyArray.length - 1; i++) {
-			String key = keyArray[i];
-			if (key.contains(Constants.OPEN_BRAKET) && key.contains(Constants.CLOSE_BRAKET)) {
-				current = findCurrentFromList(current, PointUtil.keyArray(key), PointUtil.indexArray(key), isDefault);
-			} else if (current instanceof Map) {
-				current = findCurrentFromMap((Map) current, key, field, isDefault);
-			} else {
-				field = FieldUtil.getField(current.getClass(), key, Access.PRIVATE);
-				current = findCurrentFromObject(current, key, isDefault);
-			}
-			point.append(key);
-			if (i < keyArray.length - 2) {
-				point.append(".");
-			}
-			if (current == null) {
-				Assertion.notEmpty(current, point.toString() + " should not be null or empty");
-			}
-		}
-		return (T) current;
 	}
 
 	private static Object findCurrentFromMap(Map<Object, Object> current, String key, Field field, boolean isDefault) {
@@ -157,6 +112,9 @@ public class DataBuilderUtil {
 		if (!current.containsKey(keyObject)) {
 			current.put(keyObject, InstanceUtil.getInstance(valueClass));
 		}
+		Map<String,Class<?>> returnMap=new HashMap<>();
+		returnMap.put(KEY, keyClass);
+		returnMap.put(VAL, valueClass);
 		return current.get(keyObject);
 	}
 
@@ -164,29 +122,69 @@ public class DataBuilderUtil {
 	public static <T> T setPropertyPath(Object instance, String _keyPath, Object _value, boolean isDefault) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
 		String[] keyArray = _keyPath.split(Constants.SPLIT_DOT);
-		Object current = getCurrentObject(instance, keyArray, isDefault);
+		Object current = instance;
+		StringBuffer point = new StringBuffer();
+		Field field = null;
+		for (int i = 0; i < keyArray.length - 1; i++) {
+			String key = keyArray[i];
+			if (key.contains(Constants.OPEN_BRAKET) && key.contains(Constants.CLOSE_BRAKET)) {
+				current = findCurrentFromList(current, PointUtil.keyArray(key), PointUtil.indexArray(key), isDefault);
+			} else if (current instanceof Map) {
+				current = findCurrentFromMap((Map<Object, Object>) current, key, field, isDefault);
+			} else {
+				field = FieldUtil.getField(current.getClass(), key, Access.PRIVATE);
+				current = findCurrentFromObject(current, key, isDefault);
+			}
+			point.append(key);
+			if (i < keyArray.length - 2) {
+				point.append(Constants.DOT);
+			}
+			if (current == null) {
+				Assertion.notEmpty(current, point.toString() + " should not be null or empty");
+			}
+		}
 		if (current != null) {
-			return setProperty(current, Access.PRIVATE, keyArray[keyArray.length - 1], _value);
+			return setProperty(current, field,Access.PRIVATE, keyArray[keyArray.length - 1], _value);
 		}
 		return (T) _value;
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T setProperty(Object current, Access access, String key, Object value) {
-		if (current instanceof Collection<?> && key.contains(Constants.OPEN_BRAKET)
-				&& key.contains(Constants.CLOSE_BRAKET)) {
-			return getPropertyArray(current, PointUtil.indexArray(key), access);
+	public static <T> T setProperty(Object current,Field field, Access access, String key, Object value) {
+		if (current instanceof Collection<?> && key.contains(Constants.OPEN_BRAKET)&& key.contains(Constants.CLOSE_BRAKET)) {
+			return setPropertyArray(current, field,PointUtil.indexArray(key),value);
 		} else if (current instanceof Map) {
-			return setPropertyMap((Map<String, Object>) current, key, value);
+			return setPropertyMap((Map<Object, Object>) current,field, key, value);
 		} else {
-			return setPropertyObject(current, access, key, value);
+			return setPropertyObject(current, access,key, value);
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public static <T> T getPropertyPath(Object instance, String _keyPath, boolean isDefault) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
 		String[] keyArray = _keyPath.split(Constants.SPLIT_DOT);
-		Object current = getCurrentObject(instance, keyArray, isDefault);
+		Object current = instance;
+		StringBuffer point = new StringBuffer();
+		Field field = null;
+		for (int i = 0; i < keyArray.length - 1; i++) {
+			String key = keyArray[i];
+			if (key.contains(Constants.OPEN_BRAKET) && key.contains(Constants.CLOSE_BRAKET)) {
+				current = findCurrentFromList(current, PointUtil.keyArray(key), PointUtil.indexArray(key), isDefault);
+			} else if (current instanceof Map) {
+				current = findCurrentFromMap((Map<Object, Object>) current, key, field, isDefault);
+			} else {
+				field = FieldUtil.getField(current.getClass(), key, Access.PRIVATE);
+				current = findCurrentFromObject(current, key, isDefault);
+			}
+			point.append(key);
+			if (i < keyArray.length - 2) {
+				point.append(Constants.DOT);
+			}
+			if (current == null) {
+				Assertion.notEmpty(current, point.toString() + " should not be null or empty");
+			}
+		}
 		if (current != null) {
 			return getProperty(current, Access.PRIVATE, keyArray[keyArray.length - 1]);
 		}
@@ -205,8 +203,55 @@ public class DataBuilderUtil {
 	}
 
 	/* Start list */
+
+	/***
+	 * Find collection object
+	 * 
+	 * @param instance
+	 * @param key
+	 * @param index
+	 * @param isDefault
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T getProperty(Object[] array, int index, Access access) {
+	private static <T> T findCurrentFromList(Object instance, String key, Integer index, boolean isDefault) {
+		Assertion.notEmpty(key, "Key should not be null or empty");
+		PropertyMeta property = PropertyMetaFactoryImpl.getFactory().getPropertyInfo(instance.getClass().getSimpleName() + "_" + key);
+		Field field = property != null ? property.getTargetAsField(): FieldUtil.getField(instance.getClass(), key, Access.PRIVATE);
+		Class<?> targetClass = property != null ? getTargetClass(field, property.getType()): getTargetClass(field, field.getType());
+		Object collection = PropertyAccessorUtil.getProperty(instance, key, Access.PRIVATE);
+		if (collection == null && targetClass != null && isDefault) {
+			collection = InstanceUtil.getInstance(targetClass);
+			PropertyAccessorUtil.setProperty(instance, field, collection);
+		}
+		if (collection == null) {
+			return null;
+		}
+		return (T) findCollectionObject(collection, index, field, isDefault);
+	}
+	
+	/**
+	 * Find current object for field if default is true than create object if its
+	 * not found
+	 * 
+	 * @param instance
+	 * @param index
+	 * @param field
+	 * @param isDefault
+	 * @return
+	 */
+	private static Object findCollectionObject(Object instance, Integer index, AccessibleObject field, boolean isDefault) {
+		Object paramObject = getPropertyArray(instance, index);
+		if (paramObject == null && isDefault) {
+			Class<?> paramClass = ClassUtil.collectionParamType(field);
+			paramObject = InstanceUtil.getInstance(paramClass);
+			setPropertyArray(instance,field, index, paramObject);
+		}
+		return paramObject;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T> T getProperty(Object[] array, int index) {
 		if (array == null || (array.length <= index)) {
 			return null;
 		}
@@ -214,7 +259,7 @@ public class DataBuilderUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T getProperty(List<?> array, int index, Access access) {
+	public static <T> T getProperty(List<?> array, int index) {
 		if (array == null) {
 			return null;
 		}
@@ -224,17 +269,17 @@ public class DataBuilderUtil {
 		return (T) array.get(index);
 	}
 
-	public static <T> T getPropertyArray(Object current, int index, Access access) {
+	public static <T> T getPropertyArray(Object current, int index) {
 		if (current instanceof Object[]) {
-			return getProperty((Object[]) current, index, access);
+			return getProperty((Object[]) current, index);
 		} else if (current instanceof List) {
-			return getProperty((List<?>) current, index, access);
+			return getProperty((List<?>) current, index);
 		}
 		return null;
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T getPropertyArray(Object[] array, int index, Access access, Object value) {
+	public static <T> T getPropertyArray(Object[] array, int index, Object value) {
 		if (index < 0 && array == null || array.length <= index) {
 			return null;
 		}
@@ -243,7 +288,7 @@ public class DataBuilderUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T setProperty(List<Object> array, int index, Access access, Object value) {
+	public static <T> T setProperty(List<Object> array, int index, Object value) {
 		if (array == null) {
 			return null;
 		}
@@ -252,11 +297,11 @@ public class DataBuilderUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T setPropertyArray(Object current, int index, Access access, Object value) {
+	public static <T> T setPropertyArray(Object current, AccessibleObject field,int index, Object value) {
 		if (current instanceof Object[]) {
-			return getPropertyArray((Object[]) current, index, access, value);
+			return getPropertyArray((Object[]) current, index, value);
 		} else if (current instanceof List) {
-			return setProperty((List<Object>) current, index, access, value);
+			return setProperty((List<Object>) current, index, value);
 		}
 		return null;
 	}
@@ -268,8 +313,12 @@ public class DataBuilderUtil {
 	 */
 
 	@SuppressWarnings("unchecked")
-	private static <T> T setPropertyMap(Map<String, Object> current, String key, Object value) {
-		return (T) current.put(key, value);
+	private static <T> T setPropertyMap(Map<Object, Object> current,AccessibleObject field, String key, Object value) {
+		ParameterizedType type = field instanceof Method? (ParameterizedType)((Method) field).getGenericReturnType():(ParameterizedType)((Field) field).getGenericType();
+		Class<?> keyClass = (Class<?>) type.getActualTypeArguments()[0];
+		Object keyObject = CastingUtil.castObject(key, keyClass);
+		//Class<?> valueClass = (Class<?>) type.getActualTypeArguments()[1];
+		return (T) current.put(keyObject, value);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -283,8 +332,8 @@ public class DataBuilderUtil {
 	/*
 	 * Start Object
 	 */
-	public static <T> T setPropertyObject(Object current, Access access, String keyPoint, Object _value) {
-		return PropertyAccessorUtil.setProperty(current, keyPoint, access, _value);
+	public static <T> T setPropertyObject(Object current,  Access access,String keyPoint, Object _value) {
+		return PropertyAccessorUtil.setProperty(current, keyPoint,access, _value);
 	}
 
 	public static <T> T getPropertyObject(Object object, Access access, String key) {
@@ -326,7 +375,7 @@ public class DataBuilderUtil {
 		for (int index = 0; index < keyArray.length; index++) {
 			String _key = keyArray[index];
 			if (containsPathKey(currentInstance, _key, isDefault)) {
-				returnMap.put(_key, setProperty(currentInstance, Access.PRIVATE, _key, _values[index]));
+				returnMap.put(_key, setPropertyPath(currentInstance, _key, _values[index],true));
 			}
 		}
 		return returnMap;
@@ -336,7 +385,7 @@ public class DataBuilderUtil {
 			boolean isDefault) {
 		Map<String, ?> returnMap = new LinkedHashMap<String, Object>();
 		for (String _key : _properties.keySet()) {
-			returnMap.put(_key, setProperty(currentInstance, Access.PRIVATE, _key, _properties.get(_key)));
+			returnMap.put(_key, setPropertyPath(currentInstance, _key, _properties.get(_key),true));
 		}
 		return returnMap;
 	}
@@ -382,185 +431,5 @@ public class DataBuilderUtil {
 	 * End Object
 	 */
 
-	/*
-	 * 
-	 * public static Class<?> getCurrentClass(Class<?> cls, String _keyPath) {
-	 * String[] keyArray=_keyPath.split(Constants.SPLIT_DOT); Class<?> keyClass=cls;
-	 * for (int i = 0; i < keyArray.length-1; i++) { String key = keyArray[i];
-	 * keyClass=getProperty(keyClass, key); } return keyClass; }
-	 * 
-	 * @SuppressWarnings("unchecked") public static <T> T getCurrentInstance(Object
-	 * object,String _keyPath, boolean isDefault) { if(object instanceof Map) {
-	 * return getCurrentFromMapped((Map<String, Object> )object,_keyPath,isDefault);
-	 * }else { return getCurrentFromInstance(object, _keyPath,isDefault); } }
-	 * 
-	 * @SuppressWarnings("unchecked") public static <T> T getCurrentInstance(Object
-	 * object,Access access, String _keyPath) { if(object instanceof Map) { return
-	 * getCurrentFromMapped((Map<String, Object> )object, access,_keyPath); }else {
-	 * return getCurrentFromInstance(object,access, _keyPath); } }
-	 * 
-	 * @SuppressWarnings("unchecked") public static <T> T
-	 * getCurrentFromInstance(Object object,Access access,String _keyPath) {
-	 * String[] keyArray=_keyPath.split(Constants.SPLIT_DOT); Object current=object;
-	 * for (int i = 0; i < keyArray.length-1; i++) { String key = keyArray[i];
-	 * current=getProperty(current, access,key); } return (T) current; }
-	 * 
-	 * 
-	 * @SuppressWarnings("unchecked") public static <T> T
-	 * getCurrentFromInstance(Object object,String _keyPath, boolean isDefault) {
-	 * String[] keyArray=_keyPath.split(Constants.SPLIT_DOT); Object current=object;
-	 * StringBuffer point=new StringBuffer(); for (int i = 0; i < keyArray.length-1;
-	 * i++) { String key = keyArray[i]; if(key.contains(Constants.OPEN_BRAKET)) {
-	 * key=key.split("\\"+Constants.OPEN_BRAKET)[0]; } Object
-	 * temp=getProperty(current, Access.PRIVATE,key); if(temp==null && isDefault) {
-	 * Class<?> cls=getProperty(current.getClass(),key);
-	 * temp=InstanceUtil.getInstance(cls); setProperty(current, Access.PRIVATE, key,
-	 * temp); } if(i < keyArray.length-2) { point.append("."); } current=temp; }
-	 * if(_keyPath.endsWith(Constants.CLOSE_BRAKET)) { String key = _keyPath;
-	 * if(_keyPath.contains(Constants.OPEN_BRAKET)) {
-	 * key=_keyPath.split("\\"+Constants.OPEN_BRAKET)[0]; }
-	 * current=getProperty(current, Access.PRIVATE,key); } return (T) current; }
-	 * 
-	 * 
-	 * 
-	 * @SuppressWarnings("unchecked") public static <T> T
-	 * getCurrentFromMapped(Map<String, Object> object,String _keyPath, boolean
-	 * isDefault) { String[] keyArray=_keyPath.split(Constants.SPLIT_DOT); Object
-	 * current=object; for (int i = 0; i < keyArray.length-1; i++) { String key =
-	 * keyArray[i]; PropertyMeta property=
-	 * PropertyMetaFactoryImpl.getFactory().getPropertyInfo(current.getClass().
-	 * getSimpleName(),key); Access access = property!=null
-	 * ?property.getAccess():Access.PUBLIC; current=getProperty(current,access,key);
-	 * } return (T) current; }
-	 * 
-	 * @SuppressWarnings("unchecked") public static <T> T
-	 * getSupperFromMapped(Map<String, Object> object,String _keyPath, boolean
-	 * isDefault) { String[] keyArray=_keyPath.split(Constants.SPLIT_DOT); Object
-	 * current=object; for (int i = 0; i < keyArray.length-2; i++) { String key =
-	 * keyArray[i]; PropertyMeta property=
-	 * PropertyMetaFactoryImpl.getFactory().getPropertyInfo(current.getClass().
-	 * getSimpleName(),key); Access access = property!=null
-	 * ?property.getAccess():Access.PUBLIC; current=getProperty(current,access,key);
-	 * } return (T) current; }
-	 * 
-	 * 
-	 * @SuppressWarnings("unchecked") public static <T> T
-	 * getCurrentFromMapped(Map<String, Object> object,Access access,String
-	 * _keyPath) { String[] keyArray=_keyPath.split(Constants.SPLIT_DOT); Object
-	 * current=object; for (int i = 0; i < keyArray.length-1; i++) { String key =
-	 * keyArray[i]; current=getProperty(current,access,key); } return (T) current; }
-	 * 
-	 * public static Class<?> getProperty(Class<?> _class, String _field) {
-	 * if(Map.class.isAssignableFrom(_class)) { return HashMap.class; }else
-	 * if(List.class.isAssignableFrom(_class)) { return ArrayList.class; }else
-	 * if(Set.class.isAssignableFrom(_class)) { return HashSet.class; }else
-	 * if(Collection.class.isAssignableFrom(_class)) { return ArrayList.class; }else
-	 * { Field field=FieldUtil.getField(_class, _field, Access.PRIVATE);
-	 * if(field==null) { return null; } PropertyMeta property=
-	 * PropertyMetaFactoryImpl.getFactory().getPropertyInfo(_class.getSimpleName(),
-	 * _field); if(property!=null && property.getType()!=null &&
-	 * !property.getType().equals(Type.class)) { return property.getType(); }
-	 * if(Map.class.isAssignableFrom(field.getType())) { return HashMap.class; }else
-	 * if(List.class.isAssignableFrom(field.getType())) { return ArrayList.class;
-	 * }else if(Set.class.isAssignableFrom(field.getType())) { return HashSet.class;
-	 * }else if(Collection.class.isAssignableFrom(field.getType())) { return
-	 * ArrayList.class; } return field.getType(); } }
-	 * 
-	 * 
-	 * @SuppressWarnings("unchecked") public static <T> T getProperty(Object
-	 * current,Access access, String key) { if(current instanceof Object[]) { return
-	 * getPropertyArray((Object[]) current,access,key); }else if(current instanceof
-	 * Collection) { return getPropertyCollection((Collection<?>)
-	 * current,access,key); }else if(current instanceof Map) { return
-	 * getPropertyMap((Map<String, Object>) current,key); }else { return
-	 * getPropertyObject(current,access, key); } }
-	 * 
-	 * @SuppressWarnings("unchecked") public static <T> T setProperty(Object
-	 * current,Access access, String key,Object value) { if(current instanceof
-	 * Object[]) { return setPropertyArray((Object[]) current,access,key,value);
-	 * }else if(current instanceof Collection) { return
-	 * setPropertyCollection((Collection<?>) current,access,key,value); }else
-	 * if(current instanceof Map) { return setPropertyMap((Map<String, Object>)
-	 * current,key,value); }else { return setPropertyObject(current,access,
-	 * key,value); } }
-	 * 
-	 * @SuppressWarnings("unchecked") public static <T> T setProperty(Object
-	 * superInstance,Object[] array,Integer index,Access access,Object value) {
-	 * if(array.length<=index) { return null; } array[index]=value; return (T)
-	 * value; }
-	 * 
-	 * public static <T> T setProperty(Object superInstance,Object[] array,Integer
-	 * index,Access access,String key,Object value) { if(array.length<=index) {
-	 * return null; } return setProperty(array[index],access,key,value); }
-	 * 
-	 * @SuppressWarnings("unchecked") public static <T> T setProperty(Object
-	 * superInstance,Set<Object> array,Integer index, Access access, String
-	 * key,Object value) { int count=-1; for (Iterator<?> iterator =
-	 * array.iterator(); iterator.hasNext();) { if(++count==index) {
-	 * setProperty(iterator.next(), access, key, value); } } return (T) value; }
-	 * 
-	 * @SuppressWarnings("unchecked") public static <T> T setProperty(Object
-	 * superInstance,List<Object> array,Integer index, Access access, String
-	 * key,Object value) { if(array.size()>index) { setProperty(array.get(index),
-	 * access, key, value); }else { } return (T) value; }
-	 * 
-	 * @SuppressWarnings("unchecked") public static <T> T setProperty(Object
-	 * superInstance,Object current,Integer index,Access access, String key,Object
-	 * value) { if(current instanceof Object[]) { if(key==null) { return
-	 * setProperty(superInstance,(Object[]) current, index, access, value); }else {
-	 * return setProperty(superInstance,(Object[]) current, index, access, key,
-	 * value); } }else if(current instanceof List) { return
-	 * setProperty(superInstance,(List<Object>) current, index, access, key, value);
-	 * }else if(current instanceof Set) { return
-	 * setProperty(superInstance,(Set<Object>) current, index, access, key, value);
-	 * } return null; }
-	 * 
-	 * @SuppressWarnings("unchecked") public static <T> T setProperty(Object
-	 * current, String key,Access access,Object value) { if(current instanceof
-	 * Object[]) { return setPropertyArray((Object[]) current,access, key,value);
-	 * }else if(current instanceof Collection) { return
-	 * setPropertyCollection((Collection<?>) current,access,key,value); }else
-	 * if(current instanceof Map) { return setPropertyMap((Map<String, Object>)
-	 * current,key,value); }else { return setPropertyObject(current, access, key,
-	 * value); } }
-	 * 
-	 * 
-	 * @SuppressWarnings("unchecked") private static <T> T setPropertyArray(Object[]
-	 * current, Access access, String key, Object value) { Collection<Object>
-	 * objects=new ArrayList<>(); for(Object object:current){
-	 * objects.add(setProperty(object,access, key,value)); }; return (T) objects; }
-	 * 
-	 * @SuppressWarnings("unchecked") private static <T> T
-	 * setPropertyCollection(Collection<?> current,Access access, String key, Object
-	 * value) { Collection<Object> objects=new ArrayList<>();
-	 * current.forEach(object->{ objects.add(setProperty(object,access, key,value));
-	 * }); return (T) objects; }
-	 * 
-	 * @SuppressWarnings("unchecked") private static <T> T
-	 * setPropertyMap(Map<String, Object> current, String key, Object value) {
-	 * return (T) current.put(key, value); }
-	 * 
-	 * @SuppressWarnings("unchecked") public static <T> T getPropertyMap(Map<String,
-	 * Object> current,String key ) { return (T) current.get(key); }
-	 * 
-	 * @SuppressWarnings("unchecked") public static <T> T
-	 * getPropertyCollection(Collection<?> collection,Access access,String key ) {
-	 * Collection<Object> objects=new ArrayList<>(); collection.forEach(object->{
-	 * objects.add(getProperty(object,access, key)); }); return (T) objects; }
-	 * 
-	 * @SuppressWarnings("unchecked") public static <T> T getPropertyArray(Object[]
-	 * collection,Access access,String key ) { Collection<Object> objects=new
-	 * ArrayList<>(); for(Object object:collection){
-	 * objects.add(getProperty(object,access, key)); }; return (T)
-	 * objects.toArray(); }
-	 * 
-	 * public static <T> T getPropertyObject(Object object,Access access,String key
-	 * ) { return PropertyAccessorUtil.getProperty(object, key,access); }
-	 * 
-	 * public static <T> T setPropertyObject(Object current,Access access, String
-	 * keyPoint, Object _value) { return PropertyAccessorUtil.setProperty(current,
-	 * keyPoint,access,_value); }
-	 * 
-	 */
 
 }
