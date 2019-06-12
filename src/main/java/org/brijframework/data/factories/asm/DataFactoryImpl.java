@@ -1,12 +1,15 @@
 package org.brijframework.data.factories.asm;
 
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.brijframework.container.Container;
 import org.brijframework.data.asm.ObjectData;
 import org.brijframework.data.factories.DataFactory;
-import org.brijframework.factories.Factory;
+import org.brijframework.meta.KeyInfo;
+import org.brijframework.meta.factories.asm.MetaFactoryImpl;
 import org.brijframework.meta.reflect.ClassMeta;
+import org.brijframework.support.enums.Scope;
 import org.brijframework.util.asserts.Assertion;
 
 public class DataFactoryImpl implements DataFactory{
@@ -18,6 +21,7 @@ public class DataFactoryImpl implements DataFactory{
 	public static DataFactoryImpl getFactory() {
 		if(factory==null) {
 			factory=new DataFactoryImpl();
+			factory.loadFactory();
 		}
 		return factory;
 	}
@@ -39,12 +43,19 @@ public class DataFactoryImpl implements DataFactory{
 		data=new ObjectData(owner);
 		data.setId(key);
 		getCache().put(key, data);
+		System.err.println("Data Info    : "+key);
 		return data;
 	}
 
 	@Override
-	public Factory loadFactory() {
-		return null;
+	public DataFactoryImpl loadFactory() {
+		ConcurrentHashMap<KeyInfo, ClassMeta> resources=MetaFactoryImpl.getFactory().getCache();
+		for(Entry<KeyInfo, ClassMeta> resource:resources.entrySet()) {
+			if(Scope.SINGLETON.equals(resource.getValue().getScope())) {
+				register(resource.getValue());
+			}
+		}
+		return this;
 	}
 
 	@Override
@@ -63,7 +74,7 @@ public class DataFactoryImpl implements DataFactory{
 	}
 
 	@Override
-	public Factory clear() {
+	public DataFactoryImpl clear() {
 		getCache().clear();
 		return this;
 	}

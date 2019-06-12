@@ -22,9 +22,11 @@ public class DataContainer implements DefaultContainer {
 	private ConcurrentHashMap<Object, Group> cache=new  ConcurrentHashMap<>();
 	private static DataContainer container;
 	
+	@Assignable
 	public static DataContainer getContainer() {
 		if(container==null) {
 			container=new DataContainer();
+			container.loadContainer();
 		}
 		return container;
 	}
@@ -63,6 +65,7 @@ public class DataContainer implements DefaultContainer {
 	
 	
 	private void loading(Class<?> cls) {
+		System.err.println("Factory      : "+cls);
 		boolean called=false;
 		for(Method method:MethodUtil.getAllMethod(cls)) {
 			if(method.isAnnotationPresent(Assignable.class)) {

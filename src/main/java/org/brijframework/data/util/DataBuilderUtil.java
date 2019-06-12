@@ -3,21 +3,17 @@ package org.brijframework.data.util;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.brijframework.meta.factories.asm.PropertyMetaFactoryImpl;
 import org.brijframework.meta.impl.PropertyMeta;
 import org.brijframework.meta.util.MetaBuilderUtil;
+import org.brijframework.util.accessor.MetaAccessorUtil;
 import org.brijframework.util.accessor.PropertyAccessorUtil;
 import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.casting.CastingUtil;
@@ -31,64 +27,6 @@ import org.brijframework.util.support.Constants;
 public class DataBuilderUtil {
 	private static final String KEY = "KEY";
 	private static final String VAL = "VAL";
-	/**
-	 * Find implement class from given class for create object
-	 * 
-	 * @param field
-	 * @param type
-	 * @return Class
-	 */
-	public static Class<?> getTargetClass(Method field, Class<?> type) {
-		if (type == null) {
-			return null;
-		}
-		if (!type.getName().equals(Type.class.getName())&& !(type.isInterface() || Modifier.isAbstract(type.getModifiers()))) {
-			return type;
-		}
-		if (Map.class.isAssignableFrom(type)) {
-			return HashMap.class;
-		} else if (List.class.isAssignableFrom(type)) {
-			return ArrayList.class;
-		} else if (Set.class.isAssignableFrom(type)) {
-			return HashSet.class;
-		} else if (Collection.class.isAssignableFrom(type)) {
-			return ArrayList.class;
-		}
-		if (type.getName().equals(Type.class.getName())) {
-			return field.getReturnType();
-		}
-		return type;
-	}
-	
-	/**
-	 * Find implement class from given class for create object
-	 * 
-	 * @param field
-	 * @param type
-	 * @return Class
-	 */
-	public static Class<?> getTargetClass(Field field, Class<?> type) {
-		if (type == null) {
-			return null;
-		}
-		if (!type.getName().equals(Type.class.getName())&& !(type.isInterface() || Modifier.isAbstract(type.getModifiers()))) {
-			return type;
-		}
-		if (Map.class.isAssignableFrom(type)) {
-			return HashMap.class;
-		} else if (List.class.isAssignableFrom(type)) {
-			return ArrayList.class;
-		} else if (Set.class.isAssignableFrom(type)) {
-			return HashSet.class;
-		} else if (Collection.class.isAssignableFrom(type)) {
-			return ArrayList.class;
-		}
-		if (type.getName().equals(Type.class.getName())) {
-			return field.getType();
-		}
-		return type;
-	}
-
 
 	@SuppressWarnings("unchecked")
 	private static <T> T findCurrentFromObject(Object instance, String _keyPath, boolean isDefault) {
@@ -97,15 +35,15 @@ public class DataBuilderUtil {
 		Field field = property != null ? property.getTargetAsField(): FieldUtil.getField(instance.getClass(), _keyPath, Access.PRIVATE);
 		Object _value = PropertyAccessorUtil.getProperty(instance, field, Access.PRIVATE);
 		if (_value == null && isDefault) {
-			Class<?> targetClass = property != null ? getTargetClass(field, property.getType()): getTargetClass(field, field.getType());
+			Class<?> targetClass = property != null ? CastingUtil.getTargetClass(field, property.getType()): CastingUtil.getTargetClass(field, field.getType());
 			_value = InstanceUtil.getInstance(targetClass);
 			PropertyAccessorUtil.setProperty(instance, field, _value);
 		}
 		return (T) _value;
 	}
 
-	private static Object findCurrentFromMap(Map<Object, Object> current, String key, Field field, boolean isDefault) {
-		ParameterizedType type = (ParameterizedType) field.getGenericType();
+	private static Object findCurrentFromMap(Map<Object, Object> current, String key, AccessibleObject field, boolean isDefault) {
+		ParameterizedType type = field instanceof Method? (ParameterizedType)((Method) field).getGenericReturnType():(ParameterizedType)((Field) field).getGenericType();
 		Class<?> keyClass = (Class<?>) type.getActualTypeArguments()[0];
 		Object keyObject = CastingUtil.castObject(key, keyClass);
 		Class<?> valueClass = (Class<?>) type.getActualTypeArguments()[1];
@@ -124,7 +62,7 @@ public class DataBuilderUtil {
 		String[] keyArray = _keyPath.split(Constants.SPLIT_DOT);
 		Object current = instance;
 		StringBuffer point = new StringBuffer();
-		Field field = null;
+		AccessibleObject field = null;
 		for (int i = 0; i < keyArray.length - 1; i++) {
 			String key = keyArray[i];
 			if (key.contains(Constants.OPEN_BRAKET) && key.contains(Constants.CLOSE_BRAKET)) {
@@ -132,7 +70,7 @@ public class DataBuilderUtil {
 			} else if (current instanceof Map) {
 				current = findCurrentFromMap((Map<Object, Object>) current, key, field, isDefault);
 			} else {
-				field = FieldUtil.getField(current.getClass(), key, Access.PRIVATE);
+				field = MetaAccessorUtil.setPropertyMeta(current.getClass(), key, Access.PRIVATE,null);
 				current = findCurrentFromObject(current, key, isDefault);
 			}
 			point.append(key);
@@ -150,7 +88,7 @@ public class DataBuilderUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T setProperty(Object current,Field field, Access access, String key, Object value) {
+	public static <T> T setProperty(Object current,AccessibleObject field, Access access, String key, Object value) {
 		if (current instanceof Collection<?> && key.contains(Constants.OPEN_BRAKET)&& key.contains(Constants.CLOSE_BRAKET)) {
 			return setPropertyArray(current, field,PointUtil.indexArray(key),value);
 		} else if (current instanceof Map) {
@@ -166,7 +104,7 @@ public class DataBuilderUtil {
 		String[] keyArray = _keyPath.split(Constants.SPLIT_DOT);
 		Object current = instance;
 		StringBuffer point = new StringBuffer();
-		Field field = null;
+		AccessibleObject field = null;
 		for (int i = 0; i < keyArray.length - 1; i++) {
 			String key = keyArray[i];
 			if (key.contains(Constants.OPEN_BRAKET) && key.contains(Constants.CLOSE_BRAKET)) {
@@ -218,7 +156,7 @@ public class DataBuilderUtil {
 		Assertion.notEmpty(key, "Key should not be null or empty");
 		PropertyMeta property = PropertyMetaFactoryImpl.getFactory().getPropertyInfo(instance.getClass().getSimpleName() + "_" + key);
 		Field field = property != null ? property.getTargetAsField(): FieldUtil.getField(instance.getClass(), key, Access.PRIVATE);
-		Class<?> targetClass = property != null ? getTargetClass(field, property.getType()): getTargetClass(field, field.getType());
+		Class<?> targetClass = property != null ? CastingUtil.getTargetClass(field, property.getType()): CastingUtil.getTargetClass(field, field.getType());
 		Object collection = PropertyAccessorUtil.getProperty(instance, key, Access.PRIVATE);
 		if (collection == null && targetClass != null && isDefault) {
 			collection = InstanceUtil.getInstance(targetClass);
