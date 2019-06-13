@@ -1,11 +1,15 @@
 package org.brijframework.data.factories.asm;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.brijframework.container.Container;
 import org.brijframework.data.factories.DataSetupFactory;
 import org.brijframework.data.setup.ClassDataSetup;
 import org.brijframework.group.Group;
+import org.brijframework.meta.KeyInfo;
+import org.brijframework.meta.reflect.ClassMeta;
 import org.brijframework.support.model.Assignable;
 
 public class DataSetupFactoryImpl implements DataSetupFactory{
@@ -13,7 +17,7 @@ public class DataSetupFactoryImpl implements DataSetupFactory{
 	private static DataSetupFactoryImpl factory;
 	private Container container;
 	
-	private ConcurrentHashMap<String, ClassDataSetup> cache=new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Object, ClassDataSetup> cache=new ConcurrentHashMap<>();
 
 	@Assignable
 	public static DataSetupFactoryImpl getFactory() {
@@ -55,7 +59,14 @@ public class DataSetupFactoryImpl implements DataSetupFactory{
 	}
 
 	@Override
-	public ConcurrentHashMap<String, ClassDataSetup> getCache() {
+	public ConcurrentHashMap<Object, ClassDataSetup> getCache() {
+		if(getContainer()!=null) {
+			for(Group  group:getContainer().getCache().values()) {
+				group.getCache().forEach((key,value)->{
+					cache.put(key, (ClassDataSetup)value);
+				});
+			}
+		}
 		return cache;
 	}
 
@@ -84,6 +95,16 @@ public class DataSetupFactoryImpl implements DataSetupFactory{
 			return null;
 		}
 		return getContainer().find(modelKey);
+	}
+
+	public List<ClassDataSetup> getDataSetupList(String model) {
+		List<ClassDataSetup> list=new ArrayList<>();
+		for(ClassDataSetup setup:getCache().values()) {
+			if(setup.getModel().equals(model)) {
+				list.add(setup);
+			}
+		}
+		return list;
 	}
 
 }
