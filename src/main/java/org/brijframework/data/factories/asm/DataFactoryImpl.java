@@ -1,66 +1,90 @@
 package org.brijframework.data.factories.asm;
 
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.brijframework.container.Container;
 import org.brijframework.data.asm.ObjectData;
 import org.brijframework.data.factories.DataFactory;
-import org.brijframework.meta.KeyInfo;
-import org.brijframework.meta.factories.asm.MetaFactoryImpl;
+import org.brijframework.data.setup.ClassDataSetup;
+import org.brijframework.group.Group;
 import org.brijframework.meta.reflect.ClassMeta;
-import org.brijframework.support.enums.Scope;
+import org.brijframework.monitor.factories.PrototypeFactroy;
+import org.brijframework.monitor.factories.RequestFactroy;
+import org.brijframework.monitor.factories.SessionFactroy;
+import org.brijframework.support.model.Assignable;
+import org.brijframework.util.accessor.PropertyAccessorUtil;
 import org.brijframework.util.asserts.Assertion;
+import org.brijframework.util.reflect.InstanceUtil;
 
 public class DataFactoryImpl implements DataFactory{
-	
-	private static DataFactoryImpl factory;
-	private Container container;
-	private ConcurrentHashMap<String, ObjectData> cache=new ConcurrentHashMap<>();
 
+	private static DataFactoryImpl factory;
+	private ConcurrentHashMap<String, ObjectData> cache=new ConcurrentHashMap<String, ObjectData>();
+	private Container container;
+
+	@Assignable
 	public static DataFactoryImpl getFactory() {
 		if(factory==null) {
 			factory=new DataFactoryImpl();
-			factory.loadFactory();
 		}
 		return factory;
 	}
 
 	@Override
-	public ObjectData getData(String key) {
-		return getCache().get(key);
-	}
-	
-	@Override
-	public ObjectData register(ClassMeta classMeta) {
-		return register(classMeta.getId(), classMeta);
-	}
-	
-	@Override
-	public ObjectData register(String key,ClassMeta owner) {
-		ObjectData data=getData(key);
-		Assertion.isTrue(data!=null,"Data already exist in cache with : "+key);
-		data=new ObjectData(owner);
-		data.setId(key);
-		getCache().put(key, data);
+	public ObjectData register(String key,ClassMeta owner,ClassDataSetup datainfo) {
+		ObjectData dataObject=getData(key);
+		Assertion.isTrue(dataObject!=null,"Data already exist in cache with : "+key);
+		dataObject=new ObjectData(owner);
+		dataObject.setScopeObject(buildScopeObject(key,owner,datainfo));
+		dataObject.setId(key);
+		getCache().put(key, dataObject);
 		System.err.println("Data Info    : "+key);
-		return data;
+		loadContainer(dataObject);
+		return dataObject;
+	}
+
+	@Override
+	public ObjectData getData(String modelKey) {
+		if(getCache().containsKey(modelKey)) {
+			return getCache().get(modelKey);
+		}
+		return getContainer(modelKey);
+	}
+
+
+	public String getUniqueID(ClassMeta metaSetup) {
+		switch (metaSetup.getScope()) {
+		case SINGLETON:
+			return metaSetup.getId();
+		case SESSION:
+			return metaSetup.getId()+SessionFactroy.factory().currentService().getId();
+		case REQUEST:
+			return metaSetup.getId()+RequestFactroy.factory().currentService().getId();
+		case PROTOTYPE:
+			return metaSetup.getId()+PrototypeFactroy.factory().currentService().getId();
+		default:
+			return metaSetup.getId();
+		}
+	}
+	
+
+	private Object buildScopeObject(String uniqueID, ClassMeta owner,ClassDataSetup datainfo) {
+		Object bean=InstanceUtil.getInstance(owner.getTarget(), owner.getConstructor().getValues());
+		datainfo.getProperties().forEach((key,value)->{
+			PropertyAccessorUtil.setProperty(bean, key, value);
+		});
+		return bean;
 	}
 
 	@Override
 	public DataFactoryImpl loadFactory() {
-		ConcurrentHashMap<KeyInfo, ClassMeta> resources=MetaFactoryImpl.getFactory().getCache();
-		for(Entry<KeyInfo, ClassMeta> resource:resources.entrySet()) {
-			if(Scope.SINGLETON.equals(resource.getValue().getScope())) {
-				register(resource.getValue());
-			}
-		}
+		
 		return this;
 	}
 
 	@Override
 	public Container getContainer() {
-		return container;
+		return this.container;
 	}
 
 	@Override
@@ -75,7 +99,27 @@ public class DataFactoryImpl implements DataFactory{
 
 	@Override
 	public DataFactoryImpl clear() {
-		getCache().clear();
+		this.getCache().clear();
 		return this;
+	}
+	
+	public void loadContainer(ObjectData metaInfo) {
+		if (getContainer() == null) {
+			return;
+		}
+		Group group = getContainer().load(metaInfo.getOwner().getName());
+		if(!group.containsKey(metaInfo.getId())) {
+			group.add(metaInfo.getId(), metaInfo);
+		}else {
+			group.update(metaInfo.getId(), metaInfo);
+		}
+	}
+	
+
+	public ObjectData getContainer(String modelKey) {
+		if (getContainer() == null) {
+			return null;
+		}
+		return getContainer().find(modelKey);
 	}
 }

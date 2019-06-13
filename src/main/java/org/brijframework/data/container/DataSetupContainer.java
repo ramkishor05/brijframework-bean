@@ -9,24 +9,23 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.brijframework.asm.container.DefaultContainer;
 import org.brijframework.container.Container;
-import org.brijframework.data.factories.DataFactory;
-import org.brijframework.data.group.DataGroup;
+import org.brijframework.data.factories.DataSetupFactory;
+import org.brijframework.data.group.DataSetupGroup;
 import org.brijframework.group.Group;
 import org.brijframework.support.model.Assignable;
 import org.brijframework.support.model.DepandOn;
 import org.brijframework.util.reflect.MethodUtil;
 import org.brijframework.util.reflect.ReflectionUtils;
 
-@DepandOn(depand=DataSetupContainer.class)
-public class DataContainer implements DefaultContainer {
+public class DataSetupContainer implements DefaultContainer {
 
 	private ConcurrentHashMap<Object, Group> cache=new  ConcurrentHashMap<>();
-	private static DataContainer container;
+	private static DataSetupContainer container;
 	
 	@Assignable
-	public static DataContainer getContainer() {
+	public static DataSetupContainer getContainer() {
 		if(container==null) {
-			container=new DataContainer();
+			container=new DataSetupContainer();
 			container.loadContainer();
 		}
 		return container;
@@ -35,11 +34,11 @@ public class DataContainer implements DefaultContainer {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Container loadContainer() {
-		List<Class<? extends DataFactory>> classes=new ArrayList<>();
+		List<Class<? extends DataSetupFactory>> classes=new ArrayList<>();
 		try {
 			ReflectionUtils.getClassListFromExternal().forEach(cls->{
-				if(DataFactory.class.isAssignableFrom(cls) && !cls.isInterface() && cls.getModifiers() != Modifier.ABSTRACT) {
-					classes.add((Class<? extends DataFactory>) cls);
+				if(DataSetupFactory.class.isAssignableFrom(cls) && !cls.isInterface() && cls.getModifiers() != Modifier.ABSTRACT) {
+					classes.add((Class<? extends DataSetupFactory>) cls);
 				}
 			});
 		} catch (Exception e) {
@@ -47,8 +46,8 @@ public class DataContainer implements DefaultContainer {
 		}
 		try {
 			ReflectionUtils.getClassListFromInternal().forEach(cls->{
-				if(DataFactory.class.isAssignableFrom(cls) && !cls.isInterface() && cls.getModifiers() != Modifier.ABSTRACT) {
-					classes.add((Class<? extends DataFactory>) cls);
+				if(DataSetupFactory.class.isAssignableFrom(cls) && !cls.isInterface() && cls.getModifiers() != Modifier.ABSTRACT) {
+					classes.add((Class<? extends DataSetupFactory>) cls);
 				}
 			});
 		} catch (Exception e) {
@@ -71,7 +70,7 @@ public class DataContainer implements DefaultContainer {
 		for(Method method:MethodUtil.getAllMethod(cls)) {
 			if(method.isAnnotationPresent(Assignable.class)) {
 				try {
-					DataFactory factory=(DataFactory) method.invoke(null);
+					DataSetupFactory factory=(DataSetupFactory) method.invoke(null);
 					factory.setContainer(this);
 					factory.loadFactory();
 					called=true;
@@ -82,7 +81,7 @@ public class DataContainer implements DefaultContainer {
 		}
 		if(!called) {
 			try {
-				DataFactory factory=(DataFactory) cls.newInstance();
+				DataSetupFactory factory=(DataSetupFactory) cls.newInstance();
 				factory.setContainer(this);
 				factory.loadFactory();
 			} catch (InstantiationException | IllegalAccessException e) {
@@ -101,9 +100,9 @@ public class DataContainer implements DefaultContainer {
 	public Group load(Object groupKey) {
 		Group group=get(groupKey);
 		if(group==null) {
-			group=new DataGroup(groupKey);
-			this.add(groupKey, group);
+			group=new DataSetupGroup(groupKey);
 			System.err.println("Group        : "+groupKey);
+			this.add(groupKey, group);
 		}
 		return group;
 	}
