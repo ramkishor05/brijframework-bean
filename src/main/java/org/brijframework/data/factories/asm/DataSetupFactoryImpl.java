@@ -8,8 +8,6 @@ import org.brijframework.container.Container;
 import org.brijframework.data.factories.DataSetupFactory;
 import org.brijframework.data.setup.ClassDataSetup;
 import org.brijframework.group.Group;
-import org.brijframework.meta.KeyInfo;
-import org.brijframework.meta.reflect.ClassMeta;
 import org.brijframework.support.model.Assignable;
 
 public class DataSetupFactoryImpl implements DataSetupFactory{
@@ -58,6 +56,7 @@ public class DataSetupFactoryImpl implements DataSetupFactory{
 		this.container=container;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public ConcurrentHashMap<Object, ClassDataSetup> getCache() {
 		if(getContainer()!=null) {
