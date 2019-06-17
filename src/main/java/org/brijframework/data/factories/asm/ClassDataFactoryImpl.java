@@ -5,22 +5,23 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.brijframework.container.Container;
-import org.brijframework.data.factories.DataSetupFactory;
+import org.brijframework.data.factories.ClassDataFactory;
 import org.brijframework.data.setup.ClassDataSetup;
 import org.brijframework.group.Group;
 import org.brijframework.support.model.Assignable;
 
-public class DataSetupFactoryImpl implements DataSetupFactory{
+public class ClassDataFactoryImpl implements ClassDataFactory{
 	
-	private static DataSetupFactoryImpl factory;
+	private static ClassDataFactoryImpl factory;
+	
 	private Container container;
 	
 	private ConcurrentHashMap<Object, ClassDataSetup> cache=new ConcurrentHashMap<>();
 
 	@Assignable
-	public static DataSetupFactoryImpl getFactory() {
+	public static ClassDataFactoryImpl getFactory() {
 		if(factory==null) {
-			factory=new DataSetupFactoryImpl();
+			factory=new ClassDataFactoryImpl();
 		}
 		return factory;
 	}
@@ -42,7 +43,7 @@ public class DataSetupFactoryImpl implements DataSetupFactory{
 	}
 	
 	@Override
-	public DataSetupFactoryImpl loadFactory() {
+	public ClassDataFactoryImpl loadFactory() {
 		return this;
 	}
 
@@ -70,7 +71,7 @@ public class DataSetupFactoryImpl implements DataSetupFactory{
 	}
 
 	@Override
-	public DataSetupFactoryImpl clear() {
+	public ClassDataFactoryImpl clear() {
 		getCache().clear();
 		return this;
 	}
