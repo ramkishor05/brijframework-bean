@@ -11,8 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.brijframework.meta.factories.asm.ClassMetaFactoryImpl;
-import org.brijframework.meta.impl.PropertyMeta;
-import org.brijframework.meta.reflect.FieldMeta;
+import org.brijframework.meta.info.FieldMetaInfo;
 import org.brijframework.meta.util.MetaBuilderUtil;
 import org.brijframework.util.accessor.MetaAccessorUtil;
 import org.brijframework.util.accessor.PropertyAccessorUtil;
@@ -32,7 +31,7 @@ public class DataBuilderUtil {
 	@SuppressWarnings("unchecked")
 	private static <T> T findCurrentFromObject(Object instance, String _keyPath, boolean isDefault) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
-		FieldMeta property =ClassMetaFactoryImpl.getFactory().getFieldMeta(instance.getClass().getSimpleName() , _keyPath);
+		FieldMetaInfo property =ClassMetaFactoryImpl.getFactory().getFieldMeta(instance.getClass().getSimpleName() , _keyPath);
 		Field field = property != null ? property.getTargetAsField(): FieldUtil.getField(instance.getClass(), _keyPath, Access.PRIVATE);
 		Object _value = PropertyAccessorUtil.getProperty(instance, field, Access.PRIVATE);
 		if (_value == null && isDefault) {
@@ -155,7 +154,7 @@ public class DataBuilderUtil {
 	@SuppressWarnings("unchecked")
 	private static <T> T findCurrentFromList(Object instance, String _keyPath, Integer index, boolean isDefault) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
-		FieldMeta property =ClassMetaFactoryImpl.getFactory().getFieldMeta(instance.getClass().getSimpleName() , _keyPath);
+		FieldMetaInfo property =ClassMetaFactoryImpl.getFactory().getFieldMeta(instance.getClass().getSimpleName() , _keyPath);
 		Field field = property != null ? property.getTargetAsField(): FieldUtil.getField(instance.getClass(), _keyPath, Access.PRIVATE);
 		Class<?> targetClass = property != null ? CastingUtil.getTargetClass(field, property.getType()): CastingUtil.getTargetClass(field, field.getType());
 		Object collection = PropertyAccessorUtil.getProperty(instance, _keyPath, Access.PRIVATE);

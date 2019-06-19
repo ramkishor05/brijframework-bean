@@ -5,29 +5,29 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.brijframework.container.Container;
-import org.brijframework.data.factories.ClassDataFactory;
+import org.brijframework.data.factories.ClassDataSetupFactory;
 import org.brijframework.data.setup.ClassDataSetup;
 import org.brijframework.group.Group;
 import org.brijframework.support.model.Assignable;
 
-public class ClassDataFactoryImpl implements ClassDataFactory{
+public class ClassDataSetupFactoryImpl implements ClassDataSetupFactory<ClassDataSetup>{
 	
-	private static ClassDataFactoryImpl factory;
+	private static ClassDataSetupFactoryImpl factory;
 	
 	private Container container;
 	
 	private ConcurrentHashMap<Object, ClassDataSetup> cache=new ConcurrentHashMap<>();
 
 	@Assignable
-	public static ClassDataFactoryImpl getFactory() {
+	public static ClassDataSetupFactoryImpl getFactory() {
 		if(factory==null) {
-			factory=new ClassDataFactoryImpl();
+			factory=new ClassDataSetupFactoryImpl();
 		}
 		return factory;
 	}
 
 	@Override
-	public ClassDataSetup getDataSetup(String modelKey) {
+	public ClassDataSetup getSetup(String modelKey) {
 		if(getCache().containsKey(modelKey)) {
 			return getCache().get(modelKey);
 		}
@@ -35,15 +35,26 @@ public class ClassDataFactoryImpl implements ClassDataFactory{
 	}
 	
 	@Override
+	public List<ClassDataSetup> getSetupList(String model) {
+		List<ClassDataSetup> list=new ArrayList<>();
+		for(ClassDataSetup setup:getCache().values()) {
+			if(setup.getModel().equals(model)) {
+				list.add(setup);
+			}
+		}
+		return list;
+	}
+	
+	@Override
 	public ClassDataSetup register(ClassDataSetup dataSetup) {
 		getCache().put(dataSetup.getId(), dataSetup);
-		System.err.println("Data Info    : "+dataSetup.getId());
+		System.err.println("Data Setp    : "+dataSetup.getId());
 		loadContainer(dataSetup);
 		return dataSetup;
 	}
 	
 	@Override
-	public ClassDataFactoryImpl loadFactory() {
+	public ClassDataSetupFactoryImpl loadFactory() {
 		return this;
 	}
 
@@ -71,7 +82,7 @@ public class ClassDataFactoryImpl implements ClassDataFactory{
 	}
 
 	@Override
-	public ClassDataFactoryImpl clear() {
+	public ClassDataSetupFactoryImpl clear() {
 		getCache().clear();
 		return this;
 	}
@@ -95,16 +106,6 @@ public class ClassDataFactoryImpl implements ClassDataFactory{
 			return null;
 		}
 		return getContainer().find(modelKey);
-	}
-
-	public List<ClassDataSetup> getDataSetupList(String model) {
-		List<ClassDataSetup> list=new ArrayList<>();
-		for(ClassDataSetup setup:getCache().values()) {
-			if(setup.getModel().equals(model)) {
-				list.add(setup);
-			}
-		}
-		return list;
 	}
 
 }

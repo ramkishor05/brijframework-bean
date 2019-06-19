@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.brijframework.asm.group.DefaultGroup;
 import org.brijframework.data.DataInfo;
 
-public class DataGroup implements DefaultGroup {
+public class DataInfoGroup implements DefaultGroup {
 
 	/**
 	 * 
@@ -14,7 +14,7 @@ public class DataGroup implements DefaultGroup {
 	private Object groupKey;
 	private ConcurrentHashMap<String,DataInfo> cache=new ConcurrentHashMap<>();
 	
-	public DataGroup(Object groupKey) {
+	public DataInfoGroup(Object groupKey) {
 		this.groupKey=groupKey;
 	}
 

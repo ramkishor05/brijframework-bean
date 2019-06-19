@@ -1,4 +1,4 @@
-package org.brijframework.data.setup;
+package org.brijframework.data;
 
 public interface DataSetup {
 

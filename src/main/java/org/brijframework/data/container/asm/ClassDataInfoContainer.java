@@ -1,21 +1,23 @@
-package org.brijframework.data.container;
+package org.brijframework.data.container.asm;
 
 import org.brijframework.asm.container.AbstractContainer;
-import org.brijframework.data.factories.ClassDataFactory;
+import org.brijframework.data.container.DataContainer;
+import org.brijframework.data.factories.ClassDataInfoFactory;
+import org.brijframework.data.factories.ClassDataSetupFactory;
 import org.brijframework.data.group.DataSetupGroup;
 import org.brijframework.group.Group;
 import org.brijframework.support.model.Assignable;
 import org.brijframework.util.reflect.InstanceUtil;
 import org.brijframework.util.reflect.ReflectionUtils;
 
-public class ClassDataContainer extends AbstractContainer implements DataContainer {
+public class ClassDataInfoContainer extends AbstractContainer implements DataContainer {
 
-	private static ClassDataContainer container;
+	private static ClassDataInfoContainer container;
 
 	@Assignable
-	public static ClassDataContainer getContainer() {
+	public static ClassDataInfoContainer getContainer() {
 		if (container == null) {
-			container = new ClassDataContainer();
+			container = new ClassDataInfoContainer();
 		}
 		return container;
 	}
@@ -25,8 +27,8 @@ public class ClassDataContainer extends AbstractContainer implements DataContain
 	public void init() {
 		try {
 			ReflectionUtils.getClassListFromExternal().forEach(cls -> {
-				if (ClassDataFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
-					register((Class<? extends ClassDataFactory>) cls);
+				if (ClassDataSetupFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
+					register((Class<? extends ClassDataInfoFactory<?>>) cls);
 				}
 			});
 		} catch (Exception e) {
@@ -34,8 +36,8 @@ public class ClassDataContainer extends AbstractContainer implements DataContain
 		}
 		try {
 			ReflectionUtils.getClassListFromInternal().forEach(cls -> {
-				if (ClassDataFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
-					register((Class<? extends ClassDataFactory>) cls);
+				if (ClassDataSetupFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
+					register((Class<? extends ClassDataInfoFactory<?>>) cls);
 				}
 			});
 		} catch (Exception e) {

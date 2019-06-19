@@ -3,7 +3,7 @@ package org.brijframework.data.group;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.brijframework.asm.group.DefaultGroup;
-import org.brijframework.data.setup.DataSetup;
+import org.brijframework.data.DataSetup;
 
 public class DataSetupGroup implements DefaultGroup {
 
