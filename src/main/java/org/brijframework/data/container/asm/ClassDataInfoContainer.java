@@ -3,7 +3,6 @@ package org.brijframework.data.container.asm;
 import org.brijframework.asm.container.AbstractContainer;
 import org.brijframework.data.container.DataContainer;
 import org.brijframework.data.factories.ClassDataInfoFactory;
-import org.brijframework.data.factories.ClassDataSetupFactory;
 import org.brijframework.data.group.DataSetupGroup;
 import org.brijframework.group.Group;
 import org.brijframework.support.model.Assignable;
@@ -27,7 +26,7 @@ public class ClassDataInfoContainer extends AbstractContainer implements DataCon
 	public void init() {
 		try {
 			ReflectionUtils.getClassListFromExternal().forEach(cls -> {
-				if (ClassDataSetupFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
+				if (ClassDataInfoFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					register((Class<? extends ClassDataInfoFactory<?>>) cls);
 				}
 			});
@@ -36,7 +35,7 @@ public class ClassDataInfoContainer extends AbstractContainer implements DataCon
 		}
 		try {
 			ReflectionUtils.getClassListFromInternal().forEach(cls -> {
-				if (ClassDataSetupFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
+				if (ClassDataInfoFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					register((Class<? extends ClassDataInfoFactory<?>>) cls);
 				}
 			});

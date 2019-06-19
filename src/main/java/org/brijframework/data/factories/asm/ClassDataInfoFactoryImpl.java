@@ -99,7 +99,6 @@ public class ClassDataInfoFactoryImpl implements ClassDataInfoFactory<ClassDataI
 			group.update(metaInfo.getId(), metaInfo);
 		}
 	}
-	
 
 	public ClassDataInfo getContainer(String modelKey) {
 		if (getContainer() == null) {
