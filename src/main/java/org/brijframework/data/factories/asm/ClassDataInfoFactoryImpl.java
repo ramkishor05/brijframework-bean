@@ -47,9 +47,9 @@ public class ClassDataInfoFactoryImpl implements ClassDataInfoFactory<ClassDataI
 	
 	@Override
 	public ClassDataInfo register(ClassDataInfo dataSetup) {
+		loadContainer(dataSetup);
 		getCache().put(dataSetup.getId(), dataSetup);
 		System.err.println("Data Info    : "+dataSetup.getId());
-		loadContainer(dataSetup);
 		return dataSetup;
 	}
 	

@@ -47,9 +47,9 @@ public class ClassDataSetupFactoryImpl implements ClassDataSetupFactory<ClassDat
 	
 	@Override
 	public ClassDataSetup register(ClassDataSetup dataSetup) {
+		loadContainer(dataSetup);
 		getCache().put(dataSetup.getId(), dataSetup);
 		System.err.println("Data Setp    : "+dataSetup.getId());
-		loadContainer(dataSetup);
 		return dataSetup;
 	}
 	

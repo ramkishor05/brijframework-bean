@@ -9,14 +9,14 @@ import org.brijframework.support.model.Assignable;
 import org.brijframework.util.reflect.InstanceUtil;
 import org.brijframework.util.reflect.ReflectionUtils;
 
-public class ClassDataSetupContainer extends AbstractContainer implements DataContainer {
+public class DataSetupContainer extends AbstractContainer implements DataContainer {
 
-	private static ClassDataSetupContainer container;
+	private static DataSetupContainer container;
 
 	@Assignable
-	public static ClassDataSetupContainer getContainer() {
+	public static DataSetupContainer getContainer() {
 		if (container == null) {
-			container = new ClassDataSetupContainer();
+			container = new DataSetupContainer();
 		}
 		return container;
 	}
