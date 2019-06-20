@@ -1,13 +1,14 @@
-package org.brijframework.data.info;
+package org.brijframework.data.impl;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import org.brijframework.data.DataInfo;
+import org.brijframework.bean.BeanInfo;
 import org.brijframework.meta.info.ClassMetaInfo;
 import org.brijframework.support.enums.Scope;
 import org.brijframework.util.asserts.Assertion;
 
-public class ClassDataInfo implements DataInfo {
+public class BeanInfoImpl implements BeanInfo {
 	
 	private ClassMetaInfo owner;
 	
@@ -19,7 +20,7 @@ public class ClassDataInfo implements DataInfo {
 
 	private Map<String, Object> properties;
 	
-	public ClassDataInfo(ClassMetaInfo owner) {
+	public BeanInfoImpl(ClassMetaInfo owner) {
 		this.owner=owner;
 	}
 	
@@ -63,6 +64,9 @@ public class ClassDataInfo implements DataInfo {
 	}
 
 	public Map<String, Object> getProperties() {
+		if(properties==null) {
+			properties=new HashMap<>();
+		}
 		return properties;
 	}
 	

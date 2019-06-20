@@ -1,20 +1,20 @@
-package org.brijframework.data.group;
+package org.brijframework.bean.group;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.brijframework.asm.group.DefaultGroup;
-import org.brijframework.data.DataInfo;
+import org.brijframework.data.impl.BeanInfoImpl;
 
-public class DataInfoGroup implements DefaultGroup {
+public class BeanInfoGroup implements DefaultGroup {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	private Object groupKey;
-	private ConcurrentHashMap<String,DataInfo> cache=new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String,BeanInfoImpl> cache=new ConcurrentHashMap<>();
 	
-	public DataInfoGroup(Object groupKey) {
+	public BeanInfoGroup(Object groupKey) {
 		this.groupKey=groupKey;
 	}
 
@@ -24,7 +24,7 @@ public class DataInfoGroup implements DefaultGroup {
 	}
 
 	@Override
-	public ConcurrentHashMap<String,DataInfo> getCache() {
+	public ConcurrentHashMap<String,BeanInfoImpl> getCache() {
 		return cache;
 	}
 

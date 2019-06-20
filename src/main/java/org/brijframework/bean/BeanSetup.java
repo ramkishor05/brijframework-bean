@@ -1,6 +1,6 @@
-package org.brijframework.data;
+package org.brijframework.bean;
 
-public interface DataSetup {
+public interface BeanSetup {
 
 	String getId();
 

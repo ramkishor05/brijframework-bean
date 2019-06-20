@@ -1,22 +1,22 @@
-package org.brijframework.data.context;
+package org.brijframework.bean.context;
 
 import org.brijframework.asm.context.AbstractModuleContext;
-import org.brijframework.data.container.DataContainer;
+import org.brijframework.bean.container.BeanContainer;
 import org.brijframework.meta.context.MetaContext;
 import org.brijframework.support.model.DepandOn;
 import org.brijframework.util.reflect.InstanceUtil;
 import org.brijframework.util.reflect.ReflectionUtils;
 
 @DepandOn(depand=MetaContext.class)
-public class DataContext extends AbstractModuleContext{
+public class BeanContext extends AbstractModuleContext{
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public void init() {
 		try {
 			ReflectionUtils.getClassListFromExternal().forEach(cls->{
-				if(DataContainer.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
-					register((Class<? extends DataContainer>) cls);
+				if(BeanContainer.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
+					register((Class<? extends BeanContainer>) cls);
 				}
 			});
 		} catch (Exception e) {
@@ -24,8 +24,8 @@ public class DataContext extends AbstractModuleContext{
 		}
 		try {
 			ReflectionUtils.getClassListFromInternal().forEach(cls->{
-				if(DataContainer.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
-					register((Class<? extends DataContainer>) cls);
+				if(BeanContainer.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
+					register((Class<? extends BeanContainer>) cls);
 				}
 			});
 		} catch (Exception e) {

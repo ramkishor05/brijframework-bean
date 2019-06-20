@@ -1,22 +1,22 @@
-package org.brijframework.data.container.asm;
+package org.brijframework.bean.container.impl;
 
 import org.brijframework.asm.container.AbstractContainer;
-import org.brijframework.data.container.DataContainer;
-import org.brijframework.data.factories.ClassDataInfoFactory;
-import org.brijframework.data.group.DataSetupGroup;
+import org.brijframework.bean.container.BeanContainer;
+import org.brijframework.bean.factories.BeanSetupGroupFactory;
+import org.brijframework.bean.group.BeanSetupGroup;
 import org.brijframework.group.Group;
 import org.brijframework.support.model.Assignable;
 import org.brijframework.util.reflect.InstanceUtil;
 import org.brijframework.util.reflect.ReflectionUtils;
 
-public class DataInfoContainer extends AbstractContainer implements DataContainer {
+public class BeanSetupContainer extends AbstractContainer implements BeanContainer {
 
-	private static DataInfoContainer container;
+	private static BeanSetupContainer container;
 
 	@Assignable
-	public static DataInfoContainer getContainer() {
+	public static BeanSetupContainer getContainer() {
 		if (container == null) {
-			container = new DataInfoContainer();
+			container = new BeanSetupContainer();
 		}
 		return container;
 	}
@@ -26,8 +26,8 @@ public class DataInfoContainer extends AbstractContainer implements DataContaine
 	public void init() {
 		try {
 			ReflectionUtils.getClassListFromExternal().forEach(cls -> {
-				if (ClassDataInfoFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
-					register((Class<? extends ClassDataInfoFactory<?>>) cls);
+				if (BeanSetupGroupFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
+					register((Class<? extends BeanSetupGroupFactory<?>>) cls);
 				}
 			});
 		} catch (Exception e) {
@@ -35,8 +35,8 @@ public class DataInfoContainer extends AbstractContainer implements DataContaine
 		}
 		try {
 			ReflectionUtils.getClassListFromInternal().forEach(cls -> {
-				if (ClassDataInfoFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
-					register((Class<? extends ClassDataInfoFactory<?>>) cls);
+				if (BeanSetupGroupFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
+					register((Class<? extends BeanSetupGroupFactory<?>>) cls);
 				}
 			});
 		} catch (Exception e) {
@@ -48,7 +48,7 @@ public class DataInfoContainer extends AbstractContainer implements DataContaine
 	public Group load(Object groupKey) {
 		Group group = get(groupKey);
 		if (group == null) {
-			group = new DataSetupGroup(groupKey);
+			group = new BeanSetupGroup(groupKey);
 			System.err.println("Group        : " + groupKey);
 			this.add(groupKey, group);
 		}

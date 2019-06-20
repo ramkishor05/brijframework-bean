@@ -24,7 +24,8 @@ import org.brijframework.util.reflect.InstanceUtil;
 import org.brijframework.util.support.Access;
 import org.brijframework.util.support.Constants;
 
-public class DataBuilderUtil {
+public class BeanBuilderUtil {
+	
 	private static final String KEY = "KEY";
 	private static final String VAL = "VAL";
 

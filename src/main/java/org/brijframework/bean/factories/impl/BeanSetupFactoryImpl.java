@@ -1,33 +1,33 @@
-package org.brijframework.data.factories.asm;
+package org.brijframework.bean.factories.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.brijframework.bean.BeanSetup;
+import org.brijframework.bean.factories.BeanSetupGroupFactory;
 import org.brijframework.container.Container;
-import org.brijframework.data.factories.ClassDataInfoFactory;
-import org.brijframework.data.info.ClassDataInfo;
 import org.brijframework.group.Group;
 import org.brijframework.support.model.Assignable;
 
-public class ClassDataInfoFactoryImpl implements ClassDataInfoFactory<ClassDataInfo>{
+public class BeanSetupFactoryImpl implements BeanSetupGroupFactory<BeanSetup>{
 	
-	private static ClassDataInfoFactoryImpl factory;
+	private static BeanSetupFactoryImpl factory;
 	
 	private Container container;
 	
-	private ConcurrentHashMap<Object, ClassDataInfo> cache=new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Object, BeanSetup> cache=new ConcurrentHashMap<>();
 
 	@Assignable
-	public static ClassDataInfoFactoryImpl getFactory() {
+	public static BeanSetupFactoryImpl getFactory() {
 		if(factory==null) {
-			factory=new ClassDataInfoFactoryImpl();
+			factory=new BeanSetupFactoryImpl();
 		}
 		return factory;
 	}
 
 	@Override
-	public ClassDataInfo getData(String modelKey) {
+	public BeanSetup getBeanSetup(String modelKey) {
 		if(getCache().containsKey(modelKey)) {
 			return getCache().get(modelKey);
 		}
@@ -35,10 +35,10 @@ public class ClassDataInfoFactoryImpl implements ClassDataInfoFactory<ClassDataI
 	}
 	
 	@Override
-	public List<ClassDataInfo> getDataList(String model) {
-		List<ClassDataInfo> list=new ArrayList<>();
-		for(ClassDataInfo setup:getCache().values()) {
-			if(setup.getOwner().getId().equals(model)) {
+	public List<BeanSetup> getBeanSetupList(String model) {
+		List<BeanSetup> list=new ArrayList<>();
+		for(BeanSetup setup:getCache().values()) {
+			if(setup.getModel().equals(model)) {
 				list.add(setup);
 			}
 		}
@@ -46,15 +46,15 @@ public class ClassDataInfoFactoryImpl implements ClassDataInfoFactory<ClassDataI
 	}
 	
 	@Override
-	public ClassDataInfo register(ClassDataInfo dataSetup) {
+	public BeanSetup register(BeanSetup dataSetup) {
 		loadContainer(dataSetup);
 		getCache().put(dataSetup.getId(), dataSetup);
-		System.err.println("Data Info    : "+dataSetup.getId());
+		System.err.println("Bean Load    : "+dataSetup.getId());
 		return dataSetup;
 	}
 	
 	@Override
-	public ClassDataInfoFactoryImpl loadFactory() {
+	public BeanSetupFactoryImpl loadFactory() {
 		return this;
 	}
 
@@ -70,11 +70,11 @@ public class ClassDataInfoFactoryImpl implements ClassDataInfoFactory<ClassDataI
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ConcurrentHashMap<Object, ClassDataInfo> getCache() {
+	public ConcurrentHashMap<Object, BeanSetup> getCache() {
 		if(getContainer()!=null) {
 			for(Group  group:getContainer().getCache().values()) {
 				group.getCache().forEach((key,value)->{
-					cache.put(key, (ClassDataInfo)value);
+					cache.put(key, (BeanSetup)value);
 				});
 			}
 		}
@@ -82,13 +82,13 @@ public class ClassDataInfoFactoryImpl implements ClassDataInfoFactory<ClassDataI
 	}
 
 	@Override
-	public ClassDataInfoFactoryImpl clear() {
+	public BeanSetupFactoryImpl clear() {
 		getCache().clear();
 		return this;
 	}
 	
 
-	public void loadContainer(ClassDataInfo metaInfo) {
+	public void loadContainer(BeanSetup metaInfo) {
 		if (getContainer() == null) {
 			return;
 		}
@@ -99,12 +99,12 @@ public class ClassDataInfoFactoryImpl implements ClassDataInfoFactory<ClassDataI
 			group.update(metaInfo.getId(), metaInfo);
 		}
 	}
+	
 
-	public ClassDataInfo getContainer(String modelKey) {
+	public BeanSetup getContainer(String modelKey) {
 		if (getContainer() == null) {
 			return null;
 		}
 		return getContainer().find(modelKey);
 	}
-
 }

@@ -1,11 +1,11 @@
-package org.brijframework.data.setup;
+package org.brijframework.data.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.brijframework.data.DataSetup;
+import org.brijframework.bean.BeanSetup;
 
-public class ClassDataSetup implements DataSetup {
+public class BeanSetupImpl implements BeanSetup {
 
 	private String id;
 
