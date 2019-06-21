@@ -1,5 +1,7 @@
 package org.brijframework.bean;
 
+import java.util.Map;
+
 public interface BeanSetup {
 
 	String getId();
@@ -7,4 +9,6 @@ public interface BeanSetup {
 	String getName();
 
 	String getModel();
+	
+	Map<String, Object> getProperties();
 }
