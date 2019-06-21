@@ -16,7 +16,7 @@ public class BeanSetupFactoryImpl implements BeanSetupGroupFactory<BeanSetup>{
 	
 	private Container container;
 	
-	private ConcurrentHashMap<Object, BeanSetup> cache=new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String, BeanSetup> cache=new ConcurrentHashMap<>();
 
 	@Assignable
 	public static BeanSetupFactoryImpl getFactory() {
@@ -70,11 +70,11 @@ public class BeanSetupFactoryImpl implements BeanSetupGroupFactory<BeanSetup>{
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ConcurrentHashMap<Object, BeanSetup> getCache() {
+	public ConcurrentHashMap<String, BeanSetup> getCache() {
 		if(getContainer()!=null) {
 			for(Group  group:getContainer().getCache().values()) {
 				group.getCache().forEach((key,value)->{
-					cache.put(key, (BeanSetup)value);
+					cache.put(key.toString(), (BeanSetup)value);
 				});
 			}
 		}

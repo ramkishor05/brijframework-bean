@@ -107,4 +107,14 @@ public class BeanInfoFactoryImpl implements BeanInfoGroupFactory<BeanInfo>{
 		return getContainer().find(modelKey);
 	}
 
+	public List<BeanInfo> getBeanInfoList(Class<?> cls) {
+		List<BeanInfo> list=new ArrayList<>();
+		for (BeanInfo beanInfo : getCache().values()) {
+			if(cls.isAssignableFrom(beanInfo.getOwner().getTarget())) {
+				list.add(beanInfo);
+			}
+		}
+		return list;
+	}
+
 }

@@ -11,4 +11,6 @@ public interface BeanSetup {
 	String getModel();
 	
 	Map<String, Object> getProperties();
+
+	String getScope();
 }
