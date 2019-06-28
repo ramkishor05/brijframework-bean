@@ -8,7 +8,7 @@ import org.brijframework.bean.BeanSetup;
 import org.brijframework.bean.factories.BeanSetupGroupFactory;
 import org.brijframework.container.Container;
 import org.brijframework.group.Group;
-import org.brijframework.support.model.Assignable;
+import org.brijframework.support.config.Assignable;
 
 public class BeanSetupFactoryImpl implements BeanSetupGroupFactory<BeanSetup>{
 	

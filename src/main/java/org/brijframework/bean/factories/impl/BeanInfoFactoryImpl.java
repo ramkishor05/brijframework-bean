@@ -8,7 +8,7 @@ import org.brijframework.bean.BeanInfo;
 import org.brijframework.bean.factories.BeanInfoGroupFactory;
 import org.brijframework.container.Container;
 import org.brijframework.group.Group;
-import org.brijframework.support.model.Assignable;
+import org.brijframework.support.config.Assignable;
 
 public class BeanInfoFactoryImpl implements BeanInfoGroupFactory<BeanInfo>{
 	
