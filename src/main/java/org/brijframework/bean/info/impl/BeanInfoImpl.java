@@ -1,16 +1,16 @@
-package org.brijframework.data.impl;
+package org.brijframework.bean.info.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.brijframework.bean.BeanInfo;
-import org.brijframework.meta.info.ClassMetaInfo;
+import org.brijframework.bean.info.BeanInfo;
+import org.brijframework.model.info.OwnerModelInfo;
 import org.brijframework.support.enums.Scope;
 import org.brijframework.util.asserts.Assertion;
 
 public class BeanInfoImpl implements BeanInfo {
 	
-	private ClassMetaInfo owner;
+	private OwnerModelInfo owner;
 	
 	private String id;
 	
@@ -20,11 +20,11 @@ public class BeanInfoImpl implements BeanInfo {
 
 	private Map<String, Object> properties;
 	
-	public BeanInfoImpl(ClassMetaInfo owner) {
+	public BeanInfoImpl(OwnerModelInfo owner) {
 		this.owner=owner;
 	}
 	
-	public ClassMetaInfo getOwner() {
+	public OwnerModelInfo getOwner() {
 		return owner;
 	}
 	
@@ -51,7 +51,7 @@ public class BeanInfoImpl implements BeanInfo {
 		return name;
 	}
 	
-	public void setOwner(ClassMetaInfo owner) {
+	public void setOwner(OwnerModelInfo owner) {
 		this.owner = owner;
 	}
 	

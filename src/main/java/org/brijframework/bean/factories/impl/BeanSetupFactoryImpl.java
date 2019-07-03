@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.brijframework.bean.BeanSetup;
 import org.brijframework.bean.factories.BeanSetupGroupFactory;
+import org.brijframework.bean.setup.BeanSetup;
 import org.brijframework.container.Container;
 import org.brijframework.group.Group;
 import org.brijframework.support.config.Assignable;

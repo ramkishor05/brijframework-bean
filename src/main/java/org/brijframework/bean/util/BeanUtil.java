@@ -1,4 +1,4 @@
-package org.brijframework.data.util;
+package org.brijframework.bean.util;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -10,9 +10,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.brijframework.meta.factories.asm.ClassMetaInfoFactoryImpl;
-import org.brijframework.meta.info.FieldMetaInfo;
-import org.brijframework.meta.util.MetaBuilderUtil;
+import org.brijframework.model.factories.asm.ClassMetaInfoFactoryImpl;
+import org.brijframework.model.info.PptModelInfo;
+import org.brijframework.model.util.ModelUtil;
 import org.brijframework.util.accessor.MetaAccessorUtil;
 import org.brijframework.util.accessor.PropertyAccessorUtil;
 import org.brijframework.util.asserts.Assertion;
@@ -24,7 +24,7 @@ import org.brijframework.util.reflect.InstanceUtil;
 import org.brijframework.util.support.Access;
 import org.brijframework.util.support.Constants;
 
-public class BeanBuilderUtil {
+public class BeanUtil {
 	
 	private static final String KEY = "KEY";
 	private static final String VAL = "VAL";
@@ -32,7 +32,7 @@ public class BeanBuilderUtil {
 	@SuppressWarnings("unchecked")
 	private static <T> T findCurrentFromObject(Object instance, String _keyPath, boolean isDefault) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
-		FieldMetaInfo property =ClassMetaInfoFactoryImpl.getFactory().getFieldMeta(instance.getClass().getSimpleName() , _keyPath);
+		PptModelInfo property =ClassMetaInfoFactoryImpl.getFactory().getFieldMeta(instance.getClass().getSimpleName() , _keyPath);
 		Field field = property != null ? property.getTargetAsField(): FieldUtil.getField(instance.getClass(), _keyPath, Access.PRIVATE);
 		Object _value = PropertyAccessorUtil.getProperty(instance, field, Access.PRIVATE);
 		if (_value == null && isDefault) {
@@ -155,7 +155,7 @@ public class BeanBuilderUtil {
 	@SuppressWarnings("unchecked")
 	private static <T> T findCurrentFromList(Object instance, String _keyPath, Integer index, boolean isDefault) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
-		FieldMetaInfo property =ClassMetaInfoFactoryImpl.getFactory().getFieldMeta(instance.getClass().getSimpleName() , _keyPath);
+		PptModelInfo property =ClassMetaInfoFactoryImpl.getFactory().getFieldMeta(instance.getClass().getSimpleName() , _keyPath);
 		Field field = property != null ? property.getTargetAsField(): FieldUtil.getField(instance.getClass(), _keyPath, Access.PRIVATE);
 		Class<?> targetClass = property != null ? CastingUtil.getTargetClass(field, property.getType()): CastingUtil.getTargetClass(field, field.getType());
 		Object collection = PropertyAccessorUtil.getProperty(instance, _keyPath, Access.PRIVATE);
@@ -280,7 +280,7 @@ public class BeanBuilderUtil {
 	}
 
 	public static Boolean containsPathKey(Object model, String _keyPath, boolean isDefault) {
-		return MetaBuilderUtil.typeOfProperty(model.getClass(), _keyPath) != null;
+		return ModelUtil.typeOfProperty(model.getClass(), _keyPath) != null;
 	}
 
 	public static Boolean containsPathValue(Object modelBean, String _keyPath, boolean isDefault) {

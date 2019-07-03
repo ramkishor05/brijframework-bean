@@ -1,9 +1,9 @@
-package org.brijframework.bean;
+package org.brijframework.bean.info;
 
 import java.util.Map;
 
 import org.brijframework.lifecycle.Initializer;
-import org.brijframework.meta.info.ClassMetaInfo;
+import org.brijframework.model.info.OwnerModelInfo;
 import org.brijframework.support.enums.Scope;
 
 public interface BeanInfo extends Initializer{
@@ -14,7 +14,7 @@ public interface BeanInfo extends Initializer{
 
 	String getName();
 
-	ClassMetaInfo getOwner();
+	OwnerModelInfo getOwner();
 
 	Map<String, Object> getProperties();
 }

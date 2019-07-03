@@ -1,6 +1,6 @@
 package org.brijframework.bean.factories;
 
-import org.brijframework.bean.BeanSetup;
+import org.brijframework.bean.setup.BeanSetup;
 import org.brijframework.factories.Factory;
 
 public interface BeanSetupFactory<T extends BeanSetup> extends Factory{

@@ -1,4 +1,4 @@
-package org.brijframework.bean;
+package org.brijframework.bean.setup;
 
 import java.util.Map;
 

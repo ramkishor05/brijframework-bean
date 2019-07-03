@@ -2,7 +2,7 @@ package org.brijframework.bean.factories;
 
 import java.util.List;
 
-import org.brijframework.bean.BeanInfo;
+import org.brijframework.bean.info.BeanInfo;
 
 public interface BeanInfoGroupFactory<T extends BeanInfo> extends BeanInfoFactory<T>{
 

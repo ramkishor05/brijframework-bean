@@ -2,7 +2,7 @@ package org.brijframework.bean.factories;
 
 import java.util.List;
 
-import org.brijframework.bean.BeanSetup;
+import org.brijframework.bean.setup.BeanSetup;
 
 public interface BeanSetupGroupFactory<T extends BeanSetup> extends BeanSetupFactory<T>{
 

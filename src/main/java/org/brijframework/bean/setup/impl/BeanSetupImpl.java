@@ -1,9 +1,9 @@
-package org.brijframework.data.impl;
+package org.brijframework.bean.setup.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.brijframework.bean.BeanSetup;
+import org.brijframework.bean.setup.BeanSetup;
 
 public class BeanSetupImpl implements BeanSetup {
 
