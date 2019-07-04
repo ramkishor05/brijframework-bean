@@ -41,9 +41,9 @@ public class BeanContext extends AbstractModuleContext{
 	}
 
 	@Override
-	public void destory() {
+	public void stop() {
 		System.err.println("DataContext destory start.");
-		super.destory();
+		super.stop();
 		System.err.println("DataContext destory done.");
 	}
 }
