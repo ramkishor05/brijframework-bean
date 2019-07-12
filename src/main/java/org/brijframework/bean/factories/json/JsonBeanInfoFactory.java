@@ -32,7 +32,12 @@ public class JsonBeanInfoFactory extends BeanInfoFactoryImpl{
 	}
 
 	public void register(String id, BeanSetup metaSetup) {
-		OwnerModelInfo owner=ClassMetaInfoFactoryImpl.getFactory().getClassInfo(metaSetup.getModel());
+		OwnerModelInfo owner=null;
+		if(metaSetup.getModel() != null && !metaSetup.getModel().isEmpty() ) {
+			owner=ClassMetaInfoFactoryImpl.getFactory().getClassInfo(metaSetup.getModel());
+		}else {
+			owner=ClassMetaInfoFactoryImpl.getFactory().register(metaSetup.getTarget());
+		}
 		Assertion.notNull(owner, "Model not found for "+metaSetup.getModel()+" of bean  : "+id);
 		id=Constants.DEFAULT.equals(metaSetup.getId())?owner.getTarget().getSimpleName():metaSetup.getId();
 		BeanSetup bean=BeanSetupFactoryImpl.getFactory().getBeanSetup(id);

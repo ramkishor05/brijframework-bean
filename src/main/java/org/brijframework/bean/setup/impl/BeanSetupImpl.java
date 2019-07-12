@@ -15,6 +15,8 @@ public class BeanSetupImpl implements BeanSetup {
 	
 	private String model;
 	
+	private String type;
+	
 	private Map<String, Object> properties;
 
 	public String getScope() {
@@ -50,6 +52,15 @@ public class BeanSetupImpl implements BeanSetup {
 	@Override
 	public String getModel() {
 		return model;
+	}
+	
+	@Override
+	public String getTarget() {
+		return type;
+	}
+	
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	public Map<String, Object> getProperties() {

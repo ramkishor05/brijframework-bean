@@ -10,6 +10,8 @@ public interface BeanSetup {
 
 	String getModel();
 	
+	String getTarget();
+	
 	Map<String, Object> getProperties();
 
 	String getScope();

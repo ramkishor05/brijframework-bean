@@ -8,5 +8,7 @@ public interface BeanSetupFactory<T extends BeanSetup> extends Factory{
 	public  T register(T dataSetup);
 
 	public  T getBeanSetup(String modelKey);
+	
+	public  boolean validate(T dataSetup) ;
 
 }

@@ -9,6 +9,7 @@ import org.brijframework.bean.setup.BeanSetup;
 import org.brijframework.container.Container;
 import org.brijframework.group.Group;
 import org.brijframework.support.config.Assignable;
+import org.brijframework.util.asserts.Assertion;
 
 public class BeanSetupFactoryImpl implements BeanSetupGroupFactory<BeanSetup>{
 	
@@ -47,6 +48,7 @@ public class BeanSetupFactoryImpl implements BeanSetupGroupFactory<BeanSetup>{
 	
 	@Override
 	public BeanSetup register(BeanSetup dataSetup) {
+		validate(dataSetup);
 		loadContainer(dataSetup);
 		getCache().put(dataSetup.getId(), dataSetup);
 		System.err.println("Bean Load    : "+dataSetup.getId());
@@ -106,5 +108,12 @@ public class BeanSetupFactoryImpl implements BeanSetupGroupFactory<BeanSetup>{
 			return null;
 		}
 		return getContainer().find(modelKey);
+	}
+
+	@Override
+	public boolean validate(BeanSetup dataSetup) {
+		Assertion.notNull(dataSetup.getId(), "Bean id should not be null or empty");
+		Assertion.isTrue(dataSetup.getModel()==null && dataSetup.getTarget()==null , "Bean model or type at least one spacified.");
+		return true;
 	}
 }
