@@ -24,7 +24,7 @@ import org.brijframework.util.reflect.InstanceUtil;
 import org.brijframework.util.support.Access;
 import org.brijframework.util.support.Constants;
 
-public class BeanUtil {
+public class BeanObjectUtil {
 	
 	private static final String KEY = "KEY";
 	private static final String VAL = "VAL";
@@ -117,11 +117,12 @@ public class BeanUtil {
 				current = findCurrentFromObject(current, key, isDefault);
 			}
 			point.append(key);
+			if (current == null) {
+/*				Assertion.notEmpty(current, point.toString() + " should not be null or empty");*/
+				return null;
+			}
 			if (i < keyArray.length - 2) {
 				point.append(Constants.DOT);
-			}
-			if (current == null) {
-				Assertion.notEmpty(current, point.toString() + " should not be null or empty");
 			}
 		}
 		if (current != null) {
