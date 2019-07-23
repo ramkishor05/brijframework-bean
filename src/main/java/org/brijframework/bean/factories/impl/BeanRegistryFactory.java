@@ -8,9 +8,9 @@ import org.brijframework.container.Container;
 import org.brijframework.factories.Factory;
 import org.brijframework.group.Group;
 import org.brijframework.model.info.PptModelInfoGroup;
-import org.brijframework.monitor.factories.PrototypeFactroy;
-import org.brijframework.monitor.factories.RequestFactroy;
-import org.brijframework.monitor.factories.SessionFactroy;
+import org.brijframework.monitor.factories.PrototypeScopeMonitorFactroy;
+import org.brijframework.monitor.factories.RequestScopeMonitorFactroy;
+import org.brijframework.monitor.factories.SessionScopeMonitorFactroy;
 import org.brijframework.util.accessor.PropertyAccessorUtil;
 import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.formatter.PrintUtil;
@@ -44,11 +44,11 @@ public abstract class BeanRegistryFactory implements Factory{
 		case SINGLETON:
 			return datainfo.getId();
 		case SESSION:
-			return datainfo.getId()+SessionFactroy.factory().currentService().getId();
+			return datainfo.getId()+SessionScopeMonitorFactroy.factory().currentService().getId();
 		case REQUEST:
-			return datainfo.getId()+RequestFactroy.factory().currentService().getId();
+			return datainfo.getId()+RequestScopeMonitorFactroy.factory().currentService().getId();
 		case PROTOTYPE:
-			return datainfo.getId()+PrototypeFactroy.factory().currentService().getId();
+			return datainfo.getId()+PrototypeScopeMonitorFactroy.factory().currentService().getId();
 		default:
 			return datainfo.getId();
 		}
