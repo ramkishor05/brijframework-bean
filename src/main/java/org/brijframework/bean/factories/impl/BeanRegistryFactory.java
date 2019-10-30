@@ -1,5 +1,6 @@
 package org.brijframework.bean.factories.impl;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.brijframework.bean.info.BeanInfo;
@@ -55,10 +56,14 @@ public abstract class BeanRegistryFactory implements Factory{
 	}
 	
 
+	@SuppressWarnings("rawtypes")
 	private Object buildScopeObject(String uniqueID, BeanInfo datainfo) {
 		Object bean=InstanceUtil.getInstance(datainfo.getOwner().getTarget(), datainfo.getOwner().getConstructor().getValues());
 		datainfo.getProperties().forEach((_keyPath,_value)->{
 			PptModelInfoGroup fieldGroup=datainfo.getOwner().getProperties().get(_keyPath);
+			if(_value instanceof Map && ((Map) _value).containsKey("@ref")) {
+				_value=getCache().get(((Map) _value).get("@ref"));
+			}
 			Assertion.notNull(fieldGroup, datainfo.getOwner().getName()+" : No such type of property contains : "+_keyPath);
 			Assertion.notNull(fieldGroup.getSetterMeta(), datainfo.getOwner().getName()+" : Not attow to set such type of property contains : "+_keyPath);
 			PropertyAccessorUtil.setProperty(bean, fieldGroup.getSetterMeta().getTarget(), _value);

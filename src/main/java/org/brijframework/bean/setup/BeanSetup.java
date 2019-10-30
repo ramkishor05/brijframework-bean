@@ -15,4 +15,6 @@ public interface BeanSetup {
 	Map<String, Object> getProperties();
 
 	String getScope();
+	
+	String getUniqueKey();
 }

@@ -17,7 +17,21 @@ public class BeanSetupImpl implements BeanSetup {
 	
 	private String type;
 	
+	private String uniqueKey;
+	
 	private Map<String, Object> properties;
+	
+	public void setUniqueKey(String uniqueKey) {
+		this.uniqueKey = uniqueKey;
+	}
+	
+	public String getUniqueKey() {
+		return uniqueKey;
+	}
+	
+	public String getType() {
+		return type;
+	}
 
 	public String getScope() {
 		return scope;

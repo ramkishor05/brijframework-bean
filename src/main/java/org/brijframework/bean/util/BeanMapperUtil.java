@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.brijframework.bean.impl.BeanBuilder;
-import org.brijframework.mapper.factories.impl.PptMapperModelFactoryImpl;
-import org.brijframework.mapper.model.PptMapperModel;
+import org.brijframework.mapper.factories.impl.PropertyMapperFactoryImpl;
+import org.brijframework.mapper.model.PropertyMapper;
 import org.brijframework.util.accessor.PropertyAccessorUtil;
 import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.reflect.FieldUtil;
@@ -42,11 +42,11 @@ public class BeanMapperUtil {
 	}
 	
 	public static String getKeyPoint(Object toObject,Field fromField,Object fromObject) {
-		PptMapperModel mapper=PptMapperModelFactoryImpl.getFactory().getMetaInfo(fromObject.getClass().getSimpleName()+"_"+fromField.getName());
+		PropertyMapper mapper=PropertyMapperFactoryImpl.getFactory().getMetaInfo(fromObject.getClass().getSimpleName()+"_"+fromField.getName());
 		if(mapper!=null) {
 			return mapper.getDestination();
 		}
-		 mapper=PptMapperModelFactoryImpl.getFactory().getMetaInfo(toObject.getClass().getSimpleName()+"_"+fromField.getName());
+		 mapper=PropertyMapperFactoryImpl.getFactory().getMetaInfo(toObject.getClass().getSimpleName()+"_"+fromField.getName());
 		if(mapper!=null) {
 			return mapper.getName();
 		}
@@ -56,7 +56,7 @@ public class BeanMapperUtil {
 	public static Object mappedToObjectFromMap(Object toObject,Map<String,Object> fromObject) {
 		BeanBuilder builder=new BeanBuilder(toObject);
 		for(Entry<String, Object> entry: fromObject.entrySet()) {
-			PptMapperModel mapper=PptMapperModelFactoryImpl.getFactory().getMetaInfo(fromObject.getClass().getSimpleName()+"_"+entry.getKey());
+			PropertyMapper mapper=PropertyMapperFactoryImpl.getFactory().getMetaInfo(fromObject.getClass().getSimpleName()+"_"+entry.getKey());
 			if(mapper!=null) {
 				builder.setProperty(mapper.getName(), entry.getValue());
 			}else {
@@ -69,7 +69,7 @@ public class BeanMapperUtil {
 	public static Object mappedFromObjectToMap(Object toObject, Map<String, Object> fromObject) {
 		BeanBuilder builder=new BeanBuilder(toObject);
 		for(Entry<String, Object> entry: fromObject.entrySet()) {
-			PptMapperModel mapper=PptMapperModelFactoryImpl.getFactory().getMetaInfo(fromObject.getClass().getSimpleName()+"_"+entry.getKey());
+			PropertyMapper mapper=PropertyMapperFactoryImpl.getFactory().getMetaInfo(fromObject.getClass().getSimpleName()+"_"+entry.getKey());
 			if(mapper!=null) {
 				builder.setProperty(mapper.getName(), entry.getValue());
 			}else {
@@ -82,7 +82,7 @@ public class BeanMapperUtil {
 	public static Object mappedFromObjectToObject(Object toObject,Object fromObject) {
 		BeanBuilder builder=new BeanBuilder(fromObject);
 		for(Field entry: FieldUtil.getAllField(fromObject.getClass(), Access.PRIVATE)) {
-			PptMapperModel mapper=PptMapperModelFactoryImpl.getFactory().getMetaInfo(toObject.getClass().getSimpleName()+"_"+entry.getName());
+			PropertyMapper mapper=PropertyMapperFactoryImpl.getFactory().getMetaInfo(toObject.getClass().getSimpleName()+"_"+entry.getName());
 			if(mapper!=null) {
 				builder.setProperty(entry.getName(), PropertyAccessorUtil.getProperty(toObject, mapper.getName(), Access.PRIVATE));
 			}

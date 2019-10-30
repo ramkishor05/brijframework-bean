@@ -2,8 +2,8 @@ package org.brijframework.bean.group;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.brijframework.asm.group.DefaultGroup;
 import org.brijframework.bean.info.BeanInfo;
+import org.brijframework.group.impl.DefaultGroup;
 
 public class BeanInfoGroup implements DefaultGroup {
 

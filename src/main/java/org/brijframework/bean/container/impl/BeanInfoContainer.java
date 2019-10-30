@@ -1,9 +1,9 @@
 package org.brijframework.bean.container.impl;
 
-import org.brijframework.asm.container.AbstractContainer;
 import org.brijframework.bean.container.BeanContainer;
 import org.brijframework.bean.factories.BeanInfoGroupFactory;
 import org.brijframework.bean.group.BeanSetupGroup;
+import org.brijframework.container.impl.AbstractContainer;
 import org.brijframework.group.Group;
 import org.brijframework.support.config.Assignable;
 import org.brijframework.support.config.DepandOn;

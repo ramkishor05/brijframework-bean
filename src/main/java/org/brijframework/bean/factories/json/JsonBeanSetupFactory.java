@@ -2,6 +2,7 @@ package org.brijframework.bean.factories.json;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,8 +43,11 @@ public class JsonBeanSetupFactory  extends BeanSetupFactoryImpl{
 		}else if(resources instanceof Map) {
 			return build((Map<String, Object>)resources);
 		}else {
+			Map<String,Object> resourcesMap=new HashMap<>();
+			resourcesMap.put("location", resources);
+			resourcesMap.put("enable", getContainer().getContext().getProperties().get(BeanConstants.APPLICATION_BOOTSTRAP_CONFIG_BEANS_JSON_ENABLE));
 			System.err.println("Invalid bean configration : "+resources);
-			return null;
+			return build(resourcesMap);
 		}
 	}
 	
