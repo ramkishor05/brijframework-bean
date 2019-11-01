@@ -32,7 +32,7 @@ public class JsonBeanSetupFactory  extends BeanSetupFactoryImpl{
 
 	@SuppressWarnings("unchecked")
 	public List<ResourcesBeanConfig> configration() {
-		Object resources=getContainer().getContext().getProperties().get(BeanConstants.APPLICATION_BOOTSTRAP_CONFIG_BEANS_JSON_LOCATION);
+		Object resources=getContainer().getContext().getEnvironment().get(BeanConstants.APPLICATION_BOOTSTRAP_CONFIG_BEANS_JSON_LOCATION);
 		if (resources==null) {
 			System.err.println("Bean configration not found :"+BeanConstants.APPLICATION_BOOTSTRAP_CONFIG_BEANS_JSON_LOCATION);
 			return null;
@@ -45,8 +45,7 @@ public class JsonBeanSetupFactory  extends BeanSetupFactoryImpl{
 		}else {
 			Map<String,Object> resourcesMap=new HashMap<>();
 			resourcesMap.put("location", resources);
-			resourcesMap.put("enable", getContainer().getContext().getProperties().get(BeanConstants.APPLICATION_BOOTSTRAP_CONFIG_BEANS_JSON_ENABLE));
-			System.err.println("Invalid bean configration : "+resources);
+			resourcesMap.put("enable", getContainer().getContext().getEnvironment().get(BeanConstants.APPLICATION_BOOTSTRAP_CONFIG_BEANS_JSON_ENABLE));
 			return build(resourcesMap);
 		}
 	}
