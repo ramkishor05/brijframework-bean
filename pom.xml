@@ -24,6 +24,12 @@
 			<version>3.8.1</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.brijframework</groupId>
+			<artifactId>brijframework-boot</artifactId>
+			<version>0.0.1</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.brijframework</groupId>
