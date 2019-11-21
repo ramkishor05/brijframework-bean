@@ -1,7 +1,7 @@
 package org.brijframework.bean.factories.annotation;
 
 import org.brijframework.bean.factories.impl.BeanSetupFactoryImpl;
-import org.brijframework.bean.setup.impl.BeanSetupImpl;
+import org.brijframework.bean.resource.impl.BeanResourceImpl;
 import org.brijframework.support.beans.Attribute;
 import org.brijframework.support.beans.Bean;
 import org.brijframework.support.beans.Beans;
@@ -46,7 +46,7 @@ public class AnnotationBeanSetupFactory extends BeanSetupFactoryImpl{
 	}
 
 	private void register(Class<?> target, Bean metaSetup) {
-		BeanSetupImpl dataSetup=new BeanSetupImpl();
+		BeanResourceImpl dataSetup=new BeanResourceImpl();
 		dataSetup.setId(Constants.DEFAULT.equals(metaSetup.id())?target.getSimpleName():metaSetup.id());
 		dataSetup.setName(Constants.DEFAULT.equals(metaSetup.name())?target.getSimpleName():metaSetup.name());
 		dataSetup.setModel(Constants.DEFAULT.equals(metaSetup.id())?target.getSimpleName():metaSetup.id());

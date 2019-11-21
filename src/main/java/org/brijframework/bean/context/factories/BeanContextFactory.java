@@ -1,14 +1,16 @@
 package org.brijframework.bean.context.factories;
 
 import org.brijframework.bean.context.BeanContext;
-import org.brijframework.factories.BootstrapFactory;
 import org.brijframework.factories.Factory;
-import org.brijframework.factories.impl.AbstractFactory;
+import org.brijframework.factories.impl.AbstractBootstrapFactory;
 import org.brijframework.support.config.Assignable;
+import org.brijframework.support.config.OrderOn;
+import org.brijframework.util.printer.ConsolePrint;
 import org.brijframework.util.reflect.InstanceUtil;
 import org.brijframework.util.reflect.ReflectionUtils;
 
-public class BeanContextFactory extends AbstractFactory<String, BeanContext> implements BootstrapFactory{
+@OrderOn(3)
+public class BeanContextFactory extends AbstractBootstrapFactory<String, BeanContext>{
 	
 	private static BeanContextFactory factory ;
 	
@@ -23,6 +25,7 @@ public class BeanContextFactory extends AbstractFactory<String, BeanContext> imp
 	@Override
 	public Factory loadFactory() {
 		try {
+			ConsolePrint.screen("BootstrapFactory -> "+this.getClass().getSimpleName(), "Lunching the factory to bean context");
 			ReflectionUtils.getClassListFromExternal().forEach(cls->{
 				if(BeanContext.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					BeanContext beanContext = (BeanContext) InstanceUtil.getInstance(cls);
@@ -39,7 +42,9 @@ public class BeanContextFactory extends AbstractFactory<String, BeanContext> imp
 					this.register(beanContext.getClass().getSimpleName(), beanContext);
 				}
 			});
+			ConsolePrint.screen("BootstrapFactory -> "+this.getClass().getSimpleName(), "Lunched the factory to bean context");
 		} catch (Exception e) {
+			ConsolePrint.screen("BootstrapFactory -> "+this.getClass().getSimpleName(), "Error Lunching the factory to bean context");
 			e.printStackTrace();
 		}
 		return this;

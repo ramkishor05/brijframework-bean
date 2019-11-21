@@ -3,7 +3,7 @@ package org.brijframework.bean.factories.impl;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.brijframework.bean.info.BeanInfo;
+import org.brijframework.bean.meta.BeanMetaData;
 import org.brijframework.bean.scope.BeanScope;
 import org.brijframework.container.Container;
 import org.brijframework.factories.Factory;
@@ -14,25 +14,24 @@ import org.brijframework.monitor.factories.RequestScopeMonitorFactroy;
 import org.brijframework.monitor.factories.SessionScopeMonitorFactroy;
 import org.brijframework.util.accessor.PropertyAccessorUtil;
 import org.brijframework.util.asserts.Assertion;
-import org.brijframework.util.formatter.PrintUtil;
+import org.brijframework.util.printer.ConsolePrint;
 import org.brijframework.util.reflect.InstanceUtil;
 
-public abstract class BeanRegistryFactory implements Factory{
+public abstract class BeanScopeFactory implements Factory{
 
 	private ConcurrentHashMap<String, BeanScope> cache=new ConcurrentHashMap<String, BeanScope>();
 	
 	private Container container;
 
-	public BeanScope register(String key,BeanInfo datainfo) {
+	public BeanScope register(String key,BeanMetaData datainfo) {
 		BeanScope dataObject=getBeanScope(key);
 		Assertion.isTrue(dataObject!=null,"Model already exist in cache with : "+key);
 		dataObject=new BeanScope(datainfo);
 		dataObject.setScopeObject(buildScopeObject(key,datainfo));
 		dataObject.setId(key);
-		getCache().put(key, dataObject);
-		System.err.println("Bean Scope    : "+key);
 		loadContainer(dataObject);
-		System.out.println(PrintUtil.getObjectInfo(dataObject));
+		getCache().put(key, dataObject);
+		ConsolePrint.screen("Bean", "Registery for bean scope '"+datainfo.getScope()+"' for id :"+datainfo.getId());
 		return dataObject;
 	}
 
@@ -40,7 +39,7 @@ public abstract class BeanRegistryFactory implements Factory{
 		return getCache().get(key);
 	}
 
-	public String getUniqueID(BeanInfo datainfo) {
+	public String getUniqueID(BeanMetaData datainfo) {
 		switch (datainfo.getScope()) {
 		case SINGLETON:
 			return datainfo.getId();
@@ -57,7 +56,7 @@ public abstract class BeanRegistryFactory implements Factory{
 	
 
 	@SuppressWarnings("rawtypes")
-	private Object buildScopeObject(String uniqueID, BeanInfo datainfo) {
+	private Object buildScopeObject(String uniqueID, BeanMetaData datainfo) {
 		Object bean=InstanceUtil.getInstance(datainfo.getOwner().getTarget(), datainfo.getOwner().getConstructor().getValues());
 		datainfo.getProperties().forEach((_keyPath,_value)->{
 			PptModelInfoGroup fieldGroup=datainfo.getOwner().getProperties().get(_keyPath);
@@ -87,7 +86,7 @@ public abstract class BeanRegistryFactory implements Factory{
 	}
 
 	@Override
-	public BeanRegistryFactory clear() {
+	public BeanScopeFactory clear() {
 		this.getCache().clear();
 		return this;
 	}
@@ -105,7 +104,7 @@ public abstract class BeanRegistryFactory implements Factory{
 	}
 	
 
-	public BeanInfo getContainer(String modelKey) {
+	public BeanMetaData getContainer(String modelKey) {
 		if (getContainer() == null) {
 			return null;
 		}

@@ -1,9 +1,9 @@
 package org.brijframework.bean.factories.json;
 
-import org.brijframework.bean.factories.impl.BeanInfoFactoryImpl;
+import org.brijframework.bean.factories.impl.BeanMetaDataFactoryImpl;
 import org.brijframework.bean.factories.impl.BeanSetupFactoryImpl;
-import org.brijframework.bean.info.impl.BeanInfoImpl;
-import org.brijframework.bean.setup.BeanSetup;
+import org.brijframework.bean.meta.impl.BeanMetaDataImpl;
+import org.brijframework.bean.resource.BeanResource;
 import org.brijframework.model.factories.asm.ClassMetaInfoFactoryImpl;
 import org.brijframework.model.info.OwnerModelInfo;
 import org.brijframework.support.config.Assignable;
@@ -11,7 +11,7 @@ import org.brijframework.support.enums.Scope;
 import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.support.Constants;
 
-public class JsonBeanInfoFactory extends BeanInfoFactoryImpl{
+public class JsonBeanInfoFactory extends BeanMetaDataFactoryImpl{
 
 	private static JsonBeanInfoFactory factory;
 
@@ -31,7 +31,7 @@ public class JsonBeanInfoFactory extends BeanInfoFactoryImpl{
 		return this;
 	}
 
-	public void register(String id, BeanSetup metaSetup) {
+	public void register(String id, BeanResource metaSetup) {
 		OwnerModelInfo owner=null;
 		if(metaSetup.getModel() != null && !metaSetup.getModel().isEmpty() ) {
 			owner=ClassMetaInfoFactoryImpl.getFactory().getClassInfo(metaSetup.getModel());
@@ -40,8 +40,8 @@ public class JsonBeanInfoFactory extends BeanInfoFactoryImpl{
 		}
 		Assertion.notNull(owner, "Model not found for "+metaSetup.getModel()+" of bean  : "+id);
 		id=Constants.DEFAULT.equals(metaSetup.getId())?owner.getTarget().getSimpleName():metaSetup.getId();
-		BeanSetup bean=BeanSetupFactoryImpl.getFactory().getBeanSetup(id);
-		BeanInfoImpl dataSetup=new BeanInfoImpl(owner);
+		BeanResource bean=BeanSetupFactoryImpl.getFactory().find(id);
+		BeanMetaDataImpl dataSetup=new BeanMetaDataImpl(owner);
 		dataSetup.setId(id);
 		dataSetup.setName(bean.getName());
 		dataSetup.setScope(Scope.valueFor(metaSetup.getScope(),Scope.SINGLETON));
@@ -49,12 +49,12 @@ public class JsonBeanInfoFactory extends BeanInfoFactoryImpl{
 		register(dataSetup);
 	}
 
-	public void register(Class<?> target, BeanSetup metaSetup) {
+	public void register(Class<?> target, BeanResource metaSetup) {
 		String id=Constants.DEFAULT.equals(metaSetup.getId())?target.getSimpleName():metaSetup.getId();
 		OwnerModelInfo owner=ClassMetaInfoFactoryImpl.getFactory().getClassInfo(metaSetup.getModel());
 		Assertion.notNull(owner, "Model not found for "+metaSetup.getModel()+" of bean  : "+id);
-		BeanSetup bean=BeanSetupFactoryImpl.getFactory().getBeanSetup(id);
-		BeanInfoImpl dataSetup=new BeanInfoImpl(owner);
+		BeanResource bean=BeanSetupFactoryImpl.getFactory().find(id);
+		BeanMetaDataImpl dataSetup=new BeanMetaDataImpl(owner);
 		dataSetup.setId(id);
 		dataSetup.setName(bean.getName());
 		dataSetup.setScope(Scope.valueFor(metaSetup.getScope()));

@@ -3,15 +3,16 @@ package org.brijframework.bean.container.impl;
 import org.brijframework.bean.container.BeanContainer;
 import org.brijframework.bean.factories.impl.BeanFactory;
 import org.brijframework.bean.group.BeanScopeGroup;
-import org.brijframework.container.impl.AbstractContainer;
+import org.brijframework.container.impl.AbstractModuleContainer;
 import org.brijframework.group.Group;
 import org.brijframework.support.config.Assignable;
 import org.brijframework.support.config.DepandOn;
+import org.brijframework.util.printer.ConsolePrint;
 import org.brijframework.util.reflect.InstanceUtil;
 import org.brijframework.util.reflect.ReflectionUtils;
 
-@DepandOn(depand=BeanInfoContainer.class)
-public class BeanScopeContainer extends AbstractContainer implements BeanContainer {
+@DepandOn(depand=BeanMetaDataContainer.class)
+public class BeanScopeContainer extends AbstractModuleContainer implements BeanContainer{
 
 	private static BeanScopeContainer container;
 
@@ -28,6 +29,7 @@ public class BeanScopeContainer extends AbstractContainer implements BeanContain
 		Group group = get(groupKey);
 		if (group == null) {
 			group = new BeanScopeGroup(groupKey);
+			ConsolePrint.screen("Resource", "Registery for bean scope group with id :"+groupKey);
 			this.add(groupKey, group);
 		}
 		return group;

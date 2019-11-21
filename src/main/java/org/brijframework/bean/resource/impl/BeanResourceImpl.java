@@ -1,11 +1,11 @@
-package org.brijframework.bean.setup.impl;
+package org.brijframework.bean.resource.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.brijframework.bean.setup.BeanSetup;
+import org.brijframework.bean.resource.BeanResource;
 
-public class BeanSetupImpl implements BeanSetup {
+public class BeanResourceImpl implements BeanResource {
 
 	private String id;
 

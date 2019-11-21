@@ -1,14 +1,14 @@
-package org.brijframework.bean.info.impl;
+package org.brijframework.bean.meta.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.brijframework.bean.info.BeanInfo;
+import org.brijframework.bean.meta.BeanMetaData;
 import org.brijframework.model.info.OwnerModelInfo;
 import org.brijframework.support.enums.Scope;
 import org.brijframework.util.asserts.Assertion;
 
-public class BeanInfoImpl implements BeanInfo {
+public class BeanMetaDataImpl implements BeanMetaData {
 	
 	private OwnerModelInfo owner;
 	
@@ -20,7 +20,7 @@ public class BeanInfoImpl implements BeanInfo {
 
 	private Map<String, Object> properties;
 	
-	public BeanInfoImpl(OwnerModelInfo owner) {
+	public BeanMetaDataImpl(OwnerModelInfo owner) {
 		this.owner=owner;
 	}
 	

@@ -9,11 +9,12 @@ import java.util.Map;
 import org.brijframework.bean.config.impl.ResourcesBeanConfig;
 import org.brijframework.bean.constant.BeanConstants;
 import org.brijframework.bean.factories.impl.BeanSetupFactoryImpl;
-import org.brijframework.bean.setup.impl.BeanSetupImpl;
+import org.brijframework.bean.resource.impl.BeanResourceImpl;
 import org.brijframework.resources.factory.json.JsonResourceFactory;
 import org.brijframework.resources.files.json.JsonResource;
 import org.brijframework.support.config.Assignable;
 import org.brijframework.util.asserts.Assertion;
+import org.brijframework.util.printer.ConsolePrint;
 import org.brijframework.util.reflect.InstanceUtil;
 import org.json.JSONException;
 
@@ -34,10 +35,10 @@ public class JsonBeanSetupFactory  extends BeanSetupFactoryImpl{
 	public List<ResourcesBeanConfig> configration() {
 		Object resources=getContainer().getContext().getEnvironment().get(BeanConstants.APPLICATION_BOOTSTRAP_CONFIG_BEANS_JSON_LOCATION);
 		if (resources==null) {
-			System.err.println("Bean configration not found :"+BeanConstants.APPLICATION_BOOTSTRAP_CONFIG_BEANS_JSON_LOCATION);
+			ConsolePrint.screen("BeanConfigration","Bean configration not found :"+BeanConstants.APPLICATION_BOOTSTRAP_CONFIG_BEANS_JSON_LOCATION);
 			return null;
 		}
-		System.err.println("Bean configration found :"+BeanConstants.APPLICATION_BOOTSTRAP_CONFIG_BEANS_JSON_LOCATION);
+		ConsolePrint.screen("BeanConfigration","Bean configration found :"+BeanConstants.APPLICATION_BOOTSTRAP_CONFIG_BEANS_JSON_LOCATION);
 		if(resources instanceof List) {
 			return build((List<Map<String, Object>>)resources);
 		}else if(resources instanceof Map) {
@@ -69,13 +70,12 @@ public class JsonBeanSetupFactory  extends BeanSetupFactoryImpl{
 	public JsonBeanSetupFactory loadFactory() {
 		List<ResourcesBeanConfig> configs=configration();
 		if(configs==null) {
-			System.err.println("Invalid model configration : "+configs);
+			ConsolePrint.screen("BeanConfigration","Invalid bean configration : "+configs);
 			return this;
 		}
 		for(ResourcesBeanConfig modelConfig:configs) {
 			if(!modelConfig.isEnable()) {
-				System.err.println("Bean configration disabled found :"+modelConfig.getLocation());
-			
+				ConsolePrint.screen("BeanConfigration","Bean configration disabled found :"+modelConfig.getLocation());
 			}
 			Collection<JsonResource> resources=JsonResourceFactory.factory().getResources(modelConfig.getLocation());
 			for(JsonResource resource:resources) {
@@ -110,7 +110,7 @@ public class JsonBeanSetupFactory  extends BeanSetupFactoryImpl{
 
 	public void register(Map<String, Object> resourceMap) {
 		Assertion.notNull(resourceMap, "Invalid target :"+resourceMap);
-		BeanSetupImpl metaSetup=InstanceUtil.getInstance(BeanSetupImpl.class,resourceMap);
+		BeanResourceImpl metaSetup=InstanceUtil.getInstance(BeanResourceImpl.class,resourceMap);
 		this.register(metaSetup);
 	}
 }

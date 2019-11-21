@@ -1,22 +1,22 @@
 package org.brijframework.bean.scope;
 
-import org.brijframework.bean.info.BeanInfo;
+import org.brijframework.bean.meta.BeanMetaData;
 
 public class BeanScope {
 
-	private BeanInfo datainfo;
+	private BeanMetaData datainfo;
 	private Object scopeObject;
 	private String id;
 
-	public BeanScope(BeanInfo datainfo) {
+	public BeanScope(BeanMetaData datainfo) {
 		this.setDatainfo(datainfo);
 	}
 
-	public BeanInfo getDatainfo() {
+	public BeanMetaData getDatainfo() {
 		return datainfo;
 	}
 
-	public void setDatainfo(BeanInfo datainfo) {
+	public void setDatainfo(BeanMetaData datainfo) {
 		this.datainfo = datainfo;
 	}
 

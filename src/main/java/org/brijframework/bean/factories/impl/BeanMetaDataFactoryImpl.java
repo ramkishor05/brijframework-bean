@@ -4,30 +4,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.brijframework.bean.factories.BeanInfoGroupFactory;
-import org.brijframework.bean.info.BeanInfo;
+import org.brijframework.bean.factories.BeanMetaDataGroupFactory;
+import org.brijframework.bean.meta.BeanMetaData;
 import org.brijframework.container.Container;
 import org.brijframework.group.Group;
 import org.brijframework.support.config.Assignable;
+import org.brijframework.util.printer.ConsolePrint;
 
-public class BeanInfoFactoryImpl implements BeanInfoGroupFactory<BeanInfo>{
+public class BeanMetaDataFactoryImpl implements BeanMetaDataGroupFactory<BeanMetaData>{
 	
-	private static BeanInfoFactoryImpl factory;
+	private static BeanMetaDataFactoryImpl factory;
 	
 	private Container container;
 	
-	private ConcurrentHashMap<Object, BeanInfo> cache=new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Object, BeanMetaData> cache=new ConcurrentHashMap<>();
 
 	@Assignable
-	public static BeanInfoFactoryImpl getFactory() {
+	public static BeanMetaDataFactoryImpl getFactory() {
 		if(factory==null) {
-			factory=new BeanInfoFactoryImpl();
+			factory=new BeanMetaDataFactoryImpl();
 		}
 		return factory;
 	}
 
 	@Override
-	public BeanInfo getData(String modelKey) {
+	public BeanMetaData find(String modelKey) {
 		if(getCache().containsKey(modelKey)) {
 			return getCache().get(modelKey);
 		}
@@ -35,9 +36,9 @@ public class BeanInfoFactoryImpl implements BeanInfoGroupFactory<BeanInfo>{
 	}
 	
 	@Override
-	public List<BeanInfo> getBeanInfoList(String model) {
-		List<BeanInfo> list=new ArrayList<>();
-		for(BeanInfo setup:getCache().values()) {
+	public List<BeanMetaData> findAllByModel(String model) {
+		List<BeanMetaData> list=new ArrayList<>();
+		for(BeanMetaData setup:getCache().values()) {
 			if(setup.getOwner().getId().equals(model)) {
 				list.add(setup);
 			}
@@ -46,15 +47,15 @@ public class BeanInfoFactoryImpl implements BeanInfoGroupFactory<BeanInfo>{
 	}
 	
 	@Override
-	public BeanInfo register(BeanInfo dataSetup) {
+	public BeanMetaData register(BeanMetaData dataSetup) {
 		loadContainer(dataSetup);
+		ConsolePrint.screen("Resource", "Registery for bean data with id :"+dataSetup.getId());
 		getCache().put(dataSetup.getId(), dataSetup);
-		System.err.println("Bean Info    : "+dataSetup.getId());
 		return dataSetup;
 	}
 	
 	@Override
-	public BeanInfoFactoryImpl loadFactory() {
+	public BeanMetaDataFactoryImpl loadFactory() {
 		return this;
 	}
 
@@ -70,11 +71,11 @@ public class BeanInfoFactoryImpl implements BeanInfoGroupFactory<BeanInfo>{
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ConcurrentHashMap<Object, BeanInfo> getCache() {
+	public ConcurrentHashMap<Object, BeanMetaData> getCache() {
 		if(getContainer()!=null) {
 			for(Group  group:getContainer().getCache().values()) {
 				group.getCache().forEach((key,value)->{
-					cache.put(key, (BeanInfo)value);
+					cache.put(key, (BeanMetaData)value);
 				});
 			}
 		}
@@ -82,13 +83,13 @@ public class BeanInfoFactoryImpl implements BeanInfoGroupFactory<BeanInfo>{
 	}
 
 	@Override
-	public BeanInfoFactoryImpl clear() {
+	public BeanMetaDataFactoryImpl clear() {
 		getCache().clear();
 		return this;
 	}
 	
 
-	public void loadContainer(BeanInfo metaInfo) {
+	public void loadContainer(BeanMetaData metaInfo) {
 		if (getContainer() == null) {
 			return;
 		}
@@ -100,16 +101,16 @@ public class BeanInfoFactoryImpl implements BeanInfoGroupFactory<BeanInfo>{
 		}
 	}
 
-	public BeanInfo getContainer(String modelKey) {
+	public BeanMetaData getContainer(String modelKey) {
 		if (getContainer() == null) {
 			return null;
 		}
 		return getContainer().find(modelKey);
 	}
 
-	public List<BeanInfo> getBeanInfoList(Class<?> cls) {
-		List<BeanInfo> list=new ArrayList<>();
-		for (BeanInfo beanInfo : getCache().values()) {
+	public List<BeanMetaData> getBeanInfoList(Class<?> cls) {
+		List<BeanMetaData> list=new ArrayList<>();
+		for (BeanMetaData beanInfo : getCache().values()) {
 			if(cls.isAssignableFrom(beanInfo.getOwner().getTarget())) {
 				list.add(beanInfo);
 			}

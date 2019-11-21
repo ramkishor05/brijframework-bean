@@ -2,7 +2,7 @@ package org.brijframework.bean.group;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.brijframework.bean.setup.BeanSetup;
+import org.brijframework.bean.resource.BeanResource;
 import org.brijframework.group.impl.DefaultGroup;
 
 public class BeanSetupGroup implements DefaultGroup {
@@ -12,7 +12,7 @@ public class BeanSetupGroup implements DefaultGroup {
 	 */
 	private static final long serialVersionUID = 1L;
 	private Object groupKey;
-	private ConcurrentHashMap<String,BeanSetup> cache=new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String,BeanResource> cache=new ConcurrentHashMap<>();
 	
 	public BeanSetupGroup(Object groupKey) {
 		this.groupKey=groupKey;
@@ -24,7 +24,7 @@ public class BeanSetupGroup implements DefaultGroup {
 	}
 
 	@Override
-	public ConcurrentHashMap<String,BeanSetup> getCache() {
+	public ConcurrentHashMap<String,BeanResource> getCache() {
 		return cache;
 	}
 

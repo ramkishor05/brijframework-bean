@@ -1,8 +1,8 @@
-package org.brijframework.bean.setup;
+package org.brijframework.bean.resource;
 
 import java.util.Map;
 
-public interface BeanSetup {
+public interface BeanResource {
 
 	String getId();
 

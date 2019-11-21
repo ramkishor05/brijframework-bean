@@ -1,9 +1,9 @@
 package org.brijframework.bean.factories.annotation;
 
-import org.brijframework.bean.factories.impl.BeanInfoFactoryImpl;
+import org.brijframework.bean.factories.impl.BeanMetaDataFactoryImpl;
 import org.brijframework.bean.factories.impl.BeanSetupFactoryImpl;
-import org.brijframework.bean.info.impl.BeanInfoImpl;
-import org.brijframework.bean.setup.BeanSetup;
+import org.brijframework.bean.meta.impl.BeanMetaDataImpl;
+import org.brijframework.bean.resource.BeanResource;
 import org.brijframework.model.factories.asm.ClassMetaInfoFactoryImpl;
 import org.brijframework.model.info.OwnerModelInfo;
 import org.brijframework.support.beans.Bean;
@@ -13,7 +13,7 @@ import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.reflect.ReflectionUtils;
 import org.brijframework.util.support.Constants;
 
-public class AnnotationBeanInfoFactory extends BeanInfoFactoryImpl{
+public class AnnotationBeanInfoFactory extends BeanMetaDataFactoryImpl{
 
 	private static AnnotationBeanInfoFactory factory;
 
@@ -52,8 +52,8 @@ public class AnnotationBeanInfoFactory extends BeanInfoFactoryImpl{
 		String id=Constants.DEFAULT.equals(metaSetup.id())?target.getSimpleName():metaSetup.id();
 		OwnerModelInfo owner=ClassMetaInfoFactoryImpl.getFactory().getClassInfo(metaSetup.model());
 		Assertion.notNull(owner, "Model not found for "+metaSetup.model()+" of bean  : "+id);
-		BeanSetup bean=BeanSetupFactoryImpl.getFactory().getBeanSetup(id);
-		BeanInfoImpl dataSetup=new BeanInfoImpl(owner);
+		BeanResource bean=BeanSetupFactoryImpl.getFactory().find(id);
+		BeanMetaDataImpl dataSetup=new BeanMetaDataImpl(owner);
 		dataSetup.setId(id);
 		dataSetup.setName(bean.getName());
 		dataSetup.setScope(metaSetup.scope());

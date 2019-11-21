@@ -4,20 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.brijframework.bean.factories.BeanSetupGroupFactory;
-import org.brijframework.bean.setup.BeanSetup;
+import org.brijframework.bean.factories.BeanResourceGroupFactory;
+import org.brijframework.bean.resource.BeanResource;
 import org.brijframework.container.Container;
 import org.brijframework.group.Group;
 import org.brijframework.support.config.Assignable;
 import org.brijframework.util.asserts.Assertion;
+import org.brijframework.util.printer.ConsolePrint;
 
-public class BeanSetupFactoryImpl implements BeanSetupGroupFactory<BeanSetup>{
+public class BeanSetupFactoryImpl implements BeanResourceGroupFactory<BeanResource>{
 	
 	private static BeanSetupFactoryImpl factory;
 	
 	private Container container;
 	
-	private ConcurrentHashMap<String, BeanSetup> cache=new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String, BeanResource> cache=new ConcurrentHashMap<>();
 
 	@Assignable
 	public static BeanSetupFactoryImpl getFactory() {
@@ -28,7 +29,7 @@ public class BeanSetupFactoryImpl implements BeanSetupGroupFactory<BeanSetup>{
 	}
 
 	@Override
-	public BeanSetup getBeanSetup(String modelKey) {
+	public BeanResource find(String modelKey) {
 		if(getCache().containsKey(modelKey)) {
 			return getCache().get(modelKey);
 		}
@@ -36,9 +37,9 @@ public class BeanSetupFactoryImpl implements BeanSetupGroupFactory<BeanSetup>{
 	}
 	
 	@Override
-	public List<BeanSetup> getBeanSetupList(String model) {
-		List<BeanSetup> list=new ArrayList<>();
-		for(BeanSetup setup:getCache().values()) {
+	public List<BeanResource> findAllByModel(String model) {
+		List<BeanResource> list=new ArrayList<>();
+		for(BeanResource setup:getCache().values()) {
 			if(setup.getModel().equals(model)) {
 				list.add(setup);
 			}
@@ -47,11 +48,11 @@ public class BeanSetupFactoryImpl implements BeanSetupGroupFactory<BeanSetup>{
 	}
 	
 	@Override
-	public BeanSetup register(BeanSetup dataSetup) {
+	public BeanResource register(BeanResource dataSetup) {
 		validate(dataSetup);
 		loadContainer(dataSetup);
+		ConsolePrint.screen("Resource", "Load bean resource with id :"+dataSetup.getId());
 		getCache().put(dataSetup.getId(), dataSetup);
-		System.err.println("Bean Load    : "+dataSetup.getId());
 		return dataSetup;
 	}
 	
@@ -72,11 +73,11 @@ public class BeanSetupFactoryImpl implements BeanSetupGroupFactory<BeanSetup>{
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ConcurrentHashMap<String, BeanSetup> getCache() {
+	public ConcurrentHashMap<String, BeanResource> getCache() {
 		if(getContainer()!=null) {
 			for(Group  group:getContainer().getCache().values()) {
 				group.getCache().forEach((key,value)->{
-					cache.put(key.toString(), (BeanSetup)value);
+					cache.put(key.toString(), (BeanResource)value);
 				});
 			}
 		}
@@ -90,7 +91,7 @@ public class BeanSetupFactoryImpl implements BeanSetupGroupFactory<BeanSetup>{
 	}
 	
 
-	public void loadContainer(BeanSetup metaInfo) {
+	public void loadContainer(BeanResource metaInfo) {
 		if (getContainer() == null) {
 			return;
 		}
@@ -103,7 +104,7 @@ public class BeanSetupFactoryImpl implements BeanSetupGroupFactory<BeanSetup>{
 	}
 	
 
-	public BeanSetup getContainer(String modelKey) {
+	public BeanResource getContainer(String modelKey) {
 		if (getContainer() == null) {
 			return null;
 		}
@@ -111,7 +112,7 @@ public class BeanSetupFactoryImpl implements BeanSetupGroupFactory<BeanSetup>{
 	}
 
 	@Override
-	public boolean validate(BeanSetup dataSetup) {
+	public boolean validate(BeanResource dataSetup) {
 		Assertion.notNull(dataSetup.getId(), "Bean id should not be null or empty");
 		Assertion.isTrue(dataSetup.getModel()==null && dataSetup.getTarget()==null , "Bean model or type at least one spacified.");
 		return true;

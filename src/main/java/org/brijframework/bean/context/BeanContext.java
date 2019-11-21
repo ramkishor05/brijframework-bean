@@ -33,17 +33,4 @@ public class BeanContext extends AbstractModuleContext{
 		}
 	}
 	
-	@Override
-	public void start() {
-		System.err.println("DataContext register start.");
-		super.start();
-		System.err.println("DataContext register done.");
-	}
-
-	@Override
-	public void stop() {
-		System.err.println("DataContext destory start.");
-		super.stop();
-		System.err.println("DataContext destory done.");
-	}
 }
