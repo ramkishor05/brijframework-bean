@@ -1,8 +1,9 @@
 package org.brijframework.bean.container.impl;
 
+import org.brijframework.bean.factories.BeanResourceFactory;
 import org.brijframework.bean.factories.BeanResourceGroupFactory;
 import org.brijframework.bean.group.BeanSetupGroup;
-import org.brijframework.container.impl.AbstractModuleContainer;
+import org.brijframework.container.impl.module.AbstractModuleContainer;
 import org.brijframework.group.Group;
 import org.brijframework.support.config.Assignable;
 import org.brijframework.util.printer.ConsolePrint;
@@ -27,7 +28,7 @@ public class BeanResourceContainer extends AbstractModuleContainer{
 		try {
 			ReflectionUtils.getClassListFromExternal().forEach(cls -> {
 				if (BeanResourceGroupFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
-					register((Class<? extends BeanResourceGroupFactory<?>>) cls);
+					register((Class<? extends BeanResourceFactory<?,?>>) cls);
 				}
 			});
 		} catch (Exception e) {
@@ -36,7 +37,7 @@ public class BeanResourceContainer extends AbstractModuleContainer{
 		try {
 			ReflectionUtils.getClassListFromInternal().forEach(cls -> {
 				if (BeanResourceGroupFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
-					register((Class<? extends BeanResourceGroupFactory<?>>) cls);
+					register((Class<? extends BeanResourceFactory<?,?>>) cls);
 				}
 			});
 		} catch (Exception e) {

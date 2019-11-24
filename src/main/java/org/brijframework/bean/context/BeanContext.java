@@ -1,7 +1,7 @@
 package org.brijframework.bean.context;
 
 import org.brijframework.bean.container.BeanContainer;
-import org.brijframework.context.module.impl.AbstractModuleContext;
+import org.brijframework.context.impl.module.AbstractModuleContext;
 import org.brijframework.model.context.ModelContext;
 import org.brijframework.support.config.DepandOn;
 import org.brijframework.util.reflect.InstanceUtil;

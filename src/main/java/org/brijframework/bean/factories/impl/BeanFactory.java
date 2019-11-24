@@ -5,12 +5,11 @@ import java.util.List;
 
 import org.brijframework.bean.meta.BeanMetaData;
 import org.brijframework.bean.scope.BeanScope;
-import org.brijframework.factories.Factory;
 import org.brijframework.support.config.Assignable;
 import org.brijframework.support.enums.Scope;
 import org.brijframework.util.asserts.Assertion;
 
-public class BeanFactory extends BeanScopeFactory implements Factory{
+public class BeanFactory extends BeanScopeFactory {
  
 	protected BeanFactory() {
 	}
@@ -60,7 +59,7 @@ public class BeanFactory extends BeanScopeFactory implements Factory{
 			return null;
 		}
 		String uniqueID=getUniqueID(datainfo);
-		BeanScope dataBean= getBeanScope(uniqueID);
+		BeanScope dataBean= find(uniqueID);
 		if(dataBean==null) {
 			dataBean=register(uniqueID,datainfo);
 		}
@@ -78,4 +77,17 @@ public class BeanFactory extends BeanScopeFactory implements Factory{
 		}
 		return list;
 	}
+
+	@Override
+	protected void preregister(String key, BeanScope value) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void postregister(String key, BeanScope value) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 }

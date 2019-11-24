@@ -11,20 +11,20 @@ import org.brijframework.support.enums.Scope;
 import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.support.Constants;
 
-public class JsonBeanInfoFactory extends BeanMetaDataFactoryImpl{
+public class JsonBeanMetaDataFactory extends BeanMetaDataFactoryImpl{
 
-	private static JsonBeanInfoFactory factory;
+	private static JsonBeanMetaDataFactory factory;
 
 	@Assignable
-	public static JsonBeanInfoFactory getFactory() {
+	public static JsonBeanMetaDataFactory getFactory() {
 		if(factory==null) {
-			factory=new JsonBeanInfoFactory();
+			factory=new JsonBeanMetaDataFactory();
 		}
 		return factory;
 	}
 	
 	@Override
-	public JsonBeanInfoFactory loadFactory() {
+	public JsonBeanMetaDataFactory loadFactory() {
 		JsonBeanSetupFactory.getFactory().getCache().forEach((id,beansetup)->{
 			register(id, beansetup);
 		});
@@ -46,7 +46,7 @@ public class JsonBeanInfoFactory extends BeanMetaDataFactoryImpl{
 		dataSetup.setName(bean.getName());
 		dataSetup.setScope(Scope.valueFor(metaSetup.getScope(),Scope.SINGLETON));
 		dataSetup.setProperties(bean.getProperties());
-		register(dataSetup);
+		register(id,dataSetup);
 	}
 
 	public void register(Class<?> target, BeanResource metaSetup) {
@@ -59,7 +59,7 @@ public class JsonBeanInfoFactory extends BeanMetaDataFactoryImpl{
 		dataSetup.setName(bean.getName());
 		dataSetup.setScope(Scope.valueFor(metaSetup.getScope()));
 		dataSetup.setProperties(bean.getProperties());
-		register(dataSetup);
+		register(id,dataSetup);
 	}
 
 }

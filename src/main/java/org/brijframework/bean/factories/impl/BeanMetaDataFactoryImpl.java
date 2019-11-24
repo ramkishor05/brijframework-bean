@@ -7,17 +7,18 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.brijframework.bean.factories.BeanMetaDataGroupFactory;
 import org.brijframework.bean.meta.BeanMetaData;
 import org.brijframework.container.Container;
+import org.brijframework.factories.impl.AbstractFactory;
 import org.brijframework.group.Group;
 import org.brijframework.support.config.Assignable;
 import org.brijframework.util.printer.ConsolePrint;
 
-public class BeanMetaDataFactoryImpl implements BeanMetaDataGroupFactory<BeanMetaData>{
+public class BeanMetaDataFactoryImpl extends AbstractFactory<String,BeanMetaData> implements BeanMetaDataGroupFactory<String,BeanMetaData>{
 	
 	private static BeanMetaDataFactoryImpl factory;
 	
 	private Container container;
 	
-	private ConcurrentHashMap<Object, BeanMetaData> cache=new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String, BeanMetaData> cache=new ConcurrentHashMap<>();
 
 	@Assignable
 	public static BeanMetaDataFactoryImpl getFactory() {
@@ -47,7 +48,7 @@ public class BeanMetaDataFactoryImpl implements BeanMetaDataGroupFactory<BeanMet
 	}
 	
 	@Override
-	public BeanMetaData register(BeanMetaData dataSetup) {
+	public BeanMetaData register(String key,BeanMetaData dataSetup) {
 		loadContainer(dataSetup);
 		ConsolePrint.screen("Resource", "Registery for bean data with id :"+dataSetup.getId());
 		getCache().put(dataSetup.getId(), dataSetup);
@@ -71,11 +72,11 @@ public class BeanMetaDataFactoryImpl implements BeanMetaDataGroupFactory<BeanMet
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ConcurrentHashMap<Object, BeanMetaData> getCache() {
+	public ConcurrentHashMap<String, BeanMetaData> getCache() {
 		if(getContainer()!=null) {
 			for(Group  group:getContainer().getCache().values()) {
 				group.getCache().forEach((key,value)->{
-					cache.put(key, (BeanMetaData)value);
+					cache.put(key.toString(), (BeanMetaData)value);
 				});
 			}
 		}
@@ -116,6 +117,18 @@ public class BeanMetaDataFactoryImpl implements BeanMetaDataGroupFactory<BeanMet
 			}
 		}
 		return list;
+	}
+
+	@Override
+	protected void preregister(String key, BeanMetaData value) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void postregister(String key, BeanMetaData value) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

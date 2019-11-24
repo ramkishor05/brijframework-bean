@@ -6,7 +6,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.brijframework.bean.meta.BeanMetaData;
 import org.brijframework.bean.scope.BeanScope;
 import org.brijframework.container.Container;
-import org.brijframework.factories.Factory;
+import org.brijframework.factories.impl.AbstractFactory;
+import org.brijframework.factories.module.ModuleFactory;
 import org.brijframework.group.Group;
 import org.brijframework.model.info.PptModelInfoGroup;
 import org.brijframework.monitor.factories.PrototypeScopeMonitorFactroy;
@@ -17,14 +18,14 @@ import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.printer.ConsolePrint;
 import org.brijframework.util.reflect.InstanceUtil;
 
-public abstract class BeanScopeFactory implements Factory{
+public abstract class BeanScopeFactory extends AbstractFactory<String, BeanScope> implements ModuleFactory<String, BeanScope>{
 
 	private ConcurrentHashMap<String, BeanScope> cache=new ConcurrentHashMap<String, BeanScope>();
 	
 	private Container container;
 
 	public BeanScope register(String key,BeanMetaData datainfo) {
-		BeanScope dataObject=getBeanScope(key);
+		BeanScope dataObject=find(key);
 		Assertion.isTrue(dataObject!=null,"Model already exist in cache with : "+key);
 		dataObject=new BeanScope(datainfo);
 		dataObject.setScopeObject(buildScopeObject(key,datainfo));
@@ -33,10 +34,6 @@ public abstract class BeanScopeFactory implements Factory{
 		getCache().put(key, dataObject);
 		ConsolePrint.screen("Bean", "Registery for bean scope '"+datainfo.getScope()+"' for id :"+datainfo.getId());
 		return dataObject;
-	}
-
-	protected BeanScope getBeanScope(String key) {
-		return getCache().get(key);
 	}
 
 	public String getUniqueID(BeanMetaData datainfo) {

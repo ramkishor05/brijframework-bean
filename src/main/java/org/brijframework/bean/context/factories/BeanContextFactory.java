@@ -1,8 +1,7 @@
 package org.brijframework.bean.context.factories;
 
 import org.brijframework.bean.context.BeanContext;
-import org.brijframework.factories.Factory;
-import org.brijframework.factories.impl.AbstractBootstrapFactory;
+import org.brijframework.factories.impl.bootstrap.AbstractBootstrapFactory;
 import org.brijframework.support.config.Assignable;
 import org.brijframework.support.config.OrderOn;
 import org.brijframework.util.printer.ConsolePrint;
@@ -23,7 +22,7 @@ public class BeanContextFactory extends AbstractBootstrapFactory<String, BeanCon
 	}
 
 	@Override
-	public Factory loadFactory() {
+	public BeanContextFactory loadFactory() {
 		try {
 			ConsolePrint.screen("BootstrapFactory -> "+this.getClass().getSimpleName(), "Lunching the factory to bean context");
 			ReflectionUtils.getClassListFromExternal().forEach(cls->{
@@ -65,5 +64,6 @@ public class BeanContextFactory extends AbstractBootstrapFactory<String, BeanCon
 	public BeanContext getBeanContext(Class<? extends BeanContext> beanContextClass) {
 		return getCache().get(beanContextClass.getName());
 	}
+	
 
 }

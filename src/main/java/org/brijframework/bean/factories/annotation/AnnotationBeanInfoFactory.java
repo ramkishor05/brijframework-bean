@@ -58,7 +58,7 @@ public class AnnotationBeanInfoFactory extends BeanMetaDataFactoryImpl{
 		dataSetup.setName(bean.getName());
 		dataSetup.setScope(metaSetup.scope());
 		dataSetup.setProperties(bean.getProperties());
-		register(dataSetup);
+		register(id,dataSetup);
 	}
 
 }

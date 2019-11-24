@@ -7,12 +7,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.brijframework.bean.factories.BeanResourceGroupFactory;
 import org.brijframework.bean.resource.BeanResource;
 import org.brijframework.container.Container;
+import org.brijframework.factories.impl.AbstractFactory;
 import org.brijframework.group.Group;
 import org.brijframework.support.config.Assignable;
 import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.printer.ConsolePrint;
 
-public class BeanSetupFactoryImpl implements BeanResourceGroupFactory<BeanResource>{
+public class BeanSetupFactoryImpl extends AbstractFactory<String,BeanResource> implements BeanResourceGroupFactory<String,BeanResource>{
 	
 	private static BeanSetupFactoryImpl factory;
 	
@@ -116,5 +117,13 @@ public class BeanSetupFactoryImpl implements BeanResourceGroupFactory<BeanResour
 		Assertion.notNull(dataSetup.getId(), "Bean id should not be null or empty");
 		Assertion.isTrue(dataSetup.getModel()==null && dataSetup.getTarget()==null , "Bean model or type at least one spacified.");
 		return true;
+	}
+
+	@Override
+	protected void preregister(String key, BeanResource value) {
+	}
+
+	@Override
+	protected void postregister(String key, BeanResource value) {
 	}
 }

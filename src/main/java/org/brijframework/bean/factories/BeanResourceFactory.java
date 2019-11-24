@@ -1,9 +1,9 @@
 package org.brijframework.bean.factories;
 
 import org.brijframework.bean.resource.BeanResource;
-import org.brijframework.factories.Factory;
+import org.brijframework.factories.module.ModuleFactory;
 
-public interface BeanResourceFactory<T extends BeanResource> extends Factory{
+public interface BeanResourceFactory<K,T extends BeanResource> extends ModuleFactory<K, T>{
 
 	public  T register(T dataSetup);
 

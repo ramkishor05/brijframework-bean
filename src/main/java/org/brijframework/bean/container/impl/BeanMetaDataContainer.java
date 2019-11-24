@@ -3,7 +3,7 @@ package org.brijframework.bean.container.impl;
 import org.brijframework.bean.container.BeanContainer;
 import org.brijframework.bean.factories.BeanMetaDataFactory;
 import org.brijframework.bean.group.BeanMetaDataGroup;
-import org.brijframework.container.impl.AbstractModuleContainer;
+import org.brijframework.container.impl.module.AbstractModuleContainer;
 import org.brijframework.group.Group;
 import org.brijframework.support.config.Assignable;
 import org.brijframework.support.config.DepandOn;
@@ -24,13 +24,13 @@ public class BeanMetaDataContainer extends AbstractModuleContainer implements Be
 		return container;
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked" })
 	@Override
 	public void init() {
 		try {
 			ReflectionUtils.getClassListFromExternal().forEach(cls -> {
 				if (BeanMetaDataFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
-					register((Class<? extends BeanMetaDataFactory<?>>) cls);
+					register((Class<? extends BeanMetaDataFactory<?,?>>) cls);
 				}
 			});
 		} catch (Exception e) {
@@ -39,7 +39,7 @@ public class BeanMetaDataContainer extends AbstractModuleContainer implements Be
 		try {
 			ReflectionUtils.getClassListFromInternal().forEach(cls -> {
 				if (BeanMetaDataFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
-					register((Class<? extends BeanMetaDataFactory<?>>) cls);
+					register((Class<? extends BeanMetaDataFactory<?,?>>) cls);
 				}
 			});
 		} catch (Exception e) {

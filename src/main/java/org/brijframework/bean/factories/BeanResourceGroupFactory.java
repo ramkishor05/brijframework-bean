@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.brijframework.bean.resource.BeanResource;
 
-public interface BeanResourceGroupFactory<T extends BeanResource> extends BeanResourceFactory<T>{
+public interface BeanResourceGroupFactory<K, T extends BeanResource> extends BeanResourceFactory<K,T>{
 
 	@Override
 	public T register(T dataSetup);
