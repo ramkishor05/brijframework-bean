@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.brijframework.bean.meta.BeanMetaData;
-import org.brijframework.model.info.OwnerModelInfo;
+import org.brijframework.model.info.ClassModelMetaData;
 import org.brijframework.support.enums.Scope;
 import org.brijframework.util.asserts.Assertion;
 
 public class BeanMetaDataImpl implements BeanMetaData {
 	
-	private OwnerModelInfo owner;
+	private ClassModelMetaData owner;
 	
 	private String id;
 	
@@ -20,11 +20,11 @@ public class BeanMetaDataImpl implements BeanMetaData {
 
 	private Map<String, Object> properties;
 	
-	public BeanMetaDataImpl(OwnerModelInfo owner) {
+	public BeanMetaDataImpl(ClassModelMetaData owner) {
 		this.owner=owner;
 	}
 	
-	public OwnerModelInfo getOwner() {
+	public ClassModelMetaData getOwner() {
 		return owner;
 	}
 	
@@ -51,7 +51,7 @@ public class BeanMetaDataImpl implements BeanMetaData {
 		return name;
 	}
 	
-	public void setOwner(OwnerModelInfo owner) {
+	public void setOwner(ClassModelMetaData owner) {
 		this.owner = owner;
 	}
 	

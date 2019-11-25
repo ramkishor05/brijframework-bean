@@ -4,8 +4,8 @@ import org.brijframework.bean.factories.impl.BeanMetaDataFactoryImpl;
 import org.brijframework.bean.factories.impl.BeanSetupFactoryImpl;
 import org.brijframework.bean.meta.impl.BeanMetaDataImpl;
 import org.brijframework.bean.resource.BeanResource;
-import org.brijframework.model.factories.asm.ClassMetaInfoFactoryImpl;
-import org.brijframework.model.info.OwnerModelInfo;
+import org.brijframework.model.factories.metadata.asm.impl.ClassModelMetaDataFactoryImpl;
+import org.brijframework.model.info.ClassModelMetaData;
 import org.brijframework.support.beans.Bean;
 import org.brijframework.support.beans.Beans;
 import org.brijframework.support.config.Assignable;
@@ -50,7 +50,7 @@ public class AnnotationBeanInfoFactory extends BeanMetaDataFactoryImpl{
 
 	private void register(Class<?> target, Bean metaSetup) {
 		String id=Constants.DEFAULT.equals(metaSetup.id())?target.getSimpleName():metaSetup.id();
-		OwnerModelInfo owner=ClassMetaInfoFactoryImpl.getFactory().getClassInfo(metaSetup.model());
+		ClassModelMetaData owner=ClassModelMetaDataFactoryImpl.getFactory().getClassInfo(metaSetup.model());
 		Assertion.notNull(owner, "Model not found for "+metaSetup.model()+" of bean  : "+id);
 		BeanResource bean=BeanSetupFactoryImpl.getFactory().find(id);
 		BeanMetaDataImpl dataSetup=new BeanMetaDataImpl(owner);

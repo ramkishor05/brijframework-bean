@@ -9,7 +9,7 @@ import org.brijframework.container.Container;
 import org.brijframework.factories.impl.AbstractFactory;
 import org.brijframework.factories.module.ModuleFactory;
 import org.brijframework.group.Group;
-import org.brijframework.model.info.PptModelInfoGroup;
+import org.brijframework.model.info.PropertyModelMetaDataGroup;
 import org.brijframework.monitor.factories.PrototypeScopeMonitorFactroy;
 import org.brijframework.monitor.factories.RequestScopeMonitorFactroy;
 import org.brijframework.monitor.factories.SessionScopeMonitorFactroy;
@@ -56,7 +56,7 @@ public abstract class BeanScopeFactory extends AbstractFactory<String, BeanScope
 	private Object buildScopeObject(String uniqueID, BeanMetaData datainfo) {
 		Object bean=InstanceUtil.getInstance(datainfo.getOwner().getTarget(), datainfo.getOwner().getConstructor().getValues());
 		datainfo.getProperties().forEach((_keyPath,_value)->{
-			PptModelInfoGroup fieldGroup=datainfo.getOwner().getProperties().get(_keyPath);
+			PropertyModelMetaDataGroup fieldGroup=datainfo.getOwner().getProperties().get(_keyPath);
 			if(_value instanceof Map && ((Map) _value).containsKey("@ref")) {
 				_value=getCache().get(((Map) _value).get("@ref"));
 			}

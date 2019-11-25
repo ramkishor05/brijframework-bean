@@ -2,10 +2,11 @@ package org.brijframework.bean.config.impl;
 
 import org.brijframework.bean.config.BeanConfig;
 
-public class ResourcesBeanConfig implements BeanConfig{
+public class BeanConfigration implements BeanConfig{
 	
 	private boolean enable;
 	private String location;
+	private String packages;
 
 	public void setEnable(boolean enable) {
 		this.enable = enable;
@@ -23,4 +24,11 @@ public class ResourcesBeanConfig implements BeanConfig{
 		return location;
 	}
 	
+	public void setPackages(String packages) {
+		this.packages = packages;
+	}
+	
+	public String getPackages() {
+		return packages;
+	}
 }

@@ -4,8 +4,8 @@ import org.brijframework.bean.factories.impl.BeanMetaDataFactoryImpl;
 import org.brijframework.bean.factories.impl.BeanSetupFactoryImpl;
 import org.brijframework.bean.meta.impl.BeanMetaDataImpl;
 import org.brijframework.bean.resource.BeanResource;
-import org.brijframework.model.factories.asm.ClassMetaInfoFactoryImpl;
-import org.brijframework.model.info.OwnerModelInfo;
+import org.brijframework.model.factories.metadata.asm.impl.ClassModelMetaDataFactoryImpl;
+import org.brijframework.model.info.ClassModelMetaData;
 import org.brijframework.support.config.Assignable;
 import org.brijframework.support.enums.Scope;
 import org.brijframework.util.asserts.Assertion;
@@ -32,11 +32,11 @@ public class JsonBeanMetaDataFactory extends BeanMetaDataFactoryImpl{
 	}
 
 	public void register(String id, BeanResource metaSetup) {
-		OwnerModelInfo owner=null;
+		ClassModelMetaData owner=null;
 		if(metaSetup.getModel() != null && !metaSetup.getModel().isEmpty() ) {
-			owner=ClassMetaInfoFactoryImpl.getFactory().getClassInfo(metaSetup.getModel());
+			owner=ClassModelMetaDataFactoryImpl.getFactory().getClassInfo(metaSetup.getModel());
 		}else {
-			owner=ClassMetaInfoFactoryImpl.getFactory().register(metaSetup.getTarget());
+			owner=ClassModelMetaDataFactoryImpl.getFactory().register(metaSetup.getTarget());
 		}
 		Assertion.notNull(owner, "Model not found for "+metaSetup.getModel()+" of bean  : "+id);
 		id=Constants.DEFAULT.equals(metaSetup.getId())?owner.getTarget().getSimpleName():metaSetup.getId();
@@ -51,7 +51,7 @@ public class JsonBeanMetaDataFactory extends BeanMetaDataFactoryImpl{
 
 	public void register(Class<?> target, BeanResource metaSetup) {
 		String id=Constants.DEFAULT.equals(metaSetup.getId())?target.getSimpleName():metaSetup.getId();
-		OwnerModelInfo owner=ClassMetaInfoFactoryImpl.getFactory().getClassInfo(metaSetup.getModel());
+		ClassModelMetaData owner=ClassModelMetaDataFactoryImpl.getFactory().getClassInfo(metaSetup.getModel());
 		Assertion.notNull(owner, "Model not found for "+metaSetup.getModel()+" of bean  : "+id);
 		BeanResource bean=BeanSetupFactoryImpl.getFactory().find(id);
 		BeanMetaDataImpl dataSetup=new BeanMetaDataImpl(owner);

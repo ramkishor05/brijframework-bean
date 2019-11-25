@@ -10,8 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.brijframework.model.factories.asm.ClassMetaInfoFactoryImpl;
-import org.brijframework.model.info.PptModelInfo;
+import org.brijframework.model.factories.metadata.asm.impl.ClassModelMetaDataFactoryImpl;
+import org.brijframework.model.info.PropertyModelMetaDataGroup;
 import org.brijframework.model.util.ModelUtil;
 import org.brijframework.util.accessor.MetaAccessorUtil;
 import org.brijframework.util.accessor.PropertyAccessorUtil;
@@ -32,11 +32,11 @@ public class BeanObjectUtil {
 	@SuppressWarnings("unchecked")
 	private static <T> T findCurrentFromObject(Object instance, String _keyPath, boolean isDefault) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
-		PptModelInfo property =ClassMetaInfoFactoryImpl.getFactory().getFieldMeta(instance.getClass().getSimpleName() , _keyPath);
-		Field field = property != null ? property.getTargetAsField(): FieldUtil.getField(instance.getClass(), _keyPath, Access.PRIVATE);
+		PropertyModelMetaDataGroup property =ClassModelMetaDataFactoryImpl.getFactory().getFieldMeta(instance.getClass().getSimpleName() , _keyPath);
+		Field field = property != null ? property.getFieldMeta().getTargetAsField(): FieldUtil.getField(instance.getClass(), _keyPath, Access.PRIVATE);
 		Object _value = PropertyAccessorUtil.getProperty(instance, field, Access.PRIVATE);
 		if (_value == null && isDefault) {
-			Class<?> targetClass = property != null ? CastingUtil.getTargetClass(field, property.getType()): CastingUtil.getTargetClass(field, field.getType());
+			Class<?> targetClass = property != null ? CastingUtil.getTargetClass(field, property.getFieldMeta().getType()): CastingUtil.getTargetClass(field, field.getType());
 			_value = InstanceUtil.getInstance(targetClass);
 			PropertyAccessorUtil.setProperty(instance, field, _value);
 		}
@@ -156,9 +156,9 @@ public class BeanObjectUtil {
 	@SuppressWarnings("unchecked")
 	private static <T> T findCurrentFromList(Object instance, String _keyPath, Integer index, boolean isDefault) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
-		PptModelInfo property =ClassMetaInfoFactoryImpl.getFactory().getFieldMeta(instance.getClass().getSimpleName() , _keyPath);
-		Field field = property != null ? property.getTargetAsField(): FieldUtil.getField(instance.getClass(), _keyPath, Access.PRIVATE);
-		Class<?> targetClass = property != null ? CastingUtil.getTargetClass(field, property.getType()): CastingUtil.getTargetClass(field, field.getType());
+		PropertyModelMetaDataGroup property =ClassModelMetaDataFactoryImpl.getFactory().getFieldMeta(instance.getClass().getSimpleName() , _keyPath);
+		Field field = property != null ? property.getFieldMeta().getTargetAsField(): FieldUtil.getField(instance.getClass(), _keyPath, Access.PRIVATE);
+		Class<?> targetClass = property != null ? CastingUtil.getTargetClass(field, property.getFieldMeta().getType()): CastingUtil.getTargetClass(field, field.getType());
 		Object collection = PropertyAccessorUtil.getProperty(instance, _keyPath, Access.PRIVATE);
 		if (collection == null && targetClass != null && isDefault) {
 			collection = InstanceUtil.getInstance(targetClass);

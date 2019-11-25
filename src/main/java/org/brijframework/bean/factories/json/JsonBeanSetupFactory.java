@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.brijframework.bean.config.impl.ResourcesBeanConfig;
+import org.brijframework.bean.config.impl.BeanConfigration;
 import org.brijframework.bean.constant.BeanConstants;
 import org.brijframework.bean.factories.impl.BeanSetupFactoryImpl;
 import org.brijframework.bean.resource.impl.BeanResourceImpl;
@@ -32,13 +32,13 @@ public class JsonBeanSetupFactory  extends BeanSetupFactoryImpl{
 	
 
 	@SuppressWarnings("unchecked")
-	public List<ResourcesBeanConfig> configration() {
-		Object resources=getContainer().getContext().getEnvironment().get(BeanConstants.APPLICATION_BOOTSTRAP_CONFIG_BEANS_JSON_LOCATION);
+	public List<BeanConfigration> configration() {
+		Object resources=getContainer().getContext().getEnvironment().get(BeanConstants.APPLICATION_CONFIG_BEANS);
 		if (resources==null) {
-			ConsolePrint.screen("BeanConfigration","Bean configration not found :"+BeanConstants.APPLICATION_BOOTSTRAP_CONFIG_BEANS_JSON_LOCATION);
+			ConsolePrint.screen("BeanConfigration","Bean configration not found :"+BeanConstants.APPLICATION_CONFIG_BEANS);
 			return null;
 		}
-		ConsolePrint.screen("BeanConfigration","Bean configration found :"+BeanConstants.APPLICATION_BOOTSTRAP_CONFIG_BEANS_JSON_LOCATION);
+		ConsolePrint.screen("BeanConfigration","Bean configration found :"+BeanConstants.APPLICATION_CONFIG_BEANS);
 		if(resources instanceof List) {
 			return build((List<Map<String, Object>>)resources);
 		}else if(resources instanceof Map) {
@@ -46,21 +46,21 @@ public class JsonBeanSetupFactory  extends BeanSetupFactoryImpl{
 		}else {
 			Map<String,Object> resourcesMap=new HashMap<>();
 			resourcesMap.put("location", resources);
-			resourcesMap.put("enable", getContainer().getContext().getEnvironment().get(BeanConstants.APPLICATION_BOOTSTRAP_CONFIG_BEANS_JSON_ENABLE));
+			resourcesMap.put("enable", getContainer().getContext().getEnvironment().get(BeanConstants.APPLICATION_CONFIG_BEANS_ENABLE));
 			return build(resourcesMap);
 		}
 	}
 	
-	private List<ResourcesBeanConfig> build(Map<String, Object> resource) {
-		List<ResourcesBeanConfig> configs=new ArrayList<ResourcesBeanConfig>();
-		configs.add(InstanceUtil.getInstance(ResourcesBeanConfig.class, resource));
+	private List<BeanConfigration> build(Map<String, Object> resource) {
+		List<BeanConfigration> configs=new ArrayList<BeanConfigration>();
+		configs.add(InstanceUtil.getInstance(BeanConfigration.class, resource));
 		return configs;
 	}
 
-	private List<ResourcesBeanConfig> build(List<Map<String, Object>> resources) {
-		List<ResourcesBeanConfig> configs=new ArrayList<ResourcesBeanConfig>();
+	private List<BeanConfigration> build(List<Map<String, Object>> resources) {
+		List<BeanConfigration> configs=new ArrayList<BeanConfigration>();
 		for(Map<String, Object> resource:resources) {
-			configs.add(InstanceUtil.getInstance(ResourcesBeanConfig.class, resource));
+			configs.add(InstanceUtil.getInstance(BeanConfigration.class, resource));
 		}
 		return configs;
 	}
@@ -68,12 +68,12 @@ public class JsonBeanSetupFactory  extends BeanSetupFactoryImpl{
 	
 	@Override
 	public JsonBeanSetupFactory loadFactory() {
-		List<ResourcesBeanConfig> configs=configration();
+		List<BeanConfigration> configs=configration();
 		if(configs==null) {
 			ConsolePrint.screen("BeanConfigration","Invalid bean configration : "+configs);
 			return this;
 		}
-		for(ResourcesBeanConfig modelConfig:configs) {
+		for(BeanConfigration modelConfig:configs) {
 			if(!modelConfig.isEnable()) {
 				ConsolePrint.screen("BeanConfigration","Bean configration disabled found :"+modelConfig.getLocation());
 			}
