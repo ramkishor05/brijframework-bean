@@ -1,4 +1,4 @@
-package org.brijframework.bean.factories;
+package org.brijframework.bean.factories.metadata;
 
 import org.brijframework.factories.module.ModuleFactory;
 

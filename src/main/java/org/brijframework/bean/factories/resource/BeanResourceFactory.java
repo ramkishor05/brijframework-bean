@@ -1,4 +1,4 @@
-package org.brijframework.bean.factories;
+package org.brijframework.bean.factories.resource;
 
 import org.brijframework.bean.resource.BeanResource;
 import org.brijframework.factories.module.ModuleFactory;

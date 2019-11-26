@@ -1,13 +1,11 @@
-package org.brijframework.bean.factories.impl;
+package org.brijframework.bean.factories.scope.asm;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
+import org.brijframework.bean.factories.scope.BeanScopeFactory;
 import org.brijframework.bean.meta.BeanMetaData;
 import org.brijframework.bean.scope.BeanScope;
-import org.brijframework.container.Container;
 import org.brijframework.factories.impl.AbstractFactory;
-import org.brijframework.factories.module.ModuleFactory;
 import org.brijframework.group.Group;
 import org.brijframework.model.info.PropertyModelMetaDataGroup;
 import org.brijframework.monitor.factories.PrototypeScopeMonitorFactroy;
@@ -18,15 +16,11 @@ import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.printer.ConsolePrint;
 import org.brijframework.util.reflect.InstanceUtil;
 
-public abstract class BeanScopeFactory extends AbstractFactory<String, BeanScope> implements ModuleFactory<String, BeanScope>{
-
-	private ConcurrentHashMap<String, BeanScope> cache=new ConcurrentHashMap<String, BeanScope>();
-	
-	private Container container;
+public abstract class AbstractBeanScopeFactory extends AbstractFactory<String, BeanScope> implements BeanScopeFactory{
 
 	public BeanScope register(String key,BeanMetaData datainfo) {
 		BeanScope dataObject=find(key);
-		Assertion.isTrue(dataObject!=null,"Model already exist in cache with : "+key);
+		Assertion.isTrue(dataObject!=null,"Bean already exist in cache with : "+key);
 		dataObject=new BeanScope(datainfo);
 		dataObject.setScopeObject(buildScopeObject(key,datainfo));
 		dataObject.setId(key);
@@ -50,42 +44,22 @@ public abstract class BeanScopeFactory extends AbstractFactory<String, BeanScope
 			return datainfo.getId();
 		}
 	}
-	
 
 	@SuppressWarnings("rawtypes")
 	private Object buildScopeObject(String uniqueID, BeanMetaData datainfo) {
+		Assertion.isTrue(datainfo==null,"BeanMetaData not found in cache with : "+uniqueID);
+		Assertion.isTrue(datainfo.getOwner()==null,"BeanMetaData Owner not found in cache with : "+uniqueID);
 		Object bean=InstanceUtil.getInstance(datainfo.getOwner().getTarget(), datainfo.getOwner().getConstructor().getValues());
 		datainfo.getProperties().forEach((_keyPath,_value)->{
 			PropertyModelMetaDataGroup fieldGroup=datainfo.getOwner().getProperties().get(_keyPath);
 			if(_value instanceof Map && ((Map) _value).containsKey("@ref")) {
 				_value=getCache().get(((Map) _value).get("@ref"));
 			}
-			Assertion.notNull(fieldGroup, datainfo.getOwner().getName()+" : No such type of property contains : "+_keyPath);
-			Assertion.notNull(fieldGroup.getSetterMeta(), datainfo.getOwner().getName()+" : Not attow to set such type of property contains : "+_keyPath);
+			Assertion.notNull(fieldGroup, datainfo.getOwner().getName()+" : No such type of property contains : "+_keyPath+" for "+datainfo.getId());
+			Assertion.notNull(fieldGroup.getSetterMeta(), datainfo.getOwner().getName()+" : Not allowed to set such type of property contains : "+_keyPath);
 			PropertyAccessorUtil.setProperty(bean, fieldGroup.getSetterMeta().getTarget(), _value);
 		});
 		return bean;
-	}
-
-	@Override
-	public Container getContainer() {
-		return this.container;
-	}
-
-	@Override
-	public void setContainer(Container container) {
-		this.container=container;
-	}
-
-	@Override
-	public ConcurrentHashMap<String, BeanScope> getCache() {
-		return cache;
-	}
-
-	@Override
-	public BeanScopeFactory clear() {
-		this.getCache().clear();
-		return this;
 	}
 	
 	public void loadContainer(BeanScope metaInfo) {
@@ -100,11 +74,12 @@ public abstract class BeanScopeFactory extends AbstractFactory<String, BeanScope
 		}
 	}
 	
-
-	public BeanMetaData getContainer(String modelKey) {
-		if (getContainer() == null) {
-			return null;
-		}
-		return getContainer().find(modelKey);
+	@Override
+	protected void preregister(String key, BeanScope value) {
 	}
+
+	@Override
+	protected void postregister(String key, BeanScope value) {
+	}
+
 }

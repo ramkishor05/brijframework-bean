@@ -1,4 +1,4 @@
-package org.brijframework.bean.group;
+package org.brijframework.bean.group.beanmeta;
 
 import java.util.concurrent.ConcurrentHashMap;
 

@@ -1,11 +1,11 @@
 package org.brijframework.bean.container.impl;
 
 import org.brijframework.bean.container.BeanContainer;
-import org.brijframework.bean.factories.BeanMetaDataFactory;
-import org.brijframework.bean.group.BeanMetaDataGroup;
+import org.brijframework.bean.factories.metadata.BeanMetaDataFactory;
+import org.brijframework.bean.group.beanmeta.BeanMetaDataGroup;
 import org.brijframework.container.impl.module.AbstractModuleContainer;
 import org.brijframework.group.Group;
-import org.brijframework.support.config.Assignable;
+import org.brijframework.support.config.SingletonFactory;
 import org.brijframework.support.config.DepandOn;
 import org.brijframework.util.printer.ConsolePrint;
 import org.brijframework.util.reflect.InstanceUtil;
@@ -16,7 +16,7 @@ public class BeanMetaDataContainer extends AbstractModuleContainer implements Be
 
 	private static BeanMetaDataContainer container;
 
-	@Assignable
+	@SingletonFactory
 	public static BeanMetaDataContainer getContainer() {
 		if (container == null) {
 			container = new BeanMetaDataContainer();

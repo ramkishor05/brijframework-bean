@@ -1,11 +1,11 @@
 package org.brijframework.bean.container.impl;
 
-import org.brijframework.bean.factories.BeanResourceFactory;
-import org.brijframework.bean.factories.BeanResourceGroupFactory;
-import org.brijframework.bean.group.BeanSetupGroup;
+import org.brijframework.bean.factories.resource.BeanResourceFactory;
+import org.brijframework.bean.factories.resource.BeanResourceGroupFactory;
+import org.brijframework.bean.group.resource.BeanResourceGroup;
 import org.brijframework.container.impl.module.AbstractModuleContainer;
 import org.brijframework.group.Group;
-import org.brijframework.support.config.Assignable;
+import org.brijframework.support.config.SingletonFactory;
 import org.brijframework.util.printer.ConsolePrint;
 import org.brijframework.util.reflect.InstanceUtil;
 import org.brijframework.util.reflect.ReflectionUtils;
@@ -14,7 +14,7 @@ public class BeanResourceContainer extends AbstractModuleContainer{
 
 	private static BeanResourceContainer container;
 
-	@Assignable
+	@SingletonFactory
 	public static BeanResourceContainer getContainer() {
 		if (container == null) {
 			container = new BeanResourceContainer();
@@ -49,7 +49,7 @@ public class BeanResourceContainer extends AbstractModuleContainer{
 	public Group load(Object groupKey) {
 		Group group = get(groupKey);
 		if (group == null) {
-			group = new BeanSetupGroup(groupKey);
+			group = new BeanResourceGroup(groupKey);
 			ConsolePrint.screen("Resource", "Registery for bean resource group with id :"+groupKey);
 			this.add(groupKey, group);
 		}

@@ -1,4 +1,4 @@
-package org.brijframework.bean.factories.json;
+package org.brijframework.bean.factories.resource.json;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,24 +8,24 @@ import java.util.Map;
 
 import org.brijframework.bean.config.impl.BeanConfigration;
 import org.brijframework.bean.constant.BeanConstants;
-import org.brijframework.bean.factories.impl.BeanSetupFactoryImpl;
+import org.brijframework.bean.factories.resource.impl.BeanResourceFactoryImpl;
 import org.brijframework.bean.resource.impl.BeanResourceImpl;
 import org.brijframework.resources.factory.json.JsonResourceFactory;
 import org.brijframework.resources.files.json.JsonResource;
-import org.brijframework.support.config.Assignable;
+import org.brijframework.support.config.SingletonFactory;
 import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.printer.ConsolePrint;
 import org.brijframework.util.reflect.InstanceUtil;
 import org.json.JSONException;
 
-public class JsonBeanSetupFactory  extends BeanSetupFactoryImpl{
+public class JsonBeanResourceFactory  extends BeanResourceFactoryImpl{
 
-	private static JsonBeanSetupFactory factory;
+	private static JsonBeanResourceFactory factory;
 
-	@Assignable
-	public static JsonBeanSetupFactory getFactory() {
+	@SingletonFactory
+	public static JsonBeanResourceFactory getFactory() {
 		if(factory==null) {
-			factory=new JsonBeanSetupFactory();
+			factory=new JsonBeanResourceFactory();
 		}
 		return factory;
 	}
@@ -67,7 +67,7 @@ public class JsonBeanSetupFactory  extends BeanSetupFactoryImpl{
 	
 	
 	@Override
-	public JsonBeanSetupFactory loadFactory() {
+	public JsonBeanResourceFactory loadFactory() {
 		List<BeanConfigration> configs=configration();
 		if(configs==null) {
 			ConsolePrint.screen("BeanConfigration","Invalid bean configration : "+configs);

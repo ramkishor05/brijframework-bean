@@ -2,7 +2,7 @@ package org.brijframework.bean.context.factories;
 
 import org.brijframework.bean.context.BeanContext;
 import org.brijframework.factories.impl.bootstrap.AbstractBootstrapFactory;
-import org.brijframework.support.config.Assignable;
+import org.brijframework.support.config.SingletonFactory;
 import org.brijframework.support.config.OrderOn;
 import org.brijframework.util.printer.ConsolePrint;
 import org.brijframework.util.reflect.InstanceUtil;
@@ -13,7 +13,7 @@ public class BeanContextFactory extends AbstractBootstrapFactory<String, BeanCon
 	
 	private static BeanContextFactory factory ;
 	
-	@Assignable
+	@SingletonFactory
 	public static BeanContextFactory getFactory() {
 		if(factory==null) {
 		    factory=new BeanContextFactory();

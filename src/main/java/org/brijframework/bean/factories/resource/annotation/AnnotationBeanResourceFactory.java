@@ -1,29 +1,29 @@
-package org.brijframework.bean.factories.annotation;
+package org.brijframework.bean.factories.resource.annotation;
 
-import org.brijframework.bean.factories.impl.BeanSetupFactoryImpl;
+import org.brijframework.bean.factories.resource.impl.BeanResourceFactoryImpl;
 import org.brijframework.bean.resource.impl.BeanResourceImpl;
 import org.brijframework.support.beans.Attribute;
 import org.brijframework.support.beans.Bean;
 import org.brijframework.support.beans.Beans;
-import org.brijframework.support.config.Assignable;
+import org.brijframework.support.config.SingletonFactory;
 import org.brijframework.support.enums.Scope;
 import org.brijframework.util.reflect.ReflectionUtils;
 import org.brijframework.util.support.Constants;
 
-public class AnnotationBeanSetupFactory extends BeanSetupFactoryImpl{
+public class AnnotationBeanResourceFactory extends BeanResourceFactoryImpl{
 
-	private static AnnotationBeanSetupFactory factory;
+	private static AnnotationBeanResourceFactory factory;
 
-	@Assignable
-	public static AnnotationBeanSetupFactory getFactory() {
+	@SingletonFactory
+	public static AnnotationBeanResourceFactory getFactory() {
 		if(factory==null) {
-			factory=new AnnotationBeanSetupFactory();
+			factory=new AnnotationBeanResourceFactory();
 		}
 		return factory;
 	}
 	
 	@Override
-	public AnnotationBeanSetupFactory loadFactory() {
+	public AnnotationBeanResourceFactory loadFactory() {
 		ReflectionUtils.getInternalClassList().forEach(target -> {
 			if (target.isAnnotationPresent(Beans.class) || target.isAnnotationPresent(Bean.class)) {
 				this.register(target);

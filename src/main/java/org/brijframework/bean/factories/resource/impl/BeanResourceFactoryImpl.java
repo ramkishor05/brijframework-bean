@@ -1,30 +1,30 @@
-package org.brijframework.bean.factories.impl;
+package org.brijframework.bean.factories.resource.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.brijframework.bean.factories.BeanResourceGroupFactory;
+import org.brijframework.bean.factories.resource.BeanResourceGroupFactory;
 import org.brijframework.bean.resource.BeanResource;
 import org.brijframework.container.Container;
 import org.brijframework.factories.impl.AbstractFactory;
 import org.brijframework.group.Group;
-import org.brijframework.support.config.Assignable;
+import org.brijframework.support.config.SingletonFactory;
 import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.printer.ConsolePrint;
 
-public class BeanSetupFactoryImpl extends AbstractFactory<String,BeanResource> implements BeanResourceGroupFactory<String,BeanResource>{
+public class BeanResourceFactoryImpl extends AbstractFactory<String,BeanResource> implements BeanResourceGroupFactory<String,BeanResource>{
 	
-	private static BeanSetupFactoryImpl factory;
+	private static BeanResourceFactoryImpl factory;
 	
 	private Container container;
 	
 	private ConcurrentHashMap<String, BeanResource> cache=new ConcurrentHashMap<>();
 
-	@Assignable
-	public static BeanSetupFactoryImpl getFactory() {
+	@SingletonFactory
+	public static BeanResourceFactoryImpl getFactory() {
 		if(factory==null) {
-			factory=new BeanSetupFactoryImpl();
+			factory=new BeanResourceFactoryImpl();
 		}
 		return factory;
 	}
@@ -58,7 +58,7 @@ public class BeanSetupFactoryImpl extends AbstractFactory<String,BeanResource> i
 	}
 	
 	@Override
-	public BeanSetupFactoryImpl loadFactory() {
+	public BeanResourceFactoryImpl loadFactory() {
 		return this;
 	}
 
@@ -86,7 +86,7 @@ public class BeanSetupFactoryImpl extends AbstractFactory<String,BeanResource> i
 	}
 
 	@Override
-	public BeanSetupFactoryImpl clear() {
+	public BeanResourceFactoryImpl clear() {
 		getCache().clear();
 		return this;
 	}

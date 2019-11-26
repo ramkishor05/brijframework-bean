@@ -1,20 +1,20 @@
-package org.brijframework.bean.group;
+package org.brijframework.bean.group.scope;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.brijframework.bean.resource.BeanResource;
+import org.brijframework.bean.scope.BeanScope;
 import org.brijframework.group.impl.DefaultGroup;
 
-public class BeanSetupGroup implements DefaultGroup {
+public class BeanScopeGroup implements DefaultGroup {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	private Object groupKey;
-	private ConcurrentHashMap<String,BeanResource> cache=new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String,BeanScope> cache=new ConcurrentHashMap<>();
 	
-	public BeanSetupGroup(Object groupKey) {
+	public BeanScopeGroup(Object groupKey) {
 		this.groupKey=groupKey;
 	}
 
@@ -24,7 +24,7 @@ public class BeanSetupGroup implements DefaultGroup {
 	}
 
 	@Override
-	public ConcurrentHashMap<String,BeanResource> getCache() {
+	public ConcurrentHashMap<String,BeanScope> getCache() {
 		return cache;
 	}
 

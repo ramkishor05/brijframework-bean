@@ -1,11 +1,11 @@
 package org.brijframework.bean.container.impl;
 
 import org.brijframework.bean.container.BeanContainer;
-import org.brijframework.bean.factories.impl.BeanFactory;
-import org.brijframework.bean.group.BeanScopeGroup;
+import org.brijframework.bean.factories.scope.BeanScopeFactory;
+import org.brijframework.bean.group.scope.BeanScopeGroup;
 import org.brijframework.container.impl.module.AbstractModuleContainer;
 import org.brijframework.group.Group;
-import org.brijframework.support.config.Assignable;
+import org.brijframework.support.config.SingletonFactory;
 import org.brijframework.support.config.DepandOn;
 import org.brijframework.util.printer.ConsolePrint;
 import org.brijframework.util.reflect.InstanceUtil;
@@ -16,7 +16,7 @@ public class BeanScopeContainer extends AbstractModuleContainer implements BeanC
 
 	private static BeanScopeContainer container;
 
-	@Assignable
+	@SingletonFactory
 	public static BeanScopeContainer getContainer() {
 		if (container == null) {
 			container = InstanceUtil.getSingletonInstance(BeanScopeContainer.class);
@@ -41,8 +41,8 @@ public class BeanScopeContainer extends AbstractModuleContainer implements BeanC
 	public void init() {
 		try {
 			ReflectionUtils.getClassListFromExternal().forEach(cls -> {
-				if (BeanFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
-					register((Class<? extends BeanFactory>) cls);
+				if (BeanScopeFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
+					register((Class<? extends BeanScopeFactory>) cls);
 				}
 			});
 		} catch (Exception e) {
@@ -50,8 +50,8 @@ public class BeanScopeContainer extends AbstractModuleContainer implements BeanC
 		}
 		try {
 			ReflectionUtils.getClassListFromInternal().forEach(cls -> {
-				if (BeanFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
-					register((Class<? extends BeanFactory>) cls);
+				if (BeanScopeFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
+					register((Class<? extends BeanScopeFactory>) cls);
 				}
 			});
 		} catch (Exception e) {
