@@ -17,4 +17,8 @@ public interface BeanMetaData extends Initializer{
 	ClassModelMetaData getOwner();
 
 	Map<String, Object> getProperties();
+
+	String getFactoryClass();
+
+	String getFactoryMethod();
 }

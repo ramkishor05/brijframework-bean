@@ -19,6 +19,10 @@ public class BeanResourceImpl implements BeanResource {
 	
 	private String uniqueKey;
 	
+	private String factoryClass;
+	
+	private String factoryMethod;
+	
 	private Map<String, Object> properties;
 	
 	public void setUniqueKey(String uniqueKey) {
@@ -75,6 +79,24 @@ public class BeanResourceImpl implements BeanResource {
 	
 	public void setType(String type) {
 		this.type = type;
+	}
+	
+	@Override
+	public String getFactoryClass() {
+		return factoryClass;
+	}
+
+	public void setFactoryClass(String factoryClass) {
+		this.factoryClass = factoryClass;
+	}
+
+	@Override
+	public String getFactoryMethod() {
+		return factoryMethod;
+	}
+
+	public void setFactoryMethod(String factoryMethod) {
+		this.factoryMethod = factoryMethod;
 	}
 
 	public Map<String, Object> getProperties() {

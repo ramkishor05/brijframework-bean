@@ -17,4 +17,9 @@ public interface BeanResource {
 	String getScope();
 	
 	String getUniqueKey();
+
+	String getFactoryClass();
+
+	String getFactoryMethod();
+
 }

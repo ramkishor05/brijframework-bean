@@ -29,16 +29,16 @@ public class BeanContextFactory extends AbstractBootstrapFactory<String, BeanCon
 				if(BeanContext.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					BeanContext beanContext = (BeanContext) InstanceUtil.getInstance(cls);
 					beanContext.start();
-					this.register(beanContext.getClass().getName(), beanContext);
-					this.register(beanContext.getClass().getSimpleName(), beanContext);
-				}
+					this.register(beanContext.getClass().getSimpleName().equals(BeanContext.class.getSimpleName()+"Impl")? BeanContext.class.getSimpleName(): beanContext.getClass().getSimpleName(), beanContext);
+					this.register(beanContext.getClass().getName().equals(BeanContext.class.getName()+"Impl")? BeanContext.class.getName(): beanContext.getClass().getName(), beanContext);
+			    }
 			});
 			ReflectionUtils.getClassListFromInternal().forEach(cls->{
 				if(BeanContext.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					BeanContext beanContext = (BeanContext) InstanceUtil.getInstance(cls);
 					beanContext.start();
-					this.register(beanContext.getClass().getName(), beanContext);
-					this.register(beanContext.getClass().getSimpleName(), beanContext);
+					this.register(beanContext.getClass().getSimpleName().equals(BeanContext.class.getSimpleName()+"Impl")? BeanContext.class.getSimpleName(): beanContext.getClass().getSimpleName(), beanContext);
+					this.register(beanContext.getClass().getName().equals(BeanContext.class.getName()+"Impl")? BeanContext.class.getName(): beanContext.getClass().getName(), beanContext);
 				}
 			});
 			ConsolePrint.screen("BootstrapFactory -> "+this.getClass().getSimpleName(), "Lunched the factory to bean context");
@@ -51,6 +51,7 @@ public class BeanContextFactory extends AbstractBootstrapFactory<String, BeanCon
 
 	@Override
 	protected void preregister(String key, BeanContext value) {
+		System.out.println(key+" : "+value);
 	}
 
 	@Override
@@ -58,7 +59,7 @@ public class BeanContextFactory extends AbstractBootstrapFactory<String, BeanCon
 	}
 
 	public BeanContext getBeanContext() {
-		return getCache().get(BeanContext.class.getName());
+		return getCache().get(BeanContext.class.getSimpleName());
 	}
 	
 	public BeanContext getBeanContext(Class<? extends BeanContext> beanContextClass) {

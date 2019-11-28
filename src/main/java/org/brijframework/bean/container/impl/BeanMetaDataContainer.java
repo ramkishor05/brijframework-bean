@@ -57,4 +57,9 @@ public class BeanMetaDataContainer extends AbstractModuleContainer implements Be
 		}
 		return group;
 	}
+
+	@Override
+	public boolean containsObject(Object key) {
+		return false;
+	}
 }

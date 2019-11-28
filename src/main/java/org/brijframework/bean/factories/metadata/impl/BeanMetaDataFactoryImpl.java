@@ -1,7 +1,9 @@
 package org.brijframework.bean.factories.metadata.impl;
 
+import java.util.Map.Entry;
+
 import org.brijframework.bean.factories.metadata.asm.AbstractBeanMetaDataFactory;
-import org.brijframework.bean.factories.resource.impl.BeanResourceFactoryImpl;
+import org.brijframework.group.Group;
 import org.brijframework.support.config.OrderOn;
 import org.brijframework.support.config.SingletonFactory;
 
@@ -18,12 +20,13 @@ public final class BeanMetaDataFactoryImpl extends AbstractBeanMetaDataFactory{
 		return factory;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public BeanMetaDataFactoryImpl loadFactory() {
-		BeanResourceFactoryImpl.getFactory().getCache().forEach((id,beansetup)->{
-			register(id, beansetup);
-		});
+		for(Entry<Object, Group> entry:getContainer().getCache().entrySet()) {
+			this.getCache().putAll(entry.getValue().getCache());
+		}
 		return this;
 	}
-
+	
 }

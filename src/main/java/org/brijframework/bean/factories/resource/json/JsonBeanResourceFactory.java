@@ -8,17 +8,19 @@ import java.util.Map;
 
 import org.brijframework.bean.config.impl.BeanConfigration;
 import org.brijframework.bean.constant.BeanConstants;
-import org.brijframework.bean.factories.resource.impl.BeanResourceFactoryImpl;
+import org.brijframework.bean.factories.resource.asm.AbstractBeanResourceFactory;
 import org.brijframework.bean.resource.impl.BeanResourceImpl;
 import org.brijframework.resources.factory.json.JsonResourceFactory;
 import org.brijframework.resources.files.json.JsonResource;
+import org.brijframework.support.config.OrderOn;
 import org.brijframework.support.config.SingletonFactory;
 import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.printer.ConsolePrint;
 import org.brijframework.util.reflect.InstanceUtil;
 import org.json.JSONException;
 
-public class JsonBeanResourceFactory  extends BeanResourceFactoryImpl{
+@OrderOn(2)
+public class JsonBeanResourceFactory  extends AbstractBeanResourceFactory{
 
 	private static JsonBeanResourceFactory factory;
 
@@ -29,11 +31,10 @@ public class JsonBeanResourceFactory  extends BeanResourceFactoryImpl{
 		}
 		return factory;
 	}
-	
 
 	@SuppressWarnings("unchecked")
 	public List<BeanConfigration> configration() {
-		Object resources=getContainer().getContext().getEnvironment().get(BeanConstants.APPLICATION_CONFIG_BEANS);
+		Object resources=getEnvProperty(BeanConstants.APPLICATION_CONFIG_BEANS);
 		if (resources==null) {
 			ConsolePrint.screen("BeanConfigration","Bean configration not found :"+BeanConstants.APPLICATION_CONFIG_BEANS);
 			return null;
@@ -46,7 +47,7 @@ public class JsonBeanResourceFactory  extends BeanResourceFactoryImpl{
 		}else {
 			Map<String,Object> resourcesMap=new HashMap<>();
 			resourcesMap.put("location", resources);
-			resourcesMap.put("enable", getContainer().getContext().getEnvironment().get(BeanConstants.APPLICATION_CONFIG_BEANS_ENABLE));
+			resourcesMap.put("enable", getEnvProperty(BeanConstants.APPLICATION_CONFIG_BEANS_ENABLE));
 			return build(resourcesMap);
 		}
 	}
@@ -111,6 +112,6 @@ public class JsonBeanResourceFactory  extends BeanResourceFactoryImpl{
 	public void register(Map<String, Object> resourceMap) {
 		Assertion.notNull(resourceMap, "Invalid target :"+resourceMap);
 		BeanResourceImpl metaSetup=InstanceUtil.getInstance(BeanResourceImpl.class,resourceMap);
-		this.register(metaSetup);
+		this.register(metaSetup.getId(),metaSetup);
 	}
 }

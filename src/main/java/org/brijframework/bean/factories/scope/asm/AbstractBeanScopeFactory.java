@@ -1,5 +1,7 @@
 package org.brijframework.bean.factories.scope.asm;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.brijframework.bean.factories.scope.BeanScopeFactory;
@@ -13,20 +15,25 @@ import org.brijframework.monitor.factories.RequestScopeMonitorFactroy;
 import org.brijframework.monitor.factories.SessionScopeMonitorFactroy;
 import org.brijframework.util.accessor.PropertyAccessorUtil;
 import org.brijframework.util.asserts.Assertion;
-import org.brijframework.util.printer.ConsolePrint;
 import org.brijframework.util.reflect.InstanceUtil;
 
 public abstract class AbstractBeanScopeFactory extends AbstractFactory<String, BeanScope> implements BeanScopeFactory{
 
+	@Override
+	public boolean contains(String key) {
+		return find(key)!=null;
+	}
+	
 	public BeanScope register(String key,BeanMetaData datainfo) {
 		BeanScope dataObject=find(key);
 		Assertion.isTrue(dataObject!=null,"Bean already exist in cache with : "+key);
 		dataObject=new BeanScope(datainfo);
 		dataObject.setScopeObject(buildScopeObject(key,datainfo));
 		dataObject.setId(key);
-		loadContainer(dataObject);
+		preregister(key, dataObject);
+		loadContainer(key,dataObject);
 		getCache().put(key, dataObject);
-		ConsolePrint.screen("Bean", "Registery for bean scope '"+datainfo.getScope()+"' for id :"+datainfo.getId());
+		postregister(key, dataObject);
 		return dataObject;
 	}
 
@@ -62,16 +69,38 @@ public abstract class AbstractBeanScopeFactory extends AbstractFactory<String, B
 		return bean;
 	}
 	
-	public void loadContainer(BeanScope metaInfo) {
+	@Override
+	protected void loadContainer(String key, BeanScope value) {
 		if (getContainer() == null) {
 			return;
 		}
-		Group group = getContainer().load(metaInfo.getDatainfo().getOwner().getName());
-		if(!group.containsKey(metaInfo.getId())) {
-			group.add(metaInfo.getId(), metaInfo);
+		Group group = getContainer().load(value.getDatainfo().getOwner().getName());
+		if(!group.containsKey(value.getId())) {
+			group.add(key, value);
 		}else {
-			group.update(metaInfo.getId(), metaInfo);
+			group.update(key, value);
 		}
+	}
+	
+	@Override
+	public BeanScope find(Class<? extends Object> beanClass) {
+		List<BeanScope> findAll = findAll(beanClass);
+		if(findAll.isEmpty()) {
+			return null;
+		}
+		Assertion.isTrue(findAll.size()>1, beanClass.getSimpleName()+" nonunique bean exist.");
+		return findAll.get(0);
+	}
+
+	@Override
+	public List<BeanScope> findAll(Class<? extends Object> beanClass) {
+		List<BeanScope> list=new ArrayList<BeanScope>();
+		for(BeanScope beanScope:getCache().values()) {
+			if(beanClass.isAssignableFrom(beanScope.getDatainfo().getOwner().getTarget())) {
+				list.add(beanScope);
+			}
+		}
+		return list;
 	}
 	
 	@Override

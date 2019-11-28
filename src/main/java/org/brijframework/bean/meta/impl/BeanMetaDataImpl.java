@@ -17,6 +17,10 @@ public class BeanMetaDataImpl implements BeanMetaData {
 	private String name;
 	
 	private Scope scope;
+	
+	private String factoryClass;
+	
+	private String factoryMethod;
 
 	private Map<String, Object> properties;
 	
@@ -63,6 +67,24 @@ public class BeanMetaDataImpl implements BeanMetaData {
 		return scope;
 	}
 
+	@Override
+	public String getFactoryClass() {
+		return factoryClass;
+	}
+
+	public void setFactoryClass(String factoryClass) {
+		this.factoryClass = factoryClass;
+	}
+
+	@Override
+	public String getFactoryMethod() {
+		return factoryMethod;
+	}
+
+	public void setFactoryMethod(String factoryMethod) {
+		this.factoryMethod = factoryMethod;
+	}
+
 	public Map<String, Object> getProperties() {
 		if(properties==null) {
 			properties=new HashMap<>();
@@ -73,4 +95,5 @@ public class BeanMetaDataImpl implements BeanMetaData {
 	public void setProperties(Map<String, Object> properties) {
 		this.properties = properties;
 	}
+
 }
