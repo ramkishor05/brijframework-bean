@@ -7,7 +7,7 @@ import org.brijframework.bean.factories.resource.BeanResourceFactory;
 import org.brijframework.bean.resource.BeanResource;
 import org.brijframework.factories.impl.module.AbstractModuleFactory;
 import org.brijframework.group.Group;
-import org.brijframework.util.printer.ConsolePrint;
+import org.brijframework.util.printer.LoggerConsole;
 
 public class AbstractBeanResourceFactory extends AbstractModuleFactory<String,BeanResource> implements BeanResourceFactory<String,BeanResource>{
 
@@ -39,7 +39,7 @@ public class AbstractBeanResourceFactory extends AbstractModuleFactory<String,Be
 	public List<BeanResource> findAllByModel(String model) {
 		List<BeanResource> list=new ArrayList<>();
 		for(BeanResource setup:getCache().values()) {
-			if(setup.getModel().equals(model)) {
+			if(setup.getModel()!=null && setup.getModel().equals(model)) {
 				list.add(setup);
 			}
 		}
@@ -60,12 +60,12 @@ public class AbstractBeanResourceFactory extends AbstractModuleFactory<String,Be
 
 	@Override
 	protected void preregister(String key, BeanResource value) {
-		ConsolePrint.screen("Resource", "Loading bean resource with id :"+key);
+		LoggerConsole.screen("Resource", "Loading bean resource with id :"+key);
 	}
 
 	@Override
 	protected void postregister(String key, BeanResource value) {
-		ConsolePrint.screen("Resource", "Loaded bean resource with id :"+key);
+		LoggerConsole.screen("Resource", "Loaded bean resource with id :"+key);
 	}
 
 }

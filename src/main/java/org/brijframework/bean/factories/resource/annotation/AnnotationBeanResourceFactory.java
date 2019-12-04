@@ -47,15 +47,16 @@ public class AnnotationBeanResourceFactory extends AbstractBeanResourceFactory{
 		}
 	}
 
-	private void register(Class<?> target, Bean metaSetup) {
+	private void register(Class<?> target, Bean beanResource) {
 		BeanResourceImpl dataSetup=new BeanResourceImpl();
-		dataSetup.setId(Constants.DEFAULT.equals(metaSetup.id())?target.getSimpleName():metaSetup.id());
-		dataSetup.setName(Constants.DEFAULT.equals(metaSetup.name())?target.getSimpleName():metaSetup.name());
-		dataSetup.setModel(Constants.DEFAULT.equals(metaSetup.model())?target.getSimpleName():metaSetup.model());
-		dataSetup.setScope(Constants.DEFAULT.equals(metaSetup.id())? Scope.SINGLETON.toString() :metaSetup.scope().toString());
-		dataSetup.setFactoryClass(Constants.DEFAULT.equals(metaSetup.factoryClass())?null:metaSetup.factoryClass());
-		dataSetup.setFactoryMethod(Constants.DEFAULT.equals(metaSetup.factoryMethod())?null:metaSetup.factoryMethod());
-		for(Attribute field: metaSetup.properties()) {
+		dataSetup.setId(Constants.DEFAULT.equals(beanResource.id())?target.getSimpleName():beanResource.id());
+		dataSetup.setName(Constants.DEFAULT.equals(beanResource.name())?target.getSimpleName():beanResource.name());
+		dataSetup.setModel(Constants.DEFAULT.equals(beanResource.model())?target.getSimpleName():beanResource.model());
+		dataSetup.setScope(Constants.DEFAULT.equals(beanResource.id())? Scope.SINGLETON.toString() :beanResource.scope().toString());
+		dataSetup.setType(Constants.DEFAULT.equals(beanResource.type())? target.getName() :beanResource.type());
+		dataSetup.setFactoryClass(Constants.DEFAULT.equals(beanResource.factoryClass())?null:beanResource.factoryClass());
+		dataSetup.setFactoryMethod(Constants.DEFAULT.equals(beanResource.factoryMethod())?null:beanResource.factoryMethod());
+		for(Attribute field: beanResource.properties()) {
 		    dataSetup.getProperties().put(field.name(), field.value());
 		}
 		register(dataSetup.getId(),dataSetup);

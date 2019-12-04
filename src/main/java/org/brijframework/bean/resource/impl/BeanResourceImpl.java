@@ -109,4 +109,13 @@ public class BeanResourceImpl implements BeanResource {
 	public void setProperties(Map<String, Object> properties) {
 		this.properties = properties;
 	}
+
+	@Override
+	public String toString() {
+		return super.toString()+"[id=" + id + ", name=" + name + ", scope=" + scope + ", model=" + model + ", type="
+				+ type + ", uniqueKey=" + uniqueKey + ", factoryClass=" + factoryClass + ", factoryMethod="
+				+ factoryMethod + ", properties=" + properties + "]";
+	}
+	
+	
 }

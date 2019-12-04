@@ -6,7 +6,7 @@ import org.brijframework.group.Group;
 import org.brijframework.support.config.OrderOn;
 import org.brijframework.support.config.SingletonFactory;
 
-@OrderOn(2)
+@OrderOn(3)
 public final class BeanResourceFactoryImpl extends AbstractBeanResourceFactory{
 	
 	private static BeanResourceFactoryImpl factory;
@@ -22,12 +22,13 @@ public final class BeanResourceFactoryImpl extends AbstractBeanResourceFactory{
 	@SuppressWarnings("unchecked")
 	@Override
 	public BeanResourceFactoryImpl loadFactory() {
-		if(getContainer()!=null) {
-			for(Group  group:getContainer().getCache().values()) {
-				group.getCache().forEach((key,value)->{
-					getCache().put(key.toString(), (BeanResource)value);
-				});
-			}
+		if(getContainer()==null) {
+			return this;
+		}
+		for(Group  group:getContainer().getCache().values()) {
+			group.getCache().forEach((key,value)->{
+				getCache().put(key.toString(), (BeanResource)value);
+			});
 		}
 		return this;
 	}

@@ -2,6 +2,7 @@ package org.brijframework.bean.context;
 
 import java.util.List;
 
+import org.brijframework.bean.meta.BeanMetaData;
 import org.brijframework.bean.resource.BeanResource;
 import org.brijframework.context.module.ModuleContext;
 import org.brijframework.model.context.ModelContext;
@@ -18,15 +19,30 @@ public interface BeanContext extends ModuleContext {
 
 	public List<?> getBeanObjects(Class<? extends Object> beanClass);
 
-	public List<String> getBeanObjectNames();
+	public List<String> getRegisteredBeanNames();
 
-	public List<String> getBeanObjectNames(Class<?> beanClass);
+	public List<String> getRegisteredBeanNames(Class<?> beanClass);
+	
+	public List<?> getBeanResourceNames();
+	
+	public List<?> getBeanResourceNames(String model);
 	
 	public BeanResource getBeanResource(String name);
 	
-	public BeanResource getBeanResource(Class<? extends Object> beanClass);
+	public List<? extends BeanResource> getBeanResourceList();
 	
-	public BeanResource getBeanResource(String name, Class<?> beanClass);
+	public List<? extends BeanResource> getBeanResourceList(String model);
 	
-	public List<? extends BeanResource> getBeanResources(Class<? extends Object> beanClass);
+	public List<?> getBeanMetaDataNames();
+	
+	public List<?> getBeanMetaDataNames(String model);
+	
+	public BeanMetaData getBeanMetaData(String name);
+	
+	public List<? extends BeanMetaData> getBeanMetaDataList();
+	
+	public List<? extends BeanMetaData> getBeanMetaDataList(String model);
+
+	public List<? extends BeanMetaData> getBeanMetaDataList(Class<?> metaClass);
+	
 }

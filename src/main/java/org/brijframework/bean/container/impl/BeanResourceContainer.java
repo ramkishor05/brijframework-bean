@@ -5,7 +5,6 @@ import org.brijframework.bean.group.resource.BeanResourceGroup;
 import org.brijframework.container.impl.module.AbstractModuleContainer;
 import org.brijframework.group.Group;
 import org.brijframework.support.config.SingletonFactory;
-import org.brijframework.util.printer.ConsolePrint;
 import org.brijframework.util.reflect.InstanceUtil;
 import org.brijframework.util.reflect.ReflectionUtils;
 
@@ -49,7 +48,6 @@ public class BeanResourceContainer extends AbstractModuleContainer{
 		Group group = get(groupKey);
 		if (group == null) {
 			group = new BeanResourceGroup(groupKey);
-			ConsolePrint.screen("Resource", "Registery for bean resource group with id :"+groupKey);
 			this.add(groupKey, group);
 		}
 		return group;

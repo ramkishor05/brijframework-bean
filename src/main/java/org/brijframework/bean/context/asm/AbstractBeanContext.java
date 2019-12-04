@@ -1,7 +1,9 @@
 package org.brijframework.bean.context.asm;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.brijframework.bean.container.BeanContainer;
@@ -13,11 +15,10 @@ import org.brijframework.bean.meta.BeanMetaData;
 import org.brijframework.bean.resource.BeanResource;
 import org.brijframework.bean.scope.BeanScope;
 import org.brijframework.context.impl.module.AbstractModuleContext;
-import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.reflect.InstanceUtil;
 import org.brijframework.util.reflect.ReflectionUtils;
 
-public class AbstractBeanContext extends AbstractModuleContext implements BeanContext {
+public abstract class AbstractBeanContext extends AbstractModuleContext implements BeanContext {
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -42,45 +43,45 @@ public class AbstractBeanContext extends AbstractModuleContext implements BeanCo
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
+	/*
+	 * (non-Javadoc)
+	 * @see org.brijframework.bean.context.BeanContext#getBeanObject(java.lang.String)
+	 */
 	@Override
 	public <T> T getBeanObject(String name) {
-		BeanScope find = BeanScopeFactoryImpl.getFactory().find(name);
-		if(find!=null) {
-			return (T) find.getScopeObject();
-		}
 		BeanMetaData beanMetaData = BeanMetaDataFactoryImpl.getFactory().find(name);
-		Assertion.isNull(beanMetaData, "Bean not found");;
-		BeanScope register = BeanScopeFactoryImpl.getFactory().register(name, beanMetaData);
-		return (T) register.getScopeObject();
+		if(beanMetaData==null) {
+			return null;
+		}
+		String uniqueID = BeanScopeFactoryImpl.getFactory().getUniqueID(beanMetaData);
+		return BeanScopeFactoryImpl.getFactory().getBeanScope(beanMetaData, uniqueID);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getBeanObject(Class<? extends Object> beanClass) {
-		BeanScope find = BeanScopeFactoryImpl.getFactory().find(beanClass.getSimpleName());
-		if(find!=null) {
-			return (T) find.getScopeObject();
-		}
 		BeanMetaData beanMetaData = BeanMetaDataFactoryImpl.getFactory().find(beanClass.getSimpleName());
-		Assertion.isNull(beanMetaData, "Bean not found");;
-		BeanScope register = BeanScopeFactoryImpl.getFactory().register(beanClass.getSimpleName(), beanMetaData);
-		return (T) register.getScopeObject();
+		if(beanMetaData==null) {
+			return null;
+		}
+		String uniqueID = BeanScopeFactoryImpl.getFactory().getUniqueID(beanMetaData);
+		return BeanScopeFactoryImpl.getFactory().getBeanScope(beanMetaData, uniqueID);
 	}
 	
 	@SuppressWarnings("unchecked")
 	public <T> T getBeanObject(String name,Class<? extends Object> beanClass) {
 		BeanScope find = BeanScopeFactoryImpl.getFactory().find(name);
-		if(find!=null && beanClass.isAssignableFrom(find.getDatainfo().getOwner().getTarget())) {
+		if(find!=null && beanClass.isAssignableFrom(find.getDatainfo().getOwner().getType())) {
 			return (T) find.getScopeObject();
 		}
 		BeanMetaData beanMetaData = BeanMetaDataFactoryImpl.getFactory().find(name);
-		if(beanMetaData==null || !beanClass.isAssignableFrom(find.getDatainfo().getOwner().getTarget())) {
+		if(beanMetaData==null) {
 			return null;
 		}
-		Assertion.isNull(beanMetaData, "Bean not found");;
-		BeanScope register = BeanScopeFactoryImpl.getFactory().register(name, beanMetaData);
-		return (T) register.getScopeObject();
+		if(!beanClass.isAssignableFrom(beanMetaData.getOwner().getType())) {
+			return null;
+		}
+		String uniqueID = BeanScopeFactoryImpl.getFactory().getUniqueID(beanMetaData);
+		return BeanScopeFactoryImpl.getFactory().getBeanScope(beanMetaData, uniqueID);
 	}
 
 	@Override
@@ -91,23 +92,17 @@ public class AbstractBeanContext extends AbstractModuleContext implements BeanCo
 			for (BeanScope beanScope : findAll) {
 				objects.add(beanScope.getScopeObject());
 			}
-			return objects;
-		}
-		List<BeanMetaData> beanMetaDatas = BeanMetaDataFactoryImpl.getFactory().findAll(beanClass);
-		for(BeanMetaData beanMetaData:beanMetaDatas) {
-			BeanScope register = BeanScopeFactoryImpl.getFactory().register(beanClass.getSimpleName(), beanMetaData);
-			objects.add(register.getScopeObject());
 		}
 		return objects;
 	}
 
 	@Override
-	public List<String> getBeanObjectNames() {
+	public List<String> getRegisteredBeanNames() {
 		return BeanMetaDataFactoryImpl.getFactory().getBeanNames();
 	}
 
 	@Override
-	public List<String> getBeanObjectNames(Class<?> beanClass) {
+	public List<String> getRegisteredBeanNames(Class<?> beanClass) {
 		return BeanMetaDataFactoryImpl.getFactory().getBeanNames(beanClass);
 	}
 
@@ -117,20 +112,86 @@ public class AbstractBeanContext extends AbstractModuleContext implements BeanCo
 	}
 
 	@Override
-	public BeanResource getBeanResource(Class<? extends Object> beanClass) {
-		return BeanResourceFactoryImpl.getFactory().find(beanClass);
+	public List<? extends BeanResource> getBeanResourceList(String model) {
+		return BeanResourceFactoryImpl.getFactory().findAllByModel(model);
+	}
+	
+	@Override
+	public List<? extends BeanResource> getBeanResourceList() {
+		List<BeanResource> list=new ArrayList<>();
+		for(BeanResource beanResource:BeanResourceFactoryImpl.getFactory().getCache().values()) {
+			list.add(beanResource);
+		}
+		return list ;
 	}
 
 	@Override
-	public BeanResource getBeanResource(String name, Class<?> beanClass) {
-		// TODO Auto-generated method stub
-		return null;
+	public BeanMetaData getBeanMetaData(String name) {
+		return BeanMetaDataFactoryImpl.getFactory().find(name);
 	}
 
 	@Override
-	public List<? extends BeanResource> getBeanResources(Class<? extends Object> beanClass) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<? extends BeanMetaData> getBeanMetaDataList() {
+		List<BeanMetaData> list=new ArrayList<>();
+		for(BeanMetaData beanMetaData:BeanMetaDataFactoryImpl.getFactory().getCache().values()) {
+			list.add(beanMetaData);
+		}
+		return list;
+	}
+
+	@Override
+	public List<? extends BeanMetaData> getBeanMetaDataList(String model) {
+		return BeanMetaDataFactoryImpl.getFactory().findAllByModel(model);
+	}
+
+	@Override
+	public List<?> getBeanResourceNames() {
+		List<String> list=new ArrayList<>();
+		Enumeration<String> keys = BeanResourceFactoryImpl.getFactory().getCache().keys();
+		while(keys.hasMoreElements()) {
+			list.add(keys.nextElement());
+		}
+		return list ;
+	}
+
+	@Override
+	public List<?> getBeanResourceNames(String model) {
+		List<String> list=new ArrayList<>();
+		for(Entry<String, BeanResource>entry:BeanResourceFactoryImpl.getFactory().getCache().entrySet()) {
+			if(model.equals(entry.getValue().getModel()))
+			list.add(entry.getKey());
+		}
+		return list ;
+	}
+
+	@Override
+	public List<?> getBeanMetaDataNames() {
+		List<String> list=new ArrayList<>();
+		Enumeration<String> keys = BeanMetaDataFactoryImpl.getFactory().getCache().keys();
+		while(keys.hasMoreElements()) {
+		   list.add(keys.nextElement());
+		}
+		return list ;
+	}
+
+	@Override
+	public List<?> getBeanMetaDataNames(String model) {
+		List<String> list=new ArrayList<>();
+		for(Entry<String, BeanMetaData> entry:BeanMetaDataFactoryImpl.getFactory().getCache().entrySet()) {
+			if(model.equals(entry.getValue().getOwner().getId()))
+			list.add(entry.getKey());
+		}
+		return list ;
+	}
+	
+	@Override
+	public List<? extends BeanMetaData> getBeanMetaDataList(Class<?> metaClass) {
+		List<BeanMetaData> list=new ArrayList<>();
+		for(Entry<String, BeanMetaData> entry:BeanMetaDataFactoryImpl.getFactory().getCache().entrySet()) {
+			if(metaClass.isAssignableFrom(entry.getValue().getOwner().getType()))
+			list.add(entry.getValue());
+		}
+		return list ;
 	}
 
 }

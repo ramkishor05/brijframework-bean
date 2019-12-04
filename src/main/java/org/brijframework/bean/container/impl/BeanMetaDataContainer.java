@@ -5,9 +5,8 @@ import org.brijframework.bean.factories.metadata.BeanMetaDataFactory;
 import org.brijframework.bean.group.beanmeta.BeanMetaDataGroup;
 import org.brijframework.container.impl.module.AbstractModuleContainer;
 import org.brijframework.group.Group;
-import org.brijframework.support.config.SingletonFactory;
 import org.brijframework.support.config.DepandOn;
-import org.brijframework.util.printer.ConsolePrint;
+import org.brijframework.support.config.SingletonFactory;
 import org.brijframework.util.reflect.InstanceUtil;
 import org.brijframework.util.reflect.ReflectionUtils;
 
@@ -52,7 +51,6 @@ public class BeanMetaDataContainer extends AbstractModuleContainer implements Be
 		Group group = get(groupKey);
 		if (group == null) {
 			group = new BeanMetaDataGroup(groupKey);
-			ConsolePrint.screen("Resource", "Registery for bean group with id :"+groupKey);
 			this.add(groupKey, group);
 		}
 		return group;

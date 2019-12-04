@@ -1,8 +1,10 @@
 package org.brijframework.bean.factories.scope.impl;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.brijframework.bean.factories.scope.asm.AbstractBeanScopeFactory;
 import org.brijframework.bean.scope.BeanScope;
-import org.brijframework.factories.Factory;
+import org.brijframework.container.Container;
 import org.brijframework.support.config.OrderOn;
 import org.brijframework.support.config.SingletonFactory;
 
@@ -21,9 +23,14 @@ public final class BeanScopeFactoryImpl extends AbstractBeanScopeFactory{
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public Factory<String, BeanScope> loadFactory() {
+	public BeanScopeFactoryImpl loadFactory() {
+		Container container = getContainer();
+		if(container==null) {
+			return this;
+		}
 		getContainer().getCache().forEach((key,group)->{
-			this.getCache().putAll(group.getCache());
+			ConcurrentHashMap<String, BeanScope> cache = group.getCache();
+			this.getCache().putAll(cache);
 		});
 		return this;
 	}

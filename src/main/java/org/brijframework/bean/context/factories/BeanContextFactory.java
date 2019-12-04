@@ -2,9 +2,10 @@ package org.brijframework.bean.context.factories;
 
 import org.brijframework.bean.context.BeanContext;
 import org.brijframework.factories.impl.bootstrap.AbstractBootstrapFactory;
+import org.brijframework.group.Group;
 import org.brijframework.support.config.SingletonFactory;
 import org.brijframework.support.config.OrderOn;
-import org.brijframework.util.printer.ConsolePrint;
+import org.brijframework.util.printer.LoggerConsole;
 import org.brijframework.util.reflect.InstanceUtil;
 import org.brijframework.util.reflect.ReflectionUtils;
 
@@ -24,7 +25,7 @@ public class BeanContextFactory extends AbstractBootstrapFactory<String, BeanCon
 	@Override
 	public BeanContextFactory loadFactory() {
 		try {
-			ConsolePrint.screen("BootstrapFactory -> "+this.getClass().getSimpleName(), "Lunching the factory to bean context");
+			LoggerConsole.screen("BootstrapFactory -> "+this.getClass().getSimpleName(), "Lunching the factory to bean context");
 			ReflectionUtils.getClassListFromExternal().forEach(cls->{
 				if(BeanContext.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					BeanContext beanContext = (BeanContext) InstanceUtil.getInstance(cls);
@@ -41,9 +42,9 @@ public class BeanContextFactory extends AbstractBootstrapFactory<String, BeanCon
 					this.register(beanContext.getClass().getName().equals(BeanContext.class.getName()+"Impl")? BeanContext.class.getName(): beanContext.getClass().getName(), beanContext);
 				}
 			});
-			ConsolePrint.screen("BootstrapFactory -> "+this.getClass().getSimpleName(), "Lunched the factory to bean context");
+			LoggerConsole.screen("BootstrapFactory -> "+this.getClass().getSimpleName(), "Lunched the factory to bean context");
 		} catch (Exception e) {
-			ConsolePrint.screen("BootstrapFactory -> "+this.getClass().getSimpleName(), "Error Lunching the factory to bean context");
+			LoggerConsole.screen("BootstrapFactory -> "+this.getClass().getSimpleName(), "Error Lunching the factory to bean context");
 			e.printStackTrace();
 		}
 		return this;
@@ -51,11 +52,12 @@ public class BeanContextFactory extends AbstractBootstrapFactory<String, BeanCon
 
 	@Override
 	protected void preregister(String key, BeanContext value) {
-		System.out.println(key+" : "+value);
+		LoggerConsole.screen("BeanContext -> "+value.getClass().getSimpleName(), "Lunching the bean context");
 	}
 
 	@Override
 	protected void postregister(String key, BeanContext value) {
+		LoggerConsole.screen("BeanContext -> "+value.getClass().getSimpleName(), "Lunched the bean context");
 	}
 
 	public BeanContext getBeanContext() {
@@ -65,6 +67,16 @@ public class BeanContextFactory extends AbstractBootstrapFactory<String, BeanCon
 	public BeanContext getBeanContext(Class<? extends BeanContext> beanContextClass) {
 		return getCache().get(beanContextClass.getName());
 	}
-	
+
+	@Override
+	public void loadContainer(String key, BeanContext value) {
+		if (getContainer() == null) {
+			return;
+		}
+		Group group = getContainer().load(value.getClass().getName());
+		if(!group.containsKey(key)) {
+			group.add(key, value);
+		}
+	}
 
 }

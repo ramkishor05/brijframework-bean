@@ -8,7 +8,7 @@ import org.brijframework.support.config.OrderOn;
 import org.brijframework.support.config.SingletonFactory;
 import org.brijframework.support.enums.Scope;
 
-@OrderOn(3)
+@OrderOn(2)
 public final class JsonBeanScopeFactory extends AbstractBeanScopeFactory{
 	
 	private static JsonBeanScopeFactory factory;

@@ -15,7 +15,8 @@ import org.brijframework.resources.files.json.JsonResource;
 import org.brijframework.support.config.OrderOn;
 import org.brijframework.support.config.SingletonFactory;
 import org.brijframework.util.asserts.Assertion;
-import org.brijframework.util.printer.ConsolePrint;
+import org.brijframework.util.printer.LoggerConsole;
+import org.brijframework.util.reflect.ClassUtil;
 import org.brijframework.util.reflect.InstanceUtil;
 import org.json.JSONException;
 
@@ -36,10 +37,10 @@ public class JsonBeanResourceFactory  extends AbstractBeanResourceFactory{
 	public List<BeanConfigration> configration() {
 		Object resources=getEnvProperty(BeanConstants.APPLICATION_CONFIG_BEANS);
 		if (resources==null) {
-			ConsolePrint.screen("BeanConfigration","Bean configration not found :"+BeanConstants.APPLICATION_CONFIG_BEANS);
+			LoggerConsole.screen("BeanConfigration","Bean configration not found :"+BeanConstants.APPLICATION_CONFIG_BEANS);
 			return null;
 		}
-		ConsolePrint.screen("BeanConfigration","Bean configration found :"+BeanConstants.APPLICATION_CONFIG_BEANS);
+		LoggerConsole.screen("BeanConfigration","Bean configration found :"+BeanConstants.APPLICATION_CONFIG_BEANS);
 		if(resources instanceof List) {
 			return build((List<Map<String, Object>>)resources);
 		}else if(resources instanceof Map) {
@@ -71,32 +72,36 @@ public class JsonBeanResourceFactory  extends AbstractBeanResourceFactory{
 	public JsonBeanResourceFactory loadFactory() {
 		List<BeanConfigration> configs=configration();
 		if(configs==null) {
-			ConsolePrint.screen("BeanConfigration","Invalid bean configration : "+configs);
+			LoggerConsole.screen("BeanConfigration","Invalid bean configration : "+configs);
 			return this;
 		}
 		for(BeanConfigration modelConfig:configs) {
 			if(!modelConfig.isEnable()) {
-				ConsolePrint.screen("BeanConfigration","Bean configration disabled found :"+modelConfig.getLocation());
+				LoggerConsole.screen("BeanConfigration","Bean configration disabled found :"+modelConfig.getLocation());
 			}
 			Collection<JsonResource> resources=JsonResourceFactory.factory().getResources(modelConfig.getLocation());
-			for(JsonResource resource:resources) {
-				if(resource.isJsonList()) {
-				   try {
-					  register(resource.toObjectList());
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
+			registerResource(resources);
+		}
+		return this;
+	}
+
+	private void registerResource(Collection<JsonResource> resources) {
+		for(JsonResource resource:resources) {
+			if(resource.isJsonList()) {
+			   try {
+				  register(resource.toObjectList());
+				} catch (JSONException e) {
+					e.printStackTrace();
 				}
-				if(resource.isJsonObject()) {
-					try {
-						register(resource.toObjectMap());
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
+			}
+			if(resource.isJsonObject()) {
+				try {
+					register(resource.toObjectMap());
+				} catch (JSONException e) {
+					e.printStackTrace();
 				}
 			}
 		}
-		return this;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -110,8 +115,11 @@ public class JsonBeanResourceFactory  extends AbstractBeanResourceFactory{
 	}
 
 	public void register(Map<String, Object> resourceMap) {
-		Assertion.notNull(resourceMap, "Invalid target :"+resourceMap);
+		Assertion.notNull(resourceMap, "Invalid resource :"+resourceMap);
+		String type=(String) resourceMap.get("type");
+		String model=(String) resourceMap.get("model");
 		BeanResourceImpl metaSetup=InstanceUtil.getInstance(BeanResourceImpl.class,resourceMap);
+		Assertion.notNull(metaSetup.getId(), "Invalid resource id :"+resourceMap);
 		this.register(metaSetup.getId(),metaSetup);
 	}
 }
