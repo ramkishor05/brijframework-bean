@@ -1,7 +1,7 @@
 package org.brijframework.bean.container.impl;
 
 import org.brijframework.bean.container.BeanContainer;
-import org.brijframework.bean.factories.metadata.BeanMetaDataFactory;
+import org.brijframework.bean.factories.definition.BeanDefinitionFactory;
 import org.brijframework.bean.group.beanmeta.BeanMetaDataGroup;
 import org.brijframework.container.impl.module.AbstractModuleContainer;
 import org.brijframework.group.Group;
@@ -28,8 +28,8 @@ public class BeanMetaDataContainer extends AbstractModuleContainer implements Be
 	public void init() {
 		try {
 			ReflectionUtils.getClassListFromExternal().forEach(cls -> {
-				if (BeanMetaDataFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
-					register((Class<? extends BeanMetaDataFactory<?,?>>) cls);
+				if (BeanDefinitionFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
+					register((Class<? extends BeanDefinitionFactory<?,?>>) cls);
 				}
 			});
 		} catch (Exception e) {
@@ -37,8 +37,8 @@ public class BeanMetaDataContainer extends AbstractModuleContainer implements Be
 		}
 		try {
 			ReflectionUtils.getClassListFromInternal().forEach(cls -> {
-				if (BeanMetaDataFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
-					register((Class<? extends BeanMetaDataFactory<?,?>>) cls);
+				if (BeanDefinitionFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
+					register((Class<? extends BeanDefinitionFactory<?,?>>) cls);
 				}
 			});
 		} catch (Exception e) {

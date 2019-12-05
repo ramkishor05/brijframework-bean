@@ -1,8 +1,8 @@
-package org.brijframework.bean.factories.scope.impl;
+package org.brijframework.bean.factories.impl;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.brijframework.bean.factories.scope.asm.AbstractBeanScopeFactory;
+import org.brijframework.bean.factories.asm.AbstractBeanScopeFactory;
 import org.brijframework.bean.scope.BeanScope;
 import org.brijframework.container.Container;
 import org.brijframework.support.config.OrderOn;

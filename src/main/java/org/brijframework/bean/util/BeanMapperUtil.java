@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.brijframework.bean.impl.BeanBuilder;
+import org.brijframework.bean.builder.BeanBuilder;
 import org.brijframework.mapper.factories.impl.PropertyMapperFactoryImpl;
 import org.brijframework.mapper.model.PropertyMapper;
 import org.brijframework.util.accessor.PropertyAccessorUtil;

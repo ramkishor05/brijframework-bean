@@ -8,10 +8,10 @@ import java.util.Map.Entry;
 import org.apache.commons.collections4.CollectionUtils;
 import org.brijframework.bean.container.BeanContainer;
 import org.brijframework.bean.context.BeanContext;
-import org.brijframework.bean.factories.metadata.impl.BeanMetaDataFactoryImpl;
+import org.brijframework.bean.definition.BeanDefinition;
+import org.brijframework.bean.factories.definition.impl.BeanDefinitionFactoryImpl;
+import org.brijframework.bean.factories.impl.BeanScopeFactoryImpl;
 import org.brijframework.bean.factories.resource.impl.BeanResourceFactoryImpl;
-import org.brijframework.bean.factories.scope.impl.BeanScopeFactoryImpl;
-import org.brijframework.bean.meta.BeanMetaData;
 import org.brijframework.bean.resource.BeanResource;
 import org.brijframework.bean.scope.BeanScope;
 import org.brijframework.context.impl.module.AbstractModuleContext;
@@ -48,8 +48,8 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	 * @see org.brijframework.bean.context.BeanContext#getBeanObject(java.lang.String)
 	 */
 	@Override
-	public <T> T getBeanObject(String name) {
-		BeanMetaData beanMetaData = BeanMetaDataFactoryImpl.getFactory().find(name);
+	public <T> T getBean(String name) {
+		BeanDefinition beanMetaData = BeanDefinitionFactoryImpl.getFactory().find(name);
 		if(beanMetaData==null) {
 			return null;
 		}
@@ -58,8 +58,8 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	}
 	
 	@Override
-	public <T> T getBeanObject(Class<? extends Object> beanClass) {
-		BeanMetaData beanMetaData = BeanMetaDataFactoryImpl.getFactory().find(beanClass.getSimpleName());
+	public <T> T getBean(Class<? extends Object> beanClass) {
+		BeanDefinition beanMetaData = BeanDefinitionFactoryImpl.getFactory().find(beanClass.getSimpleName());
 		if(beanMetaData==null) {
 			return null;
 		}
@@ -68,12 +68,12 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T> T getBeanObject(String name,Class<? extends Object> beanClass) {
+	public <T> T getBean(String name, Class<T> beanClass) {
 		BeanScope find = BeanScopeFactoryImpl.getFactory().find(name);
 		if(find!=null && beanClass.isAssignableFrom(find.getDatainfo().getOwner().getType())) {
 			return (T) find.getScopeObject();
 		}
-		BeanMetaData beanMetaData = BeanMetaDataFactoryImpl.getFactory().find(name);
+		BeanDefinition beanMetaData = BeanDefinitionFactoryImpl.getFactory().find(name);
 		if(beanMetaData==null) {
 			return null;
 		}
@@ -85,7 +85,7 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	}
 
 	@Override
-	public List<?> getBeanObjects(Class<? extends Object> beanClass) {
+	public List<?> getBeanList(Class<? extends Object> beanClass) {
 		List<Object> objects=new ArrayList<Object>();
 		List<BeanScope> findAll = BeanScopeFactoryImpl.getFactory().findAll(beanClass);
 		if(!CollectionUtils.isEmpty(findAll)) {
@@ -97,13 +97,13 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	}
 
 	@Override
-	public List<String> getRegisteredBeanNames() {
-		return BeanMetaDataFactoryImpl.getFactory().getBeanNames();
+	public List<String> getBeanNameList() {
+		return BeanDefinitionFactoryImpl.getFactory().getBeanNames();
 	}
 
 	@Override
-	public List<String> getRegisteredBeanNames(Class<?> beanClass) {
-		return BeanMetaDataFactoryImpl.getFactory().getBeanNames(beanClass);
+	public List<String> getBeanNameList(Class<?> beanClass) {
+		return BeanDefinitionFactoryImpl.getFactory().getBeanNames(beanClass);
 	}
 
 	@Override
@@ -126,26 +126,26 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	}
 
 	@Override
-	public BeanMetaData getBeanMetaData(String name) {
-		return BeanMetaDataFactoryImpl.getFactory().find(name);
+	public BeanDefinition getBeanDefinition(String name) {
+		return BeanDefinitionFactoryImpl.getFactory().find(name);
 	}
 
 	@Override
-	public List<? extends BeanMetaData> getBeanMetaDataList() {
-		List<BeanMetaData> list=new ArrayList<>();
-		for(BeanMetaData beanMetaData:BeanMetaDataFactoryImpl.getFactory().getCache().values()) {
+	public List<? extends BeanDefinition> getBeanDefinitionList() {
+		List<BeanDefinition> list=new ArrayList<>();
+		for(BeanDefinition beanMetaData:BeanDefinitionFactoryImpl.getFactory().getCache().values()) {
 			list.add(beanMetaData);
 		}
 		return list;
 	}
 
 	@Override
-	public List<? extends BeanMetaData> getBeanMetaDataList(String model) {
-		return BeanMetaDataFactoryImpl.getFactory().findAllByModel(model);
+	public List<? extends BeanDefinition> getBeanDefinitionList(String model) {
+		return BeanDefinitionFactoryImpl.getFactory().findAllByModel(model);
 	}
 
 	@Override
-	public List<?> getBeanResourceNames() {
+	public List<?> getBeanResourceNameList() {
 		List<String> list=new ArrayList<>();
 		Enumeration<String> keys = BeanResourceFactoryImpl.getFactory().getCache().keys();
 		while(keys.hasMoreElements()) {
@@ -155,7 +155,7 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	}
 
 	@Override
-	public List<?> getBeanResourceNames(String model) {
+	public List<?> getBeanResourceNamesList(String model) {
 		List<String> list=new ArrayList<>();
 		for(Entry<String, BeanResource>entry:BeanResourceFactoryImpl.getFactory().getCache().entrySet()) {
 			if(model.equals(entry.getValue().getModel()))
@@ -165,9 +165,9 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	}
 
 	@Override
-	public List<?> getBeanMetaDataNames() {
+	public List<?> getBeanDefinitionNameList() {
 		List<String> list=new ArrayList<>();
-		Enumeration<String> keys = BeanMetaDataFactoryImpl.getFactory().getCache().keys();
+		Enumeration<String> keys = BeanDefinitionFactoryImpl.getFactory().getCache().keys();
 		while(keys.hasMoreElements()) {
 		   list.add(keys.nextElement());
 		}
@@ -175,9 +175,9 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	}
 
 	@Override
-	public List<?> getBeanMetaDataNames(String model) {
+	public List<?> getBeanDefinitionNameList(String model) {
 		List<String> list=new ArrayList<>();
-		for(Entry<String, BeanMetaData> entry:BeanMetaDataFactoryImpl.getFactory().getCache().entrySet()) {
+		for(Entry<String, BeanDefinition> entry:BeanDefinitionFactoryImpl.getFactory().getCache().entrySet()) {
 			if(model.equals(entry.getValue().getOwner().getId()))
 			list.add(entry.getKey());
 		}
@@ -185,9 +185,9 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	}
 	
 	@Override
-	public List<? extends BeanMetaData> getBeanMetaDataList(Class<?> metaClass) {
-		List<BeanMetaData> list=new ArrayList<>();
-		for(Entry<String, BeanMetaData> entry:BeanMetaDataFactoryImpl.getFactory().getCache().entrySet()) {
+	public List<? extends BeanDefinition> getBeanDefinitionList(Class<?> metaClass) {
+		List<BeanDefinition> list=new ArrayList<>();
+		for(Entry<String, BeanDefinition> entry:BeanDefinitionFactoryImpl.getFactory().getCache().entrySet()) {
 			if(metaClass.isAssignableFrom(entry.getValue().getOwner().getType()))
 			list.add(entry.getValue());
 		}

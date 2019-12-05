@@ -1,7 +1,7 @@
-package org.brijframework.bean.factories.scope.json;
+package org.brijframework.bean.factories.json;
 
-import org.brijframework.bean.factories.metadata.json.JsonBeanMetaDataFactory;
-import org.brijframework.bean.factories.scope.asm.AbstractBeanScopeFactory;
+import org.brijframework.bean.factories.asm.AbstractBeanScopeFactory;
+import org.brijframework.bean.factories.definition.json.JsonBeanDefinitionFactory;
 import org.brijframework.bean.scope.BeanScope;
 import org.brijframework.factories.Factory;
 import org.brijframework.support.config.OrderOn;
@@ -23,7 +23,7 @@ public final class JsonBeanScopeFactory extends AbstractBeanScopeFactory{
 	
 	@Override
 	public Factory<String, BeanScope> loadFactory() {
-		JsonBeanMetaDataFactory.getFactory().getCache().forEach((key,datainfo)->{
+		JsonBeanDefinitionFactory.getFactory().getCache().forEach((key,datainfo)->{
 			try {
 			String uniqueID=(String) key;
 			if (Scope.SINGLETON.equals(datainfo.getScope())) {

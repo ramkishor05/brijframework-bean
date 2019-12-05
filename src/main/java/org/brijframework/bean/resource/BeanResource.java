@@ -10,7 +10,7 @@ public interface BeanResource {
 
 	String getModel();
 	
-	String getTarget();
+	String getType();
 	
 	Map<String, Object> getProperties();
 

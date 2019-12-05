@@ -1,33 +1,33 @@
-package org.brijframework.bean.factories.metadata.impl;
+package org.brijframework.bean.factories.definition.impl;
 
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.brijframework.bean.factories.metadata.asm.AbstractBeanMetaDataFactory;
-import org.brijframework.bean.meta.BeanMetaData;
+import org.brijframework.bean.definition.BeanDefinition;
+import org.brijframework.bean.factories.definition.asm.AbstractBeanDefinitionFactory;
 import org.brijframework.group.Group;
 import org.brijframework.support.config.OrderOn;
 import org.brijframework.support.config.SingletonFactory;
 
 @OrderOn(3)
-public final class BeanMetaDataFactoryImpl extends AbstractBeanMetaDataFactory{
+public final class BeanDefinitionFactoryImpl extends AbstractBeanDefinitionFactory{
 	
-	private static BeanMetaDataFactoryImpl factory;
+	private static BeanDefinitionFactoryImpl factory;
 	
 	@SingletonFactory
-	public static BeanMetaDataFactoryImpl getFactory() {
+	public static BeanDefinitionFactoryImpl getFactory() {
 		if(factory==null) {
-			factory=new BeanMetaDataFactoryImpl();
+			factory=new BeanDefinitionFactoryImpl();
 		}
 		return factory;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public BeanMetaDataFactoryImpl loadFactory() {
+	public BeanDefinitionFactoryImpl loadFactory() {
 		for(Entry<Object, Group> entryGroup:getContainer().getCache().entrySet()) {
-			ConcurrentHashMap<String, BeanMetaData> cache= entryGroup.getValue().getCache();
-			for(Entry<String, BeanMetaData> entryObject: cache.entrySet()) {
+			ConcurrentHashMap<String, BeanDefinition> cache= entryGroup.getValue().getCache();
+			for(Entry<String, BeanDefinition> entryObject: cache.entrySet()) {
 				preregister(entryObject.getKey(), entryObject.getValue());
 				this.getCache().put(entryObject.getKey(), entryObject.getValue());
 				postregister(entryObject.getKey(), entryObject.getValue());

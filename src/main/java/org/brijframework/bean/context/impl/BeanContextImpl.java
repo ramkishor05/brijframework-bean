@@ -6,5 +6,7 @@ import org.brijframework.support.config.DepandOn;
 
 @DepandOn(depand=ModelContext.class)
 public final class BeanContextImpl extends AbstractBeanContext{
+
+	
 	
 }

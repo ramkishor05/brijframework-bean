@@ -1,4 +1,4 @@
-package org.brijframework.bean.factories.scope;
+package org.brijframework.bean.factories;
 
 import java.util.List;
 

@@ -10,14 +10,17 @@ import org.brijframework.bean.config.impl.BeanConfigration;
 import org.brijframework.bean.constant.BeanConstants;
 import org.brijframework.bean.factories.resource.asm.AbstractBeanResourceFactory;
 import org.brijframework.bean.resource.impl.BeanResourceImpl;
+import org.brijframework.model.factories.resource.impl.TypeModelResourceFactoryImpl;
 import org.brijframework.resources.factory.json.JsonResourceFactory;
 import org.brijframework.resources.files.json.JsonResource;
 import org.brijframework.support.config.OrderOn;
 import org.brijframework.support.config.SingletonFactory;
+import org.brijframework.support.enums.Scope;
 import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.printer.LoggerConsole;
 import org.brijframework.util.reflect.ClassUtil;
 import org.brijframework.util.reflect.InstanceUtil;
+import org.brijframework.util.text.StringUtil;
 import org.json.JSONException;
 
 @OrderOn(2)
@@ -114,12 +117,41 @@ public class JsonBeanResourceFactory  extends AbstractBeanResourceFactory{
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void register(Map<String, Object> resourceMap) {
 		Assertion.notNull(resourceMap, "Invalid resource :"+resourceMap);
-		String type=(String) resourceMap.get("type");
-		String model=(String) resourceMap.get("model");
-		BeanResourceImpl metaSetup=InstanceUtil.getInstance(BeanResourceImpl.class,resourceMap);
-		Assertion.notNull(metaSetup.getId(), "Invalid resource id :"+resourceMap);
-		this.register(metaSetup.getId(),metaSetup);
+		BeanResourceImpl beanResource=InstanceUtil.getInstance(BeanResourceImpl.class, resourceMap);
+		String id=(String) resourceMap.remove("id");
+		String type=(String) resourceMap.remove("type");
+		String model=(String) resourceMap.remove("model");
+		String name=(String) resourceMap.remove("name");
+		String scope=(String) resourceMap.get("scope");
+		String factoryClass=(String) resourceMap.get("factory-class");
+		String factoryMethod=(String) resourceMap.get("factory-method");
+		if(StringUtil.isEmpty(scope)) {
+			scope=Scope.SINGLETON.toString();
+		}
+		Assertion.isTrue(StringUtil.isEmpty(type)&& StringUtil.isEmpty(model), "Invalid type or model for BeanResource");
+		if(StringUtil.isNonEmpty(type)) {
+			Class<?> typeClass=ClassUtil.getClass(type);
+			Assertion.notEmpty(typeClass, "Not found type for BeanResource");
+			if(StringUtil.isEmpty(name)) {
+				name=typeClass.getSimpleName();
+			}
+			if(StringUtil.isEmpty(model)) {
+				model=typeClass.getSimpleName();
+				TypeModelResourceFactoryImpl.getFactory().createOrload(typeClass);
+			}
+		}
+		Assertion.notEmpty(id, "Invalid id for BeanResource");
+		beanResource.setId(id);
+		beanResource.setName(name);
+		beanResource.setScope(scope);
+		beanResource.setType(type);
+		beanResource.setModel(model);
+		beanResource.setFactoryClass(factoryClass);
+		beanResource.setFactoryMethod(factoryMethod);
+	    beanResource.getProperties().putAll((Map<? extends String, ? extends Object>)resourceMap.get("properties"));
+		this.register(beanResource.getId(),beanResource);
 	}
 }

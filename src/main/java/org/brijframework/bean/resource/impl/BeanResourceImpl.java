@@ -33,10 +33,6 @@ public class BeanResourceImpl implements BeanResource {
 		return uniqueKey;
 	}
 	
-	public String getType() {
-		return type;
-	}
-
 	public String getScope() {
 		return scope;
 	}
@@ -73,7 +69,7 @@ public class BeanResourceImpl implements BeanResource {
 	}
 	
 	@Override
-	public String getTarget() {
+	public String getType() {
 		return type;
 	}
 	

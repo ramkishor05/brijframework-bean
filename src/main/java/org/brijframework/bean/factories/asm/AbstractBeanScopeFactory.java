@@ -1,4 +1,4 @@
-package org.brijframework.bean.factories.scope.asm;
+package org.brijframework.bean.factories.asm;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.brijframework.bean.factories.metadata.impl.BeanMetaDataFactoryImpl;
-import org.brijframework.bean.factories.scope.BeanScopeFactory;
-import org.brijframework.bean.factories.scope.impl.BeanScopeFactoryImpl;
-import org.brijframework.bean.meta.BeanMetaData;
+import org.brijframework.bean.definition.BeanDefinition;
+import org.brijframework.bean.factories.BeanScopeFactory;
+import org.brijframework.bean.factories.definition.impl.BeanDefinitionFactoryImpl;
+import org.brijframework.bean.factories.impl.BeanScopeFactoryImpl;
 import org.brijframework.bean.scope.BeanScope;
 import org.brijframework.factories.impl.AbstractFactory;
 import org.brijframework.group.Group;
@@ -35,7 +35,7 @@ public abstract class AbstractBeanScopeFactory extends AbstractFactory<String, B
 	}
 	
 	public <T> T getBeanScope(String name) {
-		BeanMetaData beanMetaData = BeanMetaDataFactoryImpl.getFactory().find(name);
+		BeanDefinition beanMetaData = BeanDefinitionFactoryImpl.getFactory().find(name);
 		if(beanMetaData==null) {
 			return null;
 		}
@@ -44,7 +44,7 @@ public abstract class AbstractBeanScopeFactory extends AbstractFactory<String, B
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> T getBeanScope(BeanMetaData beanMetaData, String uniqueID) {
+	public <T> T getBeanScope(BeanDefinition beanMetaData, String uniqueID) {
 		BeanScope find = BeanScopeFactoryImpl.getFactory().find(uniqueID);
 		if(find!=null) {
 			return (T) find.getScopeObject();
@@ -53,7 +53,7 @@ public abstract class AbstractBeanScopeFactory extends AbstractFactory<String, B
 		return (T) register.getScopeObject();
 	}
 	
-	public BeanScope register(String key,BeanMetaData beanMetaData) {
+	public BeanScope register(String key,BeanDefinition beanMetaData) {
 		BeanScope value=find(key);
 		Assertion.isTrue(value!=null,"Bean already exist in cache with : "+key);
 		value=new BeanScope(beanMetaData);
@@ -63,7 +63,7 @@ public abstract class AbstractBeanScopeFactory extends AbstractFactory<String, B
 		return register(key, value);
 	}
 
-	public String getUniqueID(BeanMetaData datainfo) {
+	public String getUniqueID(BeanDefinition datainfo) {
 		switch (datainfo.getScope()) {
 		case SINGLETON:
 			return datainfo.getId();
@@ -79,7 +79,7 @@ public abstract class AbstractBeanScopeFactory extends AbstractFactory<String, B
 	}
 
 	@SuppressWarnings("rawtypes")
-	private Object buildScopeObject(String uniqueID, BeanMetaData datainfo) {
+	private Object buildScopeObject(String uniqueID, BeanDefinition datainfo) {
 		Assertion.isTrue(datainfo==null,"BeanMetaData not found in cache with : "+uniqueID);
 		Assertion.isTrue(datainfo.getOwner()==null,"BeanMetaData Owner not found in cache with : "+uniqueID);
 		Object bean=createBean(datainfo);
@@ -100,7 +100,7 @@ public abstract class AbstractBeanScopeFactory extends AbstractFactory<String, B
 		return bean;
 	}
 
-	private Object createBean(BeanMetaData datainfo) {
+	private Object createBean(BeanDefinition datainfo) {
 		if(StringUtil.isNonEmpty(datainfo.getFactoryClass())) {
 			Class<?> factory=ClassUtil.getClass(datainfo.getFactoryClass());
 			Object current=null;

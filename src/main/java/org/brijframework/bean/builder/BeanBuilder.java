@@ -1,4 +1,4 @@
-package org.brijframework.bean.impl;
+package org.brijframework.bean.builder;
 
 import org.brijframework.bean.BeanObject;
 import org.brijframework.bean.context.factories.BeanContextFactory;
@@ -20,12 +20,12 @@ public class BeanBuilder implements BeanObject {
 	}
 	
 	public static BeanBuilder getBuilder(Class<?> model) {
-		Object object=BeanContextFactory.getFactory().getBeanContext().getBeanObject(model);
+		Object object=BeanContextFactory.getFactory().getBeanContext().getBean(model);
 		return getBuilder(object);
 	}
 	
 	public static BeanBuilder getBuilder(String model) {
-		Object object=BeanContextFactory.getFactory().getBeanContext().getBeanObject(model);
+		Object object=BeanContextFactory.getFactory().getBeanContext().getBean(model);
 		return getBuilder(object);
 	}
 	

@@ -28,7 +28,7 @@ public class AbstractBeanResourceFactory extends AbstractModuleFactory<String,Be
 	
 	public BeanResource find(Class<? extends Object> beanClass) {
 		for(BeanResource setup:getCache().values()) {
-			if(beanClass.getName().equals(setup.getTarget())) {
+			if(beanClass.getName().equals(setup.getType())) {
 				return setup;
 			}
 		}

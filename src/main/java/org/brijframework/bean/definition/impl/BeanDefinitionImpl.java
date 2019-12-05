@@ -1,14 +1,14 @@
-package org.brijframework.bean.meta.impl;
+package org.brijframework.bean.definition.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.brijframework.bean.meta.BeanMetaData;
+import org.brijframework.bean.definition.BeanDefinition;
 import org.brijframework.model.metadata.TypeModelMetaData;
 import org.brijframework.support.enums.Scope;
 import org.brijframework.util.asserts.Assertion;
 
-public class BeanMetaDataImpl implements BeanMetaData {
+public class BeanDefinitionImpl implements BeanDefinition {
 	
 	private TypeModelMetaData owner;
 	
@@ -24,7 +24,7 @@ public class BeanMetaDataImpl implements BeanMetaData {
 
 	private Map<String, Object> properties;
 	
-	public BeanMetaDataImpl(TypeModelMetaData owner) {
+	public BeanDefinitionImpl(TypeModelMetaData owner) {
 		this.owner=owner;
 	}
 	

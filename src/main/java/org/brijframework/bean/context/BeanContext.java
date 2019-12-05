@@ -2,7 +2,7 @@ package org.brijframework.bean.context;
 
 import java.util.List;
 
-import org.brijframework.bean.meta.BeanMetaData;
+import org.brijframework.bean.definition.BeanDefinition;
 import org.brijframework.bean.resource.BeanResource;
 import org.brijframework.context.module.ModuleContext;
 import org.brijframework.model.context.ModelContext;
@@ -11,21 +11,21 @@ import org.brijframework.support.config.DepandOn;
 @DepandOn(depand = ModelContext.class)
 public interface BeanContext extends ModuleContext {
 
-	public <T> T getBeanObject(String name);
+	public <T> T getBean(String name);
 
-	public <T> T getBeanObject(Class<? extends Object> beanClass);
+	public <T> T getBean(Class<? extends Object> beanClass);
 
-	public <T> T getBeanObject(String name, Class<?> beanClass);
+	public <T> T getBean(String name, Class<T> beanClass);
 
-	public List<?> getBeanObjects(Class<? extends Object> beanClass);
+	public List<?> getBeanList(Class<? extends Object> beanClass);
 
-	public List<String> getRegisteredBeanNames();
+	public List<String> getBeanNameList();
 
-	public List<String> getRegisteredBeanNames(Class<?> beanClass);
+	public List<String> getBeanNameList(Class<?> beanClass);
 	
-	public List<?> getBeanResourceNames();
+	public List<?> getBeanResourceNameList();
 	
-	public List<?> getBeanResourceNames(String model);
+	public List<?> getBeanResourceNamesList(String model);
 	
 	public BeanResource getBeanResource(String name);
 	
@@ -33,16 +33,16 @@ public interface BeanContext extends ModuleContext {
 	
 	public List<? extends BeanResource> getBeanResourceList(String model);
 	
-	public List<?> getBeanMetaDataNames();
+	public List<?> getBeanDefinitionNameList();
 	
-	public List<?> getBeanMetaDataNames(String model);
+	public List<?> getBeanDefinitionNameList(String model);
 	
-	public BeanMetaData getBeanMetaData(String name);
+	public BeanDefinition getBeanDefinition(String name);
 	
-	public List<? extends BeanMetaData> getBeanMetaDataList();
+	public List<? extends BeanDefinition> getBeanDefinitionList();
 	
-	public List<? extends BeanMetaData> getBeanMetaDataList(String model);
+	public List<? extends BeanDefinition> getBeanDefinitionList(String model);
 
-	public List<? extends BeanMetaData> getBeanMetaDataList(Class<?> metaClass);
+	public List<? extends BeanDefinition> getBeanDefinitionList(Class<?> metaClass);
 	
 }

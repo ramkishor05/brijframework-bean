@@ -1,7 +1,7 @@
 package org.brijframework.bean.container.impl;
 
 import org.brijframework.bean.container.BeanContainer;
-import org.brijframework.bean.factories.scope.BeanScopeFactory;
+import org.brijframework.bean.factories.BeanScopeFactory;
 import org.brijframework.bean.group.scope.BeanScopeGroup;
 import org.brijframework.container.impl.module.AbstractModuleContainer;
 import org.brijframework.group.Group;

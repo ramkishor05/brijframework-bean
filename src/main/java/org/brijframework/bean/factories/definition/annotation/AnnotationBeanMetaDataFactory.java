@@ -1,12 +1,12 @@
-package org.brijframework.bean.factories.metadata.annotation;
+package org.brijframework.bean.factories.definition.annotation;
 
-import org.brijframework.bean.factories.metadata.asm.AbstractBeanMetaDataFactory;
+import org.brijframework.bean.factories.definition.asm.AbstractBeanDefinitionFactory;
 import org.brijframework.bean.factories.resource.annotation.AnnotationBeanResourceFactory;
 import org.brijframework.support.config.OrderOn;
 import org.brijframework.support.config.SingletonFactory;
 
 @OrderOn(1)
-public class AnnotationBeanMetaDataFactory extends AbstractBeanMetaDataFactory{
+public class AnnotationBeanMetaDataFactory extends AbstractBeanDefinitionFactory{
 
 	private static AnnotationBeanMetaDataFactory factory;
 

@@ -1,13 +1,13 @@
-package org.brijframework.bean.factories.metadata.asm;
+package org.brijframework.bean.factories.definition.asm;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.brijframework.bean.factories.metadata.BeanMetaDataFactory;
+import org.brijframework.bean.definition.BeanDefinition;
+import org.brijframework.bean.definition.impl.BeanDefinitionImpl;
+import org.brijframework.bean.factories.definition.BeanDefinitionFactory;
 import org.brijframework.bean.factories.resource.impl.BeanResourceFactoryImpl;
-import org.brijframework.bean.meta.BeanMetaData;
-import org.brijframework.bean.meta.impl.BeanMetaDataImpl;
 import org.brijframework.bean.resource.BeanResource;
 import org.brijframework.factories.impl.AbstractFactory;
 import org.brijframework.group.Group;
@@ -18,7 +18,7 @@ import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.printer.LoggerConsole;
 import org.brijframework.util.support.Constants;
 
-public abstract class AbstractBeanMetaDataFactory extends AbstractFactory<String,BeanMetaData> implements BeanMetaDataFactory<String,BeanMetaData>{
+public abstract class AbstractBeanDefinitionFactory extends AbstractFactory<String,BeanDefinition> implements BeanDefinitionFactory<String,BeanDefinition>{
 
 
 	public boolean contains(String id) {
@@ -29,13 +29,16 @@ public abstract class AbstractBeanMetaDataFactory extends AbstractFactory<String
 		TypeModelMetaData owner=null;
 		if(metaSetup.getModel() != null && !metaSetup.getModel().isEmpty() ) {
 			owner=TypeModelMetaDataFactoryImpl.getFactory().findById(metaSetup.getModel());
+			if(owner==null) {
+				owner=TypeModelMetaDataFactoryImpl.getFactory().findOrCreate(metaSetup.getModel());
+			}
 		}else {
-			owner=TypeModelMetaDataFactoryImpl.getFactory().register(metaSetup.getTarget());
+			owner=TypeModelMetaDataFactoryImpl.getFactory().register(metaSetup.getType());
 		}
 		Assertion.notNull(owner, "Model not found for "+metaSetup.getModel()+" of bean  : "+id);
 		id=Constants.DEFAULT.equals(metaSetup.getId())?owner.getType().getSimpleName():metaSetup.getId();
 		BeanResource bean=BeanResourceFactoryImpl.getFactory().find(id);
-		BeanMetaDataImpl dataSetup=new BeanMetaDataImpl(owner);
+		BeanDefinitionImpl dataSetup=new BeanDefinitionImpl(owner);
 		dataSetup.setId(id);
 		dataSetup.setName(bean.getName());
 		dataSetup.setScope(Scope.valueFor(metaSetup.getScope(),Scope.SINGLETON));
@@ -50,7 +53,7 @@ public abstract class AbstractBeanMetaDataFactory extends AbstractFactory<String
 		TypeModelMetaData owner=TypeModelMetaDataFactoryImpl.getFactory().findById(metaSetup.getModel());
 		Assertion.notNull(owner, "Model not found for "+metaSetup.getModel()+" of bean  : "+id);
 		BeanResource bean=BeanResourceFactoryImpl.getFactory().find(id);
-		BeanMetaDataImpl dataSetup=new BeanMetaDataImpl(owner);
+		BeanDefinitionImpl dataSetup=new BeanDefinitionImpl(owner);
 		dataSetup.setId(id);
 		dataSetup.setName(bean.getName());
 		dataSetup.setScope(Scope.valueFor(metaSetup.getScope()));
@@ -60,7 +63,7 @@ public abstract class AbstractBeanMetaDataFactory extends AbstractFactory<String
 	
 	public List<String> getBeanNames() {
 		List<String> list=new ArrayList<>();
-		for (Entry<String, BeanMetaData> entry : getCache().entrySet()) {
+		for (Entry<String, BeanDefinition> entry : getCache().entrySet()) {
 			list.add(entry.getKey());
 		}
 		return list;
@@ -68,7 +71,7 @@ public abstract class AbstractBeanMetaDataFactory extends AbstractFactory<String
 	
 	public List<String> getBeanNames(Class<?> beanClass) {
 		List<String> list=new ArrayList<>();
-		for (Entry<String, BeanMetaData> entry : getCache().entrySet()) {
+		for (Entry<String, BeanDefinition> entry : getCache().entrySet()) {
 			if(beanClass.isAssignableFrom(entry.getValue().getOwner().getType())) {
 			  list.add(entry.getKey());
 			}
@@ -77,15 +80,15 @@ public abstract class AbstractBeanMetaDataFactory extends AbstractFactory<String
 	}
 	
 	@Override
-	public AbstractBeanMetaDataFactory clear() {
+	public AbstractBeanDefinitionFactory clear() {
 		getCache().clear();
 		return this;
 	}
 
 	@Override
-	public List<BeanMetaData> findAll(Class<?> cls) {
-		List<BeanMetaData> list=new ArrayList<>();
-		for (BeanMetaData beanInfo : getCache().values()) {
+	public List<BeanDefinition> findAll(Class<?> cls) {
+		List<BeanDefinition> list=new ArrayList<>();
+		for (BeanDefinition beanInfo : getCache().values()) {
 			if(cls.isAssignableFrom(beanInfo.getOwner().getType())) {
 				list.add(beanInfo);
 			}
@@ -94,7 +97,7 @@ public abstract class AbstractBeanMetaDataFactory extends AbstractFactory<String
 	}
 
 	@Override
-	public BeanMetaData register(String key,BeanMetaData value) {
+	public BeanDefinition register(String key,BeanDefinition value) {
 		preregister(key, value);
 		loadContainer(key, value);
 		getCache().put(key, value);
@@ -102,7 +105,7 @@ public abstract class AbstractBeanMetaDataFactory extends AbstractFactory<String
 		return value;
 	}
 	
-	public void loadContainer(String key, BeanMetaData value) {
+	public void loadContainer(String key, BeanDefinition value) {
 		if (getContainer() == null) {
 			return;
 		}
@@ -115,9 +118,9 @@ public abstract class AbstractBeanMetaDataFactory extends AbstractFactory<String
 	}
 	
 	@Override
-	public List<BeanMetaData> findAllByModel(String model) {
-		List<BeanMetaData> list=new ArrayList<>();
-		for(BeanMetaData setup:getCache().values()) {
+	public List<BeanDefinition> findAllByModel(String model) {
+		List<BeanDefinition> list=new ArrayList<>();
+		for(BeanDefinition setup:getCache().values()) {
 			if(setup.getOwner().getId().equals(model)) {
 				list.add(setup);
 			}
@@ -126,15 +129,15 @@ public abstract class AbstractBeanMetaDataFactory extends AbstractFactory<String
 	}
 	
 	@Override
-	public BeanMetaData find(String modelKey) {
-		BeanMetaData beanMetaData = getCache().get(modelKey);
+	public BeanDefinition find(String modelKey) {
+		BeanDefinition beanMetaData = getCache().get(modelKey);
 		if(beanMetaData!=null) {
 			return beanMetaData;
 		}
 		return getContainer(modelKey);
 	}
 	
-	public BeanMetaData getContainer(String modelKey) {
+	public BeanDefinition getContainer(String modelKey) {
 		if (getContainer() == null) {
 			return null;
 		}
@@ -142,12 +145,12 @@ public abstract class AbstractBeanMetaDataFactory extends AbstractFactory<String
 	}
 
 	@Override
-	protected void preregister(String key, BeanMetaData value) {
+	protected void preregister(String key, BeanDefinition value) {
 		LoggerConsole.screen("BeanMeta", "Registering for bean data with id :"+value.getId());
 	}
 
 	@Override
-	protected void postregister(String key, BeanMetaData value) {
+	protected void postregister(String key, BeanDefinition value) {
 		LoggerConsole.screen("BeanMeta", "Registered for bean data with id :"+value.getId());
 	}
 
