@@ -11,12 +11,12 @@ import org.brijframework.bean.factories.BeanScopeFactory;
 import org.brijframework.bean.factories.definition.impl.BeanDefinitionFactoryImpl;
 import org.brijframework.bean.factories.impl.BeanScopeFactoryImpl;
 import org.brijframework.bean.scope.BeanScope;
+import org.brijframework.bean.scope.monitor.factories.PrototypeScopeMonitorFactroy;
+import org.brijframework.bean.scope.monitor.factories.RequestScopeMonitorFactroy;
+import org.brijframework.bean.scope.monitor.factories.SessionScopeMonitorFactroy;
 import org.brijframework.factories.impl.AbstractFactory;
 import org.brijframework.group.Group;
-import org.brijframework.model.metadata.PropertyModelMetaDataGroup;
-import org.brijframework.monitor.factories.PrototypeScopeMonitorFactroy;
-import org.brijframework.monitor.factories.RequestScopeMonitorFactroy;
-import org.brijframework.monitor.factories.SessionScopeMonitorFactroy;
+import org.brijframework.model.diffination.PropertyModelMetaDataGroup;
 import org.brijframework.util.accessor.LogicAccessorUtil;
 import org.brijframework.util.accessor.PropertyAccessorUtil;
 import org.brijframework.util.asserts.Assertion;
@@ -119,7 +119,7 @@ public abstract class AbstractBeanScopeFactory extends AbstractFactory<String, B
 		if (getContainer() == null) {
 			return;
 		}
-		Group group = getContainer().load(value.getDatainfo().getOwner().getName());
+		Group group = getContainer().load(value.getBeanDefinition().getOwner().getName());
 		if(!group.containsKey(value.getId())) {
 			group.add(key, value);
 		}else {
@@ -141,7 +141,7 @@ public abstract class AbstractBeanScopeFactory extends AbstractFactory<String, B
 	public List<BeanScope> findAll(Class<? extends Object> beanClass) {
 		List<BeanScope> list=new ArrayList<BeanScope>();
 		for(BeanScope beanScope:getCache().values()) {
-			if(beanClass.isAssignableFrom(beanScope.getDatainfo().getOwner().getType())) {
+			if(beanClass.isAssignableFrom(beanScope.getBeanDefinition().getOwner().getType())) {
 				list.add(beanScope);
 			}
 		}

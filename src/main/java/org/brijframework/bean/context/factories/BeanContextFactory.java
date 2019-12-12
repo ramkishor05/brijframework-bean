@@ -3,11 +3,11 @@ package org.brijframework.bean.context.factories;
 import org.brijframework.bean.context.BeanContext;
 import org.brijframework.factories.impl.bootstrap.AbstractBootstrapFactory;
 import org.brijframework.group.Group;
-import org.brijframework.support.config.SingletonFactory;
 import org.brijframework.support.config.OrderOn;
+import org.brijframework.support.config.SingletonFactory;
+import org.brijframework.util.factories.ReflectionFactory;
 import org.brijframework.util.printer.LoggerConsole;
 import org.brijframework.util.reflect.InstanceUtil;
-import org.brijframework.util.reflect.ReflectionUtils;
 
 @OrderOn(3)
 public class BeanContextFactory extends AbstractBootstrapFactory<String, BeanContext>{
@@ -26,7 +26,7 @@ public class BeanContextFactory extends AbstractBootstrapFactory<String, BeanCon
 	public BeanContextFactory loadFactory() {
 		try {
 			LoggerConsole.screen("BootstrapFactory -> "+this.getClass().getSimpleName(), "Lunching the factory to bean context");
-			ReflectionUtils.getClassListFromExternal().forEach(cls->{
+			ReflectionFactory.getFactory().getClassListFromExternal().forEach(cls->{
 				if(BeanContext.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					BeanContext beanContext = (BeanContext) InstanceUtil.getInstance(cls);
 					beanContext.start();
@@ -34,7 +34,7 @@ public class BeanContextFactory extends AbstractBootstrapFactory<String, BeanCon
 					this.register(beanContext.getClass().getName().equals(BeanContext.class.getName()+"Impl")? BeanContext.class.getName(): beanContext.getClass().getName(), beanContext);
 			    }
 			});
-			ReflectionUtils.getClassListFromInternal().forEach(cls->{
+			ReflectionFactory.getFactory().getClassListFromInternal().forEach(cls->{
 				if(BeanContext.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					BeanContext beanContext = (BeanContext) InstanceUtil.getInstance(cls);
 					beanContext.start();

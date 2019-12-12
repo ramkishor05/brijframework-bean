@@ -4,20 +4,20 @@ import org.brijframework.bean.definition.BeanDefinition;
 
 public class BeanScope {
 
-	private BeanDefinition datainfo;
+	private BeanDefinition definition;
 	private Object scopeObject;
 	private String id;
 
-	public BeanScope(BeanDefinition datainfo) {
-		this.setDatainfo(datainfo);
+	public BeanScope(BeanDefinition definition) {
+		this.setBeanDefinition(definition);
 	}
 
-	public BeanDefinition getDatainfo() {
-		return datainfo;
+	public BeanDefinition getBeanDefinition() {
+		return definition;
 	}
 
-	public void setDatainfo(BeanDefinition datainfo) {
-		this.datainfo = datainfo;
+	public void setBeanDefinition(BeanDefinition definition) {
+		this.definition = definition;
 	}
 
 	public void setScopeObject(Object scopeObject) {

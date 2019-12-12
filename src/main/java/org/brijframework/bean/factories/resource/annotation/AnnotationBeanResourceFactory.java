@@ -8,7 +8,7 @@ import org.brijframework.support.beans.Beans;
 import org.brijframework.support.config.OrderOn;
 import org.brijframework.support.config.SingletonFactory;
 import org.brijframework.support.enums.Scope;
-import org.brijframework.util.reflect.ReflectionUtils;
+import org.brijframework.util.factories.ReflectionFactory;
 import org.brijframework.util.support.Constants;
 
 @OrderOn(1)
@@ -26,7 +26,7 @@ public class AnnotationBeanResourceFactory extends AbstractBeanResourceFactory{
 	
 	@Override
 	public AnnotationBeanResourceFactory loadFactory() {
-		ReflectionUtils.getInternalClassList().forEach(target -> {
+		ReflectionFactory.getFactory().getInternalClassList().forEach(target -> {
 			if (target.isAnnotationPresent(Beans.class) || target.isAnnotationPresent(Bean.class)) {
 				this.register(target);
 			}

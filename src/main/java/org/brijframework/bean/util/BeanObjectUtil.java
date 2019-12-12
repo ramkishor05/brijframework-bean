@@ -10,8 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.brijframework.model.diffination.PropertyModelMetaDataGroup;
 import org.brijframework.model.factories.metadata.impl.TypeModelMetaDataFactoryImpl;
-import org.brijframework.model.metadata.PropertyModelMetaDataGroup;
 import org.brijframework.model.util.ModelUtil;
 import org.brijframework.util.accessor.MetaAccessorUtil;
 import org.brijframework.util.accessor.PropertyAccessorUtil;

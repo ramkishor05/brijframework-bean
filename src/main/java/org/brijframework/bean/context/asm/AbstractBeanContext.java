@@ -15,8 +15,9 @@ import org.brijframework.bean.factories.resource.impl.BeanResourceFactoryImpl;
 import org.brijframework.bean.resource.BeanResource;
 import org.brijframework.bean.scope.BeanScope;
 import org.brijframework.context.impl.module.AbstractModuleContext;
+import org.brijframework.support.enums.Scope;
+import org.brijframework.util.factories.ReflectionFactory;
 import org.brijframework.util.reflect.InstanceUtil;
-import org.brijframework.util.reflect.ReflectionUtils;
 
 public abstract class AbstractBeanContext extends AbstractModuleContext implements BeanContext {
 
@@ -24,7 +25,7 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	@SuppressWarnings("unchecked")
 	public void init() {
 		try {
-			ReflectionUtils.getClassListFromExternal().forEach(cls->{
+			ReflectionFactory.getFactory().getClassListFromExternal().forEach(cls->{
 				if(BeanContainer.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					register((Class<? extends BeanContainer>) cls);
 				}
@@ -33,7 +34,7 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 			e.printStackTrace();
 		}
 		try {
-			ReflectionUtils.getClassListFromInternal().forEach(cls->{
+			ReflectionFactory.getFactory().getClassListFromInternal().forEach(cls->{
 				if(BeanContainer.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					register((Class<? extends BeanContainer>) cls);
 				}
@@ -44,8 +45,7 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	}
 	
 	/*
-	 * (non-Javadoc)
-	 * @see org.brijframework.bean.context.BeanContext#getBeanObject(java.lang.String)
+	 * Bean Object
 	 */
 	@Override
 	public <T> T getBean(String name) {
@@ -67,12 +67,7 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 		return BeanScopeFactoryImpl.getFactory().getBeanScope(beanMetaData, uniqueID);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public <T> T getBean(String name, Class<T> beanClass) {
-		BeanScope find = BeanScopeFactoryImpl.getFactory().find(name);
-		if(find!=null && beanClass.isAssignableFrom(find.getDatainfo().getOwner().getType())) {
-			return (T) find.getScopeObject();
-		}
 		BeanDefinition beanMetaData = BeanDefinitionFactoryImpl.getFactory().find(name);
 		if(beanMetaData==null) {
 			return null;
@@ -107,6 +102,20 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	}
 
 	@Override
+	public List<?> getBeanList(Scope scope) {
+		List<Object> list=new ArrayList<>();
+		for (Entry<String, BeanScope> entry : BeanScopeFactoryImpl.getFactory().getCache().entrySet()) {
+			if(entry.getValue().getBeanDefinition().getScope().equals(scope)) {
+				list.add(entry.getValue().getScopeObject());
+			}
+		}
+		return list;
+	}
+	
+	/*
+	 * Bean Resource
+	 */
+	@Override
 	public BeanResource getBeanResource(String name) {
 		return BeanResourceFactoryImpl.getFactory().find(name);
 	}
@@ -126,6 +135,42 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	}
 
 	@Override
+	public List<?> getBeanResourceNameList() {
+		List<String> list=new ArrayList<>();
+		Enumeration<String> keys = BeanResourceFactoryImpl.getFactory().getCache().keys();
+		while(keys.hasMoreElements()) {
+			list.add(keys.nextElement());
+		}
+		return list ;
+	}
+
+	@Override
+	public List<?> getBeanResourceNamesList(String model) {
+		List<String> list=new ArrayList<>();
+		for(Entry<String, BeanResource>entry:BeanResourceFactoryImpl.getFactory().getCache().entrySet()) {
+			if(model.equals(entry.getValue().getModel())) {
+				list.add(entry.getKey());
+			}
+		}
+		return list ;
+	}
+	
+	@Override
+	public List<BeanResource> getBeanResourceList(Scope scope) {
+		List<BeanResource> list=new ArrayList<>();
+		for (Entry<String, BeanResource> entry : BeanResourceFactoryImpl.getFactory().getCache().entrySet()) {
+			if(entry.getValue().getScope().equalsIgnoreCase(scope.getName())) {
+				list.add(entry.getValue());
+			}
+		}
+		return list;
+	}
+
+	/*
+	 * BeanDefinition
+	 */
+
+	@Override
 	public BeanDefinition getBeanDefinition(String name) {
 		return BeanDefinitionFactoryImpl.getFactory().find(name);
 	}
@@ -143,27 +188,7 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	public List<? extends BeanDefinition> getBeanDefinitionList(String model) {
 		return BeanDefinitionFactoryImpl.getFactory().findAllByModel(model);
 	}
-
-	@Override
-	public List<?> getBeanResourceNameList() {
-		List<String> list=new ArrayList<>();
-		Enumeration<String> keys = BeanResourceFactoryImpl.getFactory().getCache().keys();
-		while(keys.hasMoreElements()) {
-			list.add(keys.nextElement());
-		}
-		return list ;
-	}
-
-	@Override
-	public List<?> getBeanResourceNamesList(String model) {
-		List<String> list=new ArrayList<>();
-		for(Entry<String, BeanResource>entry:BeanResourceFactoryImpl.getFactory().getCache().entrySet()) {
-			if(model.equals(entry.getValue().getModel()))
-			list.add(entry.getKey());
-		}
-		return list ;
-	}
-
+	
 	@Override
 	public List<?> getBeanDefinitionNameList() {
 		List<String> list=new ArrayList<>();
@@ -178,8 +203,9 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	public List<?> getBeanDefinitionNameList(String model) {
 		List<String> list=new ArrayList<>();
 		for(Entry<String, BeanDefinition> entry:BeanDefinitionFactoryImpl.getFactory().getCache().entrySet()) {
-			if(model.equals(entry.getValue().getOwner().getId()))
-			list.add(entry.getKey());
+			if(model.equals(entry.getValue().getOwner().getId())) {
+			  list.add(entry.getKey());
+			}
 		}
 		return list ;
 	}
@@ -188,10 +214,21 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	public List<? extends BeanDefinition> getBeanDefinitionList(Class<?> metaClass) {
 		List<BeanDefinition> list=new ArrayList<>();
 		for(Entry<String, BeanDefinition> entry:BeanDefinitionFactoryImpl.getFactory().getCache().entrySet()) {
-			if(metaClass.isAssignableFrom(entry.getValue().getOwner().getType()))
-			list.add(entry.getValue());
+			if(metaClass.isAssignableFrom(entry.getValue().getOwner().getType())) {
+			  list.add(entry.getValue());
+			}
 		}
 		return list ;
 	}
-
+	
+	@Override
+	public List<BeanDefinition> getBeanDefinitionList(Scope scope) {
+		List<BeanDefinition> list=new ArrayList<>();
+		for (Entry<String, BeanDefinition> entry : BeanDefinitionFactoryImpl.getFactory().getCache().entrySet()) {
+			if(entry.getValue().getScope().equalsIgnoreCase(scope)) {
+				list.add(entry.getValue());
+			}
+		}
+		return list;
+	}
 }

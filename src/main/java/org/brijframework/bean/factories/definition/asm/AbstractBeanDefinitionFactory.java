@@ -11,8 +11,8 @@ import org.brijframework.bean.factories.resource.impl.BeanResourceFactoryImpl;
 import org.brijframework.bean.resource.BeanResource;
 import org.brijframework.factories.impl.AbstractFactory;
 import org.brijframework.group.Group;
+import org.brijframework.model.diffination.TypeModelDiffination;
 import org.brijframework.model.factories.metadata.impl.TypeModelMetaDataFactoryImpl;
-import org.brijframework.model.metadata.TypeModelMetaData;
 import org.brijframework.support.enums.Scope;
 import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.printer.LoggerConsole;
@@ -26,7 +26,7 @@ public abstract class AbstractBeanDefinitionFactory extends AbstractFactory<Stri
 	}
 	
 	public void register(String id, BeanResource metaSetup) {
-		TypeModelMetaData owner=null;
+		TypeModelDiffination owner=null;
 		if(metaSetup.getModel() != null && !metaSetup.getModel().isEmpty() ) {
 			owner=TypeModelMetaDataFactoryImpl.getFactory().findById(metaSetup.getModel());
 			if(owner==null) {
@@ -50,7 +50,7 @@ public abstract class AbstractBeanDefinitionFactory extends AbstractFactory<Stri
 
 	public void register(Class<?> target, BeanResource metaSetup) {
 		String id=Constants.DEFAULT.equals(metaSetup.getId())?target.getSimpleName():metaSetup.getId();
-		TypeModelMetaData owner=TypeModelMetaDataFactoryImpl.getFactory().findById(metaSetup.getModel());
+		TypeModelDiffination owner=TypeModelMetaDataFactoryImpl.getFactory().findById(metaSetup.getModel());
 		Assertion.notNull(owner, "Model not found for "+metaSetup.getModel()+" of bean  : "+id);
 		BeanResource bean=BeanResourceFactoryImpl.getFactory().find(id);
 		BeanDefinitionImpl dataSetup=new BeanDefinitionImpl(owner);
