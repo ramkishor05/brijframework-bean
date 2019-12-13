@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import org.brijframework.bean.definition.BeanDefinition;
 import org.brijframework.bean.factories.BeanScopeFactory;
 import org.brijframework.bean.factories.definition.impl.BeanDefinitionFactoryImpl;
-import org.brijframework.bean.factories.impl.BeanScopeFactoryImpl;
 import org.brijframework.bean.scope.BeanScope;
 import org.brijframework.bean.scope.monitor.factories.PrototypeScopeMonitorFactroy;
 import org.brijframework.bean.scope.monitor.factories.RequestScopeMonitorFactroy;
@@ -27,42 +26,46 @@ import org.brijframework.util.support.Access;
 import org.brijframework.util.support.Constants;
 import org.brijframework.util.text.StringUtil;
 
-public abstract class AbstractBeanScopeFactory extends AbstractFactory<String, BeanScope> implements BeanScopeFactory{
+public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends AbstractFactory<K, T> implements BeanScopeFactory<K, T>{
 
 	@Override
-	public boolean contains(String key) {
+	public boolean contains(K key) {
 		return find(key)!=null;
 	}
 	
-	public <T> T getBeanScope(String name) {
-		BeanDefinition beanMetaData = BeanDefinitionFactoryImpl.getFactory().find(name);
+	@SuppressWarnings("unchecked")
+	public T getBeanScope(K name) {
+		BeanDefinition beanMetaData = BeanDefinitionFactoryImpl.getFactory().find(name.toString());
 		if(beanMetaData==null) {
 			return null;
 		}
-		String uniqueID = BeanScopeFactoryImpl.getFactory().getUniqueID(beanMetaData);
+		K uniqueID = (K) getUniqueID(beanMetaData);
 		return getBeanScope(beanMetaData, uniqueID);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> T getBeanScope(BeanDefinition beanMetaData, String uniqueID) {
-		BeanScope find = BeanScopeFactoryImpl.getFactory().find(uniqueID);
+	public T getBeanScope(BeanDefinition definition, K uniqueID) {
+		T find = find(uniqueID);
 		if(find!=null) {
-			return (T) find.getScopeObject();
+			return (T) find;
 		}
-		BeanScope register = BeanScopeFactoryImpl.getFactory().register(uniqueID, beanMetaData);
-		return (T) register.getScopeObject();
+		BeanScope register = register(uniqueID, definition);
+		return (T) register;
 	}
 	
-	public BeanScope register(String key,BeanDefinition beanMetaData) {
-		BeanScope value=find(key);
+	public BeanScope register(K key,BeanDefinition definition) {
+		T value=find(key);
 		Assertion.isTrue(value!=null,"Bean already exist in cache with : "+key);
-		value=new BeanScope(beanMetaData);
-		Object scopeObject=buildScopeObject(key,beanMetaData);
+		value=create(definition);
+		value.setBeanDefinition(definition);
+		Object scopeObject=buildScopeObject(key,definition);
 		value.setScopeObject(scopeObject);
-		value.setId(key);
+		value.setId(key.toString());
 		return register(key, value);
 	}
-
+	
+	protected abstract T create(BeanDefinition definition);
+	
 	public String getUniqueID(BeanDefinition datainfo) {
 		switch (datainfo.getScope()) {
 		case SINGLETON:
@@ -78,8 +81,8 @@ public abstract class AbstractBeanScopeFactory extends AbstractFactory<String, B
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	private Object buildScopeObject(String uniqueID, BeanDefinition datainfo) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private Object buildScopeObject(K uniqueID, BeanDefinition datainfo) {
 		Assertion.isTrue(datainfo==null,"BeanMetaData not found in cache with : "+uniqueID);
 		Assertion.isTrue(datainfo.getOwner()==null,"BeanMetaData Owner not found in cache with : "+uniqueID);
 		Object bean=createBean(datainfo);
@@ -91,7 +94,7 @@ public abstract class AbstractBeanScopeFactory extends AbstractFactory<String, B
 			PropertyModelMetaDataGroup fieldGroup=datainfo.getOwner().getProperties().get(entry.getKey());
 			if(value instanceof Map && ((Map) value).containsKey("@ref")) {
 				String ref=(String) ((Map) value).get("@ref");
-				value=getBeanScope(ref);
+				value=getBeanScope((K)ref);
 			}
 			Assertion.notNull(fieldGroup, datainfo.getOwner().getName()+" : No such type of property contains : "+entry.getKey()+" for "+datainfo.getId());
 			Assertion.notNull(fieldGroup.getSetterMeta(), datainfo.getOwner().getName()+" : Not allowed to set such type of property contains : "+entry.getKey());
@@ -115,7 +118,7 @@ public abstract class AbstractBeanScopeFactory extends AbstractFactory<String, B
 	}
 	
 	@Override
-	public void loadContainer(String key, BeanScope value) {
+	public void loadContainer(K key, T value) {
 		if (getContainer() == null) {
 			return;
 		}
@@ -128,8 +131,8 @@ public abstract class AbstractBeanScopeFactory extends AbstractFactory<String, B
 	}
 	
 	@Override
-	public BeanScope find(Class<? extends Object> beanClass) {
-		List<BeanScope> findAll = findAll(beanClass);
+	public T find(Class<? extends Object> beanClass) {
+		List<T> findAll = findAll(beanClass);
 		if(findAll.isEmpty()) {
 			return null;
 		}
@@ -138,9 +141,9 @@ public abstract class AbstractBeanScopeFactory extends AbstractFactory<String, B
 	}
 
 	@Override
-	public List<BeanScope> findAll(Class<? extends Object> beanClass) {
-		List<BeanScope> list=new ArrayList<BeanScope>();
-		for(BeanScope beanScope:getCache().values()) {
+	public List<T> findAll(Class<? extends Object> beanClass) {
+		List<T> list=new ArrayList<T>();
+		for(T beanScope:getCache().values()) {
 			if(beanClass.isAssignableFrom(beanScope.getBeanDefinition().getOwner().getType())) {
 				list.add(beanScope);
 			}
@@ -149,11 +152,11 @@ public abstract class AbstractBeanScopeFactory extends AbstractFactory<String, B
 	}
 	
 	@Override
-	protected void preregister(String key, BeanScope value) {
+	protected void preregister(K key, T value) {
 	}
 
 	@Override
-	protected void postregister(String key, BeanScope value) {
+	protected void postregister(K key, T value) {
 	}
 
 }

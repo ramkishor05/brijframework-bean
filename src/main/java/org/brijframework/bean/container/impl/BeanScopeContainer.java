@@ -5,8 +5,8 @@ import org.brijframework.bean.factories.BeanScopeFactory;
 import org.brijframework.bean.group.scope.BeanScopeGroup;
 import org.brijframework.container.impl.module.AbstractModuleContainer;
 import org.brijframework.group.Group;
-import org.brijframework.support.config.DepandOn;
-import org.brijframework.support.config.SingletonFactory;
+import org.brijframework.support.factories.SingletonFactory;
+import org.brijframework.support.ordering.DepandOn;
 import org.brijframework.util.factories.ReflectionFactory;
 import org.brijframework.util.reflect.InstanceUtil;
 
@@ -40,7 +40,7 @@ public class BeanScopeContainer extends AbstractModuleContainer implements BeanC
 		try {
 			ReflectionFactory.getFactory().getClassListFromExternal().forEach(cls -> {
 				if (BeanScopeFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
-					register((Class<? extends BeanScopeFactory>) cls);
+					register((Class<? extends BeanScopeFactory<?, ?>>) cls);
 				}
 			});
 		} catch (Exception e) {
@@ -49,7 +49,7 @@ public class BeanScopeContainer extends AbstractModuleContainer implements BeanC
 		try {
 			ReflectionFactory.getFactory().getClassListFromInternal().forEach(cls -> {
 				if (BeanScopeFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
-					register((Class<? extends BeanScopeFactory>) cls);
+					register((Class<? extends BeanScopeFactory<?, ?>>) cls);
 				}
 			});
 		} catch (Exception e) {

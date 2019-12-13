@@ -4,7 +4,7 @@ import org.brijframework.bean.factories.resource.BeanResourceFactory;
 import org.brijframework.bean.group.resource.BeanResourceGroup;
 import org.brijframework.container.impl.module.AbstractModuleContainer;
 import org.brijframework.group.Group;
-import org.brijframework.support.config.SingletonFactory;
+import org.brijframework.support.factories.SingletonFactory;
 import org.brijframework.util.factories.ReflectionFactory;
 import org.brijframework.util.reflect.InstanceUtil;
 

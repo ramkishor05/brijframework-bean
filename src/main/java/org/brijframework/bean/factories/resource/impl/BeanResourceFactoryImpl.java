@@ -3,8 +3,8 @@ package org.brijframework.bean.factories.resource.impl;
 import org.brijframework.bean.factories.resource.asm.AbstractBeanResourceFactory;
 import org.brijframework.bean.resource.BeanResource;
 import org.brijframework.group.Group;
-import org.brijframework.support.config.OrderOn;
-import org.brijframework.support.config.SingletonFactory;
+import org.brijframework.support.factories.SingletonFactory;
+import org.brijframework.support.ordering.OrderOn;
 
 @OrderOn(3)
 public final class BeanResourceFactoryImpl extends AbstractBeanResourceFactory{

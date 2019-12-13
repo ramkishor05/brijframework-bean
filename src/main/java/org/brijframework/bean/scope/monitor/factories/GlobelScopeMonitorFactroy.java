@@ -1,11 +1,12 @@
 package org.brijframework.bean.scope.monitor.factories;
 
+import org.brijframework.bean.definition.BeanDefinition;
+import org.brijframework.bean.factories.asm.AbstractBeanScopeFactory;
 import org.brijframework.bean.scope.monitor.GlobelScope;
 import org.brijframework.bean.scope.monitor.threads.GlobelThreadLocal;
-import org.brijframework.factories.impl.AbstractFactory;
 import org.brijframework.util.reflect.InstanceUtil;
 
-public class GlobelScopeMonitorFactroy extends AbstractFactory<String, GlobelScope>{
+public class GlobelScopeMonitorFactroy extends AbstractBeanScopeFactory<String, GlobelScope>{
 	
 	public int count;
 	private static GlobelScopeMonitorFactroy factory;
@@ -42,5 +43,10 @@ public class GlobelScopeMonitorFactroy extends AbstractFactory<String, GlobelSco
 
 	public GlobelScope getService() {
 		return new GlobelScope();
+	}
+
+	@Override
+	protected GlobelScope create(BeanDefinition definition) {
+		return new GlobelScope(definition);
 	}
 }

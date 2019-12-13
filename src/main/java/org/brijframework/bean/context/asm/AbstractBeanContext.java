@@ -47,6 +47,7 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	/*
 	 * Bean Object
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getBean(String name) {
 		BeanDefinition beanMetaData = BeanDefinitionFactoryImpl.getFactory().find(name);
@@ -54,9 +55,10 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 			return null;
 		}
 		String uniqueID = BeanScopeFactoryImpl.getFactory().getUniqueID(beanMetaData);
-		return BeanScopeFactoryImpl.getFactory().getBeanScope(beanMetaData, uniqueID);
+		return (T) BeanScopeFactoryImpl.getFactory().getBeanScope(beanMetaData, uniqueID).getScopeObject();
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getBean(Class<? extends Object> beanClass) {
 		BeanDefinition beanMetaData = BeanDefinitionFactoryImpl.getFactory().find(beanClass.getSimpleName());
@@ -64,9 +66,10 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 			return null;
 		}
 		String uniqueID = BeanScopeFactoryImpl.getFactory().getUniqueID(beanMetaData);
-		return BeanScopeFactoryImpl.getFactory().getBeanScope(beanMetaData, uniqueID);
+		return (T) BeanScopeFactoryImpl.getFactory().getBeanScope(beanMetaData, uniqueID).getScopeObject();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public <T> T getBean(String name, Class<T> beanClass) {
 		BeanDefinition beanMetaData = BeanDefinitionFactoryImpl.getFactory().find(name);
 		if(beanMetaData==null) {
@@ -76,7 +79,7 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 			return null;
 		}
 		String uniqueID = BeanScopeFactoryImpl.getFactory().getUniqueID(beanMetaData);
-		return BeanScopeFactoryImpl.getFactory().getBeanScope(beanMetaData, uniqueID);
+		return (T) BeanScopeFactoryImpl.getFactory().getBeanScope(beanMetaData, uniqueID).getScopeObject();
 	}
 
 	@Override

@@ -1,8 +1,9 @@
 package org.brijframework.bean.scope.monitor;
 
+import org.brijframework.bean.scope.BeanScope;
 import org.brijframework.util.runtime.RandomUtil;
 
-public class PrototypeScope{
+public class PrototypeScope extends BeanScope{
 	private String id;
 	private String device;
 

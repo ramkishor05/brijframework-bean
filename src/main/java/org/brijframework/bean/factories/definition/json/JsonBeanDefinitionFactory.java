@@ -2,8 +2,8 @@ package org.brijframework.bean.factories.definition.json;
 
 import org.brijframework.bean.factories.definition.asm.AbstractBeanDefinitionFactory;
 import org.brijframework.bean.factories.resource.json.JsonBeanResourceFactory;
-import org.brijframework.support.config.OrderOn;
-import org.brijframework.support.config.SingletonFactory;
+import org.brijframework.support.factories.SingletonFactory;
+import org.brijframework.support.ordering.OrderOn;
 
 @OrderOn(2)
 public class JsonBeanDefinitionFactory extends AbstractBeanDefinitionFactory{

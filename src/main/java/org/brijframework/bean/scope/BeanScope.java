@@ -1,15 +1,18 @@
 package org.brijframework.bean.scope;
 
+import java.util.Map;
+
 import org.brijframework.bean.definition.BeanDefinition;
 
 public class BeanScope {
 
 	private BeanDefinition definition;
 	private Object scopeObject;
+	private Map<String, BeanScope> properties;
+	
 	private String id;
 
-	public BeanScope(BeanDefinition definition) {
-		this.setBeanDefinition(definition);
+	public BeanScope() {
 	}
 
 	public BeanDefinition getBeanDefinition() {
@@ -35,4 +38,21 @@ public class BeanScope {
 	public String getId() {
 		return id;
 	}
+
+	public BeanDefinition getDefinition() {
+		return definition;
+	}
+
+	public void setDefinition(BeanDefinition definition) {
+		this.definition = definition;
+	}
+
+	public Map<String, BeanScope> getProperties() {
+		return properties;
+	}
+
+	public void setProperties(Map<String, BeanScope> properties) {
+		this.properties = properties;
+	}
+	
 }

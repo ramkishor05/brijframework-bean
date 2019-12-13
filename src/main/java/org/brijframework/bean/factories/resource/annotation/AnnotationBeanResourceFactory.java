@@ -2,12 +2,12 @@ package org.brijframework.bean.factories.resource.annotation;
 
 import org.brijframework.bean.factories.resource.asm.AbstractBeanResourceFactory;
 import org.brijframework.bean.resource.impl.BeanResourceImpl;
-import org.brijframework.support.beans.Attribute;
-import org.brijframework.support.beans.Bean;
-import org.brijframework.support.beans.Beans;
-import org.brijframework.support.config.OrderOn;
-import org.brijframework.support.config.SingletonFactory;
+import org.brijframework.support.bean.Bean;
+import org.brijframework.support.bean.Beans;
+import org.brijframework.support.bean.attributes.Attribute;
 import org.brijframework.support.enums.Scope;
+import org.brijframework.support.factories.SingletonFactory;
+import org.brijframework.support.ordering.OrderOn;
 import org.brijframework.util.factories.ReflectionFactory;
 import org.brijframework.util.support.Constants;
 

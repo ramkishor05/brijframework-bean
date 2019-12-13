@@ -6,8 +6,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.brijframework.bean.definition.BeanDefinition;
 import org.brijframework.bean.factories.definition.asm.AbstractBeanDefinitionFactory;
 import org.brijframework.group.Group;
-import org.brijframework.support.config.OrderOn;
-import org.brijframework.support.config.SingletonFactory;
+import org.brijframework.support.factories.SingletonFactory;
+import org.brijframework.support.ordering.OrderOn;
 
 @OrderOn(3)
 public final class BeanDefinitionFactoryImpl extends AbstractBeanDefinitionFactory{

@@ -6,8 +6,8 @@ import org.brijframework.bean.definition.BeanDefinition;
 import org.brijframework.bean.resource.BeanResource;
 import org.brijframework.context.module.ModuleContext;
 import org.brijframework.model.context.ModelContext;
-import org.brijframework.support.config.DepandOn;
 import org.brijframework.support.enums.Scope;
+import org.brijframework.support.ordering.DepandOn;
 
 @DepandOn(depand = ModelContext.class)
 public interface BeanContext extends ModuleContext {
