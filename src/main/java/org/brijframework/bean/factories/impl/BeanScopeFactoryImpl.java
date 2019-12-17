@@ -40,5 +40,7 @@ public final class BeanScopeFactoryImpl extends AbstractBeanScopeFactory<String,
 	protected BeanScope create(BeanDefinition definition) {
 		return new BeanScope();
 	}
+
+	
 	
 }

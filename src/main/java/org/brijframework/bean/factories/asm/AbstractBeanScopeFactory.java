@@ -13,9 +13,10 @@ import org.brijframework.bean.scope.BeanScope;
 import org.brijframework.bean.scope.monitor.factories.PrototypeScopeMonitorFactroy;
 import org.brijframework.bean.scope.monitor.factories.RequestScopeMonitorFactroy;
 import org.brijframework.bean.scope.monitor.factories.SessionScopeMonitorFactroy;
+import org.brijframework.container.Container;
 import org.brijframework.factories.impl.AbstractFactory;
 import org.brijframework.group.Group;
-import org.brijframework.model.diffination.PropertyModelMetaDataGroup;
+import org.brijframework.model.diffination.ModelPropertyDiffinationGroup;
 import org.brijframework.util.accessor.LogicAccessorUtil;
 import org.brijframework.util.accessor.PropertyAccessorUtil;
 import org.brijframework.util.asserts.Assertion;
@@ -31,6 +32,35 @@ public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends A
 	@Override
 	public boolean contains(K key) {
 		return find(key)!=null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public T getBeanScopeOfObject(Object object) {
+		for(BeanScope beanScope:getCache().values()) {
+			if(object==beanScope.getScopeObject()) {
+				return (T) beanScope;
+			}
+		}
+		Container container =getContainer();
+		if(container==null) {
+			return null;
+		}
+		for(Group group:container.getCache().values()) {
+			for(Object objectScope:group.getCache().values()) {
+				if(objectScope instanceof BeanScope) {
+					BeanScope beanScope=(BeanScope) objectScope;
+					if(object==beanScope.getScopeObject()) {
+						return (T) beanScope;
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	public BeanDefinition getBeanDefinitionOfObject(Object object) {
+		T beanScopeOfObject = getBeanScopeOfObject(object);
+		return beanScopeOfObject!=null ? beanScopeOfObject.getBeanDefinition(): null;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -53,7 +83,7 @@ public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends A
 		return (T) register;
 	}
 	
-	public BeanScope register(K key,BeanDefinition definition) {
+	public BeanScope register(K key, BeanDefinition definition) {
 		T value=find(key);
 		Assertion.isTrue(value!=null,"Bean already exist in cache with : "+key);
 		value=create(definition);
@@ -91,7 +121,7 @@ public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends A
 		}
 		for(Entry<String, Object> entry:datainfo.getProperties().entrySet()){
 			Object value=entry.getValue();
-			PropertyModelMetaDataGroup fieldGroup=datainfo.getOwner().getProperties().get(entry.getKey());
+			ModelPropertyDiffinationGroup fieldGroup=datainfo.getOwner().getProperties().get(entry.getKey());
 			if(value instanceof Map && ((Map) value).containsKey("@ref")) {
 				String ref=(String) ((Map) value).get("@ref");
 				value=getBeanScope((K)ref);

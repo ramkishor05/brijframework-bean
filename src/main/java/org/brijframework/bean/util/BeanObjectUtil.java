@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.brijframework.model.diffination.PropertyModelMetaDataGroup;
+import org.brijframework.model.diffination.ModelPropertyDiffinationGroup;
 import org.brijframework.model.factories.metadata.impl.TypeModelMetaDataFactoryImpl;
 import org.brijframework.model.util.ModelUtil;
 import org.brijframework.util.accessor.MetaAccessorUtil;
@@ -32,7 +32,7 @@ public class BeanObjectUtil {
 	@SuppressWarnings("unchecked")
 	private static <T> T findCurrentFromObject(Object instance, String _keyPath, boolean isDefault) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
-		PropertyModelMetaDataGroup property =TypeModelMetaDataFactoryImpl.getFactory().getPropertyMetaData(instance.getClass().getSimpleName() , _keyPath);
+		ModelPropertyDiffinationGroup property =TypeModelMetaDataFactoryImpl.getFactory().getPropertyMetaData(instance.getClass().getSimpleName() , _keyPath);
 		Field field = property != null ? property.getFieldMeta().getTargetAsField(): FieldUtil.getField(instance.getClass(), _keyPath, Access.PRIVATE);
 		Object _value = PropertyAccessorUtil.getProperty(instance, field, Access.PRIVATE);
 		if (_value == null && isDefault) {
@@ -156,7 +156,7 @@ public class BeanObjectUtil {
 	@SuppressWarnings("unchecked")
 	private static <T> T findCurrentFromList(Object instance, String _keyPath, Integer index, boolean isDefault) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
-		PropertyModelMetaDataGroup property =TypeModelMetaDataFactoryImpl.getFactory().getPropertyMetaData(instance.getClass().getSimpleName() , _keyPath);
+		ModelPropertyDiffinationGroup property =TypeModelMetaDataFactoryImpl.getFactory().getPropertyMetaData(instance.getClass().getSimpleName() , _keyPath);
 		Field field = property != null ? property.getFieldMeta().getTargetAsField(): FieldUtil.getField(instance.getClass(), _keyPath, Access.PRIVATE);
 		Class<?> targetClass = property != null ? CastingUtil.getTargetClass(field, property.getFieldMeta().isField()? property.getFieldMeta().getTargetAsField().getType() : property.getGetterMeta().getTargetAsField().getType()): CastingUtil.getTargetClass(field, field.getType());
 		Object collection = PropertyAccessorUtil.getProperty(instance, _keyPath, Access.PRIVATE);

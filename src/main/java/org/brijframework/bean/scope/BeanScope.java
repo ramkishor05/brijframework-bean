@@ -54,5 +54,12 @@ public class BeanScope {
 	public void setProperties(Map<String, BeanScope> properties) {
 		this.properties = properties;
 	}
+
+	@Override
+	public String toString() {
+		return "BeanScope [definition=" + definition + ", scopeObject=" + scopeObject + ", properties=" + properties
+				+ ", id=" + id + "]";
+	}
+	
 	
 }

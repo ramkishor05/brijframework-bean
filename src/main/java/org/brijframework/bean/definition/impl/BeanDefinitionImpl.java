@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.brijframework.bean.definition.BeanDefinition;
-import org.brijframework.model.diffination.TypeModelDiffination;
+import org.brijframework.model.diffination.ModelTypeDiffination;
 import org.brijframework.support.enums.Scope;
 import org.brijframework.util.asserts.Assertion;
 
 public class BeanDefinitionImpl implements BeanDefinition {
 	
-	private TypeModelDiffination owner;
+	private ModelTypeDiffination owner;
 	
 	private String id;
 	
@@ -24,11 +24,11 @@ public class BeanDefinitionImpl implements BeanDefinition {
 
 	private Map<String, Object> properties;
 	
-	public BeanDefinitionImpl(TypeModelDiffination owner) {
+	public BeanDefinitionImpl(ModelTypeDiffination owner) {
 		this.owner=owner;
 	}
 	
-	public TypeModelDiffination getOwner() {
+	public ModelTypeDiffination getOwner() {
 		return owner;
 	}
 	
@@ -55,7 +55,7 @@ public class BeanDefinitionImpl implements BeanDefinition {
 		return name;
 	}
 	
-	public void setOwner(TypeModelDiffination owner) {
+	public void setOwner(ModelTypeDiffination owner) {
 		this.owner = owner;
 	}
 	
