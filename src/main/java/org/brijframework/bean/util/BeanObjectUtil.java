@@ -21,7 +21,7 @@ import org.brijframework.util.meta.PointUtil;
 import org.brijframework.util.reflect.ClassUtil;
 import org.brijframework.util.reflect.FieldUtil;
 import org.brijframework.util.reflect.InstanceUtil;
-import org.brijframework.util.support.Access;
+import org.brijframework.util.support.ReflectionAccess;
 import org.brijframework.util.support.Constants;
 
 public class BeanObjectUtil {
@@ -33,8 +33,8 @@ public class BeanObjectUtil {
 	private static <T> T findCurrentFromObject(Object instance, String _keyPath, boolean isDefault) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
 		ModelPropertyDiffinationGroup property =TypeModelMetaDataFactoryImpl.getFactory().getPropertyMetaData(instance.getClass().getSimpleName() , _keyPath);
-		Field field = property != null ? property.getFieldMeta().getTargetAsField(): FieldUtil.getField(instance.getClass(), _keyPath, Access.PRIVATE);
-		Object _value = PropertyAccessorUtil.getProperty(instance, field, Access.PRIVATE);
+		Field field = property != null ? property.getFieldMeta().getTargetAsField(): FieldUtil.getField(instance.getClass(), _keyPath, ReflectionAccess.PRIVATE);
+		Object _value = PropertyAccessorUtil.getProperty(instance, field, ReflectionAccess.PRIVATE);
 		if (_value == null && isDefault) {
 			Class<?> targetClass = property != null ? CastingUtil.getTargetClass(field,property.getFieldMeta().isField()? property.getFieldMeta().getTargetAsField().getType() : property.getGetterMeta().getTargetAsField().getType() ): CastingUtil.getTargetClass(field, field.getType());
 			_value = InstanceUtil.getInstance(targetClass);
@@ -71,7 +71,7 @@ public class BeanObjectUtil {
 			} else if (current instanceof Map) {
 				current = findCurrentFromMap((Map<Object, Object>) current, key, field, isDefault);
 			} else {
-				field = MetaAccessorUtil.setPropertyMeta(current.getClass(), key, Access.PRIVATE,null);
+				field = MetaAccessorUtil.setPropertyMeta(current.getClass(), key, ReflectionAccess.PRIVATE,null);
 				current = findCurrentFromObject(current, key, isDefault);
 			}
 			point.append(key);
@@ -83,13 +83,13 @@ public class BeanObjectUtil {
 			}
 		}
 		if (current != null) {
-			return setProperty(current, field,Access.PRIVATE, keyArray[keyArray.length - 1], _value);
+			return setProperty(current, field,ReflectionAccess.PRIVATE, keyArray[keyArray.length - 1], _value);
 		}
 		return (T) _value;
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T setProperty(Object current,AccessibleObject field, Access access, String key, Object value) {
+	public static <T> T setProperty(Object current,AccessibleObject field, ReflectionAccess access, String key, Object value) {
 		if (current instanceof Collection<?> && key.contains(Constants.OPEN_BRAKET)&& key.contains(Constants.CLOSE_BRAKET)) {
 			return setPropertyArray(current, field,PointUtil.indexArray(key),value);
 		} else if (current instanceof Map) {
@@ -113,7 +113,7 @@ public class BeanObjectUtil {
 			} else if (current instanceof Map) {
 				current = findCurrentFromMap((Map<Object, Object>) current, key, field, isDefault);
 			} else {
-				field = FieldUtil.getField(current.getClass(), key, Access.PRIVATE);
+				field = FieldUtil.getField(current.getClass(), key, ReflectionAccess.PRIVATE);
 				current = findCurrentFromObject(current, key, isDefault);
 			}
 			point.append(key);
@@ -126,13 +126,13 @@ public class BeanObjectUtil {
 			}
 		}
 		if (current != null) {
-			return getProperty(current, Access.PRIVATE, keyArray[keyArray.length - 1]);
+			return getProperty(current, ReflectionAccess.PRIVATE, keyArray[keyArray.length - 1]);
 		}
 		return null;
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T getProperty(Object current, Access access, String key) {
+	public static <T> T getProperty(Object current, ReflectionAccess access, String key) {
 		if (key.contains(Constants.OPEN_BRAKET) && key.contains(Constants.CLOSE_BRAKET)) {
 			return findCurrentFromList(current, PointUtil.keyArray(key), PointUtil.indexArray(key), false);
 		} else if (current instanceof Map) {
@@ -157,9 +157,9 @@ public class BeanObjectUtil {
 	private static <T> T findCurrentFromList(Object instance, String _keyPath, Integer index, boolean isDefault) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
 		ModelPropertyDiffinationGroup property =TypeModelMetaDataFactoryImpl.getFactory().getPropertyMetaData(instance.getClass().getSimpleName() , _keyPath);
-		Field field = property != null ? property.getFieldMeta().getTargetAsField(): FieldUtil.getField(instance.getClass(), _keyPath, Access.PRIVATE);
+		Field field = property != null ? property.getFieldMeta().getTargetAsField(): FieldUtil.getField(instance.getClass(), _keyPath, ReflectionAccess.PRIVATE);
 		Class<?> targetClass = property != null ? CastingUtil.getTargetClass(field, property.getFieldMeta().isField()? property.getFieldMeta().getTargetAsField().getType() : property.getGetterMeta().getTargetAsField().getType()): CastingUtil.getTargetClass(field, field.getType());
-		Object collection = PropertyAccessorUtil.getProperty(instance, _keyPath, Access.PRIVATE);
+		Object collection = PropertyAccessorUtil.getProperty(instance, _keyPath, ReflectionAccess.PRIVATE);
 		if (collection == null && targetClass != null && isDefault) {
 			collection = InstanceUtil.getInstance(targetClass);
 			PropertyAccessorUtil.setProperty(instance, field, collection);
@@ -272,11 +272,11 @@ public class BeanObjectUtil {
 	/*
 	 * Start Object
 	 */
-	public static <T> T setPropertyObject(Object current,  Access access,String keyPoint, Object _value) {
+	public static <T> T setPropertyObject(Object current,  ReflectionAccess access,String keyPoint, Object _value) {
 		return PropertyAccessorUtil.setProperty(current, keyPoint,access, _value);
 	}
 
-	public static <T> T getPropertyObject(Object object, Access access, String key) {
+	public static <T> T getPropertyObject(Object object, ReflectionAccess access, String key) {
 		return PropertyAccessorUtil.getProperty(object, key, access);
 	}
 
@@ -331,10 +331,10 @@ public class BeanObjectUtil {
 	}
 
 	public static Map<String, ?> getPropertiesPath(Object currentInstance, boolean isDefault) {
-		List<Field> fields = FieldUtil.getAllField(currentInstance.getClass(), Access.PRIVATE);
+		List<Field> fields = FieldUtil.getAllField(currentInstance.getClass(), ReflectionAccess.PRIVATE);
 		Map<String, ?> returnMap = new LinkedHashMap<String, Object>();
 		for (Field _key : fields) {
-			returnMap.put(_key.getName(), getProperty(currentInstance, Access.PRIVATE, _key.getName()));
+			returnMap.put(_key.getName(), getProperty(currentInstance, ReflectionAccess.PRIVATE, _key.getName()));
 		}
 		return returnMap;
 	}
@@ -342,7 +342,7 @@ public class BeanObjectUtil {
 	public static Map<String, ?> getPropertiesPath(Object currentInstance, String[] _keyPath, boolean isDefault) {
 		Map<String, ?> returnMap = new LinkedHashMap<String, Object>();
 		for (String _key : _keyPath) {
-			returnMap.put(_key, getProperty(currentInstance, Access.PRIVATE, _key));
+			returnMap.put(_key, getProperty(currentInstance, ReflectionAccess.PRIVATE, _key));
 		}
 		return returnMap;
 	}
@@ -351,7 +351,7 @@ public class BeanObjectUtil {
 		Map<String, ?> returnMap = new LinkedHashMap<String, Object>();
 		for (String _key : _keyPath) {
 			if (containsPathKey(currentInstance, _key, isDefault)) {
-				returnMap.put(_key, getProperty(currentInstance, Access.PRIVATE, _key));
+				returnMap.put(_key, getProperty(currentInstance, ReflectionAccess.PRIVATE, _key));
 			}
 		}
 		return returnMap;

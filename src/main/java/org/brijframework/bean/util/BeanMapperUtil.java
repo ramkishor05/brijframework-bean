@@ -11,7 +11,7 @@ import org.brijframework.util.accessor.PropertyAccessorUtil;
 import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.reflect.FieldUtil;
 import org.brijframework.util.reflect.InstanceUtil;
-import org.brijframework.util.support.Access;
+import org.brijframework.util.support.ReflectionAccess;
 
 public class BeanMapperUtil {
 
@@ -29,9 +29,9 @@ public class BeanMapperUtil {
 	
 	public static Object mappedToObjectFromObject(Object toObject,Object fromObject) {
 		BeanBuilder builder=new BeanBuilder(toObject);
-		for(Field fromField: FieldUtil.getAllField(fromObject.getClass(), Access.PRIVATE)) {
+		for(Field fromField: FieldUtil.getAllField(fromObject.getClass(), ReflectionAccess.PRIVATE)) {
 			String keyPoint=getKeyPoint(toObject, fromField, fromObject);
-			Object value=PropertyAccessorUtil.getProperty(fromObject, fromField, Access.PRIVATE);
+			Object value=PropertyAccessorUtil.getProperty(fromObject, fromField, ReflectionAccess.PRIVATE);
 			if(builder.containsKey(keyPoint)) {
 				builder.setProperty(keyPoint, value);
 			}else {
@@ -81,10 +81,10 @@ public class BeanMapperUtil {
 
 	public static Object mappedFromObjectToObject(Object toObject,Object fromObject) {
 		BeanBuilder builder=new BeanBuilder(fromObject);
-		for(Field entry: FieldUtil.getAllField(fromObject.getClass(), Access.PRIVATE)) {
+		for(Field entry: FieldUtil.getAllField(fromObject.getClass(), ReflectionAccess.PRIVATE)) {
 			PropertyModelMapperResource mapper=PropertyModelMapperResourceImpl.getFactory().getMetaInfo(toObject.getClass().getSimpleName()+"_"+entry.getName());
 			if(mapper!=null) {
-				builder.setProperty(entry.getName(), PropertyAccessorUtil.getProperty(toObject, mapper.getName(), Access.PRIVATE));
+				builder.setProperty(entry.getName(), PropertyAccessorUtil.getProperty(toObject, mapper.getName(), ReflectionAccess.PRIVATE));
 			}
 		}
 		return builder.getCurrentInstance();

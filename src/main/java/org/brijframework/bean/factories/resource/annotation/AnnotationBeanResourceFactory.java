@@ -4,7 +4,7 @@ import org.brijframework.bean.factories.resource.asm.AbstractBeanResourceFactory
 import org.brijframework.bean.resource.impl.BeanResourceImpl;
 import org.brijframework.support.bean.Bean;
 import org.brijframework.support.bean.Beans;
-import org.brijframework.support.bean.attributes.Attribute;
+import org.brijframework.support.bean.properties.BeanProperty;
 import org.brijframework.support.enums.Scope;
 import org.brijframework.support.factories.SingletonFactory;
 import org.brijframework.support.ordering.OrderOn;
@@ -56,7 +56,7 @@ public class AnnotationBeanResourceFactory extends AbstractBeanResourceFactory{
 		dataSetup.setType(Constants.DEFAULT.equals(beanResource.type())? target.getName() :beanResource.type());
 		dataSetup.setFactoryClass(Constants.DEFAULT.equals(beanResource.factoryClass())?null:beanResource.factoryClass());
 		dataSetup.setFactoryMethod(Constants.DEFAULT.equals(beanResource.factoryMethod())?null:beanResource.factoryMethod());
-		for(Attribute field: beanResource.properties()) {
+		for(BeanProperty field: beanResource.properties()) {
 		    dataSetup.getProperties().put(field.name(), field.value());
 		}
 		register(dataSetup.getId(),dataSetup);

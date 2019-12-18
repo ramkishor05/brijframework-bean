@@ -7,8 +7,8 @@ import org.brijframework.model.diffination.ModelPropertyDiffinationGroup;
 import org.brijframework.util.accessor.PropertyAccessorUtil;
 import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.reflect.InstanceUtil;
-import org.brijframework.util.support.Access;
 import org.brijframework.util.support.Constants;
+import org.brijframework.util.support.ReflectionAccess;
 
 public class BeanScopeUtil {
 
@@ -23,19 +23,21 @@ public class BeanScopeUtil {
 	public static <T> T getPropertyObject(Object instance, String[] keyArray, boolean isDefault) {
 		Object current = instance;
 		for (int i = 0; i < keyArray.length - 1; i++) {
+			if(current==null) {
+			   return null;
+			}
 			String keyPoint = keyArray[i];
 			Object refPoint=getPropertyPath(instance, keyPoint, isDefault);
 			if(refPoint==null) {
-				ModelPropertyDiffination setterMeta = setterPropertyDefination(current, keyPoint);
-				if(setterMeta!=null) {
-					refPoint=InstanceUtil.getInstance(setterMeta.getTargetAsField().getType());
-					PropertyAccessorUtil.setProperty(current, keyPoint,setterMeta.getAccess(), refPoint);
-				}
+				current=refPoint;
+				continue;
 			}
-			if(refPoint==null) {
-				return null;
+			ModelPropertyDiffination setterMeta = setterPropertyDefination(current, keyPoint);
+			if(setterMeta!=null) {
+				refPoint=InstanceUtil.getInstance(setterMeta.getTargetAsField().getType());
+				setPropertyPath(current, keyPoint, refPoint, isDefault);
+				current=refPoint;
 			}
-			current=refPoint;
 		}
 		return (T) current;
 	}
@@ -48,22 +50,52 @@ public class BeanScopeUtil {
 		String keyPoint=keyArray[keyArray.length-1];
 		ModelPropertyDiffination getterMeta = getterPropertyDefination(current, keyPoint);
 		if(getterMeta!=null) {
-			return PropertyAccessorUtil.getProperty(current, keyPoint,getterMeta.getAccess());
+			return getProperty(current, keyPoint, getterMeta);
 		}
-		return PropertyAccessorUtil.getProperty(current, keyPoint);
+		return PropertyAccessorUtil.getProperty(current, keyPoint, ReflectionAccess.PUBLIC);
+	}
+
+	protected static <T> T  getProperty(Object current, String keyPoint, ModelPropertyDiffination getterMeta) {
+		System.out.println(keyPoint+" ==> getterMeta<== "+getterMeta);
+		switch (getterMeta.getAccess()) {
+		case AUTO:
+			return PropertyAccessorUtil.getProperty(current, keyPoint);
+		case READ_ONLY:
+			return PropertyAccessorUtil.getProperty(current, keyPoint);
+		case READ_WRITE:
+			return PropertyAccessorUtil.getProperty(current, keyPoint);
+		default:
+			Assertion.state(false, "Can't read '"+keyPoint+"'. it's protected to read.");
+			return null;
+		}
 	}
 	
 	public static <T> T setPropertyPath(Object instance, String _keyPath,Object _val, boolean isDefault) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
 		String[] keyArray = _keyPath.split(Constants.SPLIT_DOT);
 		Object current = getPropertyObject(instance, keyArray, isDefault);
-		Assertion.notEmpty(current, "Instance should not be null");
 		String keyPoint=keyArray[keyArray.length-1];
-		ModelPropertyDiffination getterMeta = setterPropertyDefination(current, keyPoint);
-		if(getterMeta!=null) {
-			return PropertyAccessorUtil.setProperty(current, keyPoint,getterMeta.getAccess(), _val);
+		Assertion.notNull(current, "Instance should not be null");
+		ModelPropertyDiffination setterMeta = setterPropertyDefination(current, keyPoint);
+		System.out.println(keyPoint+" ==> getterMeta<== "+setterMeta);
+		if(setterMeta!=null) {
+			return setProperty(current, keyPoint, _val, setterMeta);
 		}
-		return PropertyAccessorUtil.setProperty(current, keyPoint, Access.PUBLIC, _val);
+		return PropertyAccessorUtil.setProperty(current, keyPoint, ReflectionAccess.PUBLIC, _val);
+	}
+
+	private static <T> T setProperty(Object current, String keyPoint,Object _val, ModelPropertyDiffination setterMeta) {
+		switch (setterMeta.getAccess()) {
+		case AUTO:
+			return PropertyAccessorUtil.setProperty(current, keyPoint,_val);
+		case WRITE_ONLY:
+			return PropertyAccessorUtil.setProperty(current, keyPoint,_val);
+		case READ_WRITE:
+			return PropertyAccessorUtil.setProperty(current, keyPoint,_val);
+		default:
+			Assertion.state(false, "Can't write '"+keyPoint+"'. it's protected to write.");
+			return null;
+		}
 	}
 
 	private static ModelPropertyDiffination getterPropertyDefination(Object current, String keyPoint) {

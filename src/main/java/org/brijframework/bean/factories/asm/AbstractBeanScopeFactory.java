@@ -23,7 +23,7 @@ import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.reflect.ClassUtil;
 import org.brijframework.util.reflect.InstanceUtil;
 import org.brijframework.util.reflect.MethodUtil;
-import org.brijframework.util.support.Access;
+import org.brijframework.util.support.ReflectionAccess;
 import org.brijframework.util.support.Constants;
 import org.brijframework.util.text.StringUtil;
 
@@ -138,7 +138,7 @@ public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends A
 			Class<?> factory=ClassUtil.getClass(datainfo.getFactoryClass());
 			Object current=null;
 			for(String key:datainfo.getFactoryMethod().split(Constants.SPLIT_DOT)) {
-				Method findMethod = MethodUtil.findMethod(factory, key, Access.PRIVATE);
+				Method findMethod = MethodUtil.findMethod(factory, key, ReflectionAccess.PRIVATE);
 				current= LogicAccessorUtil.callLogic(current, findMethod);
 			}
 			return current;
