@@ -1,8 +1,11 @@
 package org.brijframework.bean.factories.resource.annotation;
 
 import org.brijframework.bean.factories.resource.asm.AbstractBeanResourceFactory;
+import org.brijframework.bean.resource.impl.BeanResourceConstructorImpl;
 import org.brijframework.bean.resource.impl.BeanResourceImpl;
+import org.brijframework.bean.resource.impl.BeanResourceParamImpl;
 import org.brijframework.support.bean.Bean;
+import org.brijframework.support.bean.BeanParam;
 import org.brijframework.support.bean.Beans;
 import org.brijframework.support.bean.properties.BeanProperty;
 import org.brijframework.support.enums.Scope;
@@ -58,6 +61,16 @@ public class AnnotationBeanResourceFactory extends AbstractBeanResourceFactory{
 		dataSetup.setFactoryMethod(Constants.DEFAULT.equals(beanResource.factoryMethod())?null:beanResource.factoryMethod());
 		for(BeanProperty field: beanResource.properties()) {
 		    dataSetup.getProperties().put(field.name(), field.value());
+		}
+		if(beanResource.constructor()!=null) {
+			BeanResourceConstructorImpl constructor=new BeanResourceConstructorImpl();
+			constructor.setId(beanResource.constructor().id());
+			if(beanResource.constructor().params()!=null) {
+				for(BeanParam beanParam: beanResource.constructor().params() ) {
+				   constructor.getParams().add(new BeanResourceParamImpl(beanParam.index(), beanParam.type(), beanParam.name(), beanParam.value()));
+				}
+			}
+			dataSetup.setConstructor(constructor);
 		}
 		register(dataSetup.getId(),dataSetup);
 	}

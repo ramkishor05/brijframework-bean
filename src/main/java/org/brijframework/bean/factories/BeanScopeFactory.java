@@ -12,4 +12,7 @@ public interface BeanScopeFactory<K, T> extends ModuleFactory<K, T>{
 	
 	boolean contains(K key);
 
+	T getBeanScopeForObject(Object object);
+	
+	Object getObjectForRef(String object);
 }

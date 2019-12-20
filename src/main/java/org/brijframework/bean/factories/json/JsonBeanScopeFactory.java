@@ -38,7 +38,7 @@ public final class JsonBeanScopeFactory extends AbstractBeanScopeFactory<String,
 	}
 
 	@Override
-	protected BeanScope create(BeanDefinition definition) {
+	protected BeanScope createBeanScope(BeanDefinition definition) {
 		return new BeanScope();
 	}
 }

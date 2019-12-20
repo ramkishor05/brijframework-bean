@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.brijframework.bean.resource.BeanResource;
+import org.brijframework.bean.resource.BeanResourceConstructor;
 
 public class BeanResourceImpl implements BeanResource {
 
@@ -23,8 +24,19 @@ public class BeanResourceImpl implements BeanResource {
 	
 	private String factoryMethod;
 	
+	private BeanResourceConstructor constructor;
+	
 	private Map<String, Object> properties;
 	
+	@Override
+	public BeanResourceConstructor getConstructor() {
+		return constructor;
+	}
+
+	public void setConstructor(BeanResourceConstructor constructor) {
+		this.constructor = constructor;
+	}
+
 	public void setUniqueKey(String uniqueKey) {
 		this.uniqueKey = uniqueKey;
 	}

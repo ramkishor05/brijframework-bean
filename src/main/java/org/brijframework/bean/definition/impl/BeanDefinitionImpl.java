@@ -3,6 +3,7 @@ package org.brijframework.bean.definition.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.brijframework.bean.definition.BeanDefinationConstructor;
 import org.brijframework.bean.definition.BeanDefinition;
 import org.brijframework.model.diffination.ModelTypeDiffination;
 import org.brijframework.support.enums.Scope;
@@ -17,6 +18,7 @@ public class BeanDefinitionImpl implements BeanDefinition {
 	private String name;
 	
 	private Scope scope;
+	private BeanDefinationConstructor constructor;
 	
 	private String factoryClass;
 	
@@ -26,6 +28,15 @@ public class BeanDefinitionImpl implements BeanDefinition {
 	
 	public BeanDefinitionImpl(ModelTypeDiffination owner) {
 		this.owner=owner;
+	}
+
+	@Override
+	public BeanDefinationConstructor getConstructor() {
+		return constructor;
+	}
+
+	public void setConstructor(BeanDefinationConstructor constructor) {
+		this.constructor = constructor;
 	}
 	
 	public ModelTypeDiffination getOwner() {
@@ -103,5 +114,4 @@ public class BeanDefinitionImpl implements BeanDefinition {
 				+ "]";
 	}
 
-	
 }

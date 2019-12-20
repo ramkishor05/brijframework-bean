@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.brijframework.bean.definition.BeanDefinationConstructor;
 import org.brijframework.bean.definition.BeanDefinition;
+import org.brijframework.bean.definition.impl.BeanDefinationConstructorImpl;
 import org.brijframework.bean.definition.impl.BeanDefinitionImpl;
 import org.brijframework.bean.factories.definition.BeanDefinitionFactory;
 import org.brijframework.bean.factories.resource.impl.BeanResourceFactoryImpl;
 import org.brijframework.bean.resource.BeanResource;
+import org.brijframework.bean.resource.BeanResourceConstructor;
 import org.brijframework.factories.impl.AbstractFactory;
 import org.brijframework.group.Group;
 import org.brijframework.model.diffination.ModelTypeDiffination;
@@ -44,8 +47,17 @@ public abstract class AbstractBeanDefinitionFactory extends AbstractFactory<Stri
 		dataSetup.setScope(Scope.valueFor(metaSetup.getScope(),Scope.SINGLETON));
 		dataSetup.setFactoryClass(Constants.DEFAULT.equals(metaSetup.getFactoryClass())?null:metaSetup.getFactoryClass());
 		dataSetup.setFactoryMethod(Constants.DEFAULT.equals(metaSetup.getFactoryMethod())?null:metaSetup.getFactoryMethod());
+		dataSetup.setConstructor(buildConstructor(metaSetup.getConstructor()));
 		dataSetup.setProperties(bean.getProperties());
 		register(id,dataSetup);
+	}
+
+	private BeanDefinationConstructor buildConstructor(BeanResourceConstructor resourceConstructor) {
+		BeanDefinationConstructorImpl definationConstructor=new BeanDefinationConstructorImpl();
+		definationConstructor.setId(resourceConstructor.getId());
+		definationConstructor.setModel(resourceConstructor.getModel());
+		definationConstructor.setName(resourceConstructor.getName());
+		return definationConstructor;
 	}
 
 	public void register(Class<?> target, BeanResource metaSetup) {

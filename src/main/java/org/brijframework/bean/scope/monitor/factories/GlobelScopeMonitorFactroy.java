@@ -46,7 +46,7 @@ public class GlobelScopeMonitorFactroy extends AbstractBeanScopeFactory<String, 
 	}
 
 	@Override
-	protected GlobelScope create(BeanDefinition definition) {
+	protected GlobelScope createBeanScope(BeanDefinition definition) {
 		return new GlobelScope(definition);
 	}
 }

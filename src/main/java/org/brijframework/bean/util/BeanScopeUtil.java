@@ -1,5 +1,8 @@
 package org.brijframework.bean.util;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.brijframework.bean.definition.BeanDefinition;
 import org.brijframework.bean.factories.impl.BeanScopeFactoryImpl;
 import org.brijframework.model.diffination.ModelPropertyDiffination;
@@ -12,6 +15,8 @@ import org.brijframework.util.support.ReflectionAccess;
 
 public class BeanScopeUtil {
 
+	public static final String REF_BY_KEY="@ref";
+	
 	@SuppressWarnings("unchecked")
 	public static <T> T getPropertyObject(Object instance, String _keyPath, boolean isDefault) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
@@ -28,11 +33,12 @@ public class BeanScopeUtil {
 			}
 			String keyPoint = keyArray[i];
 			Object refPoint=getPropertyPath(instance, keyPoint, isDefault);
-			if(refPoint==null) {
+			if(refPoint!=null) {
 				current=refPoint;
 				continue;
 			}
-			ModelPropertyDiffination setterMeta = setterPropertyDefination(current, keyPoint);
+			BeanDefinition beanDefinition = BeanScopeFactoryImpl.getFactory().getBeanDefinitionOfObject(current);
+			ModelPropertyDiffination setterMeta = setterPropertyDefination(beanDefinition, keyPoint);
 			if(setterMeta!=null) {
 				refPoint=InstanceUtil.getInstance(setterMeta.getTargetAsField().getType());
 				setPropertyPath(current, keyPoint, refPoint, isDefault);
@@ -48,14 +54,15 @@ public class BeanScopeUtil {
 		Object current = getPropertyObject(instance, keyArray, isDefault);
 		Assertion.notEmpty(current, "Instance should not be null");
 		String keyPoint=keyArray[keyArray.length-1];
-		ModelPropertyDiffination getterMeta = getterPropertyDefination(current, keyPoint);
+		BeanDefinition beanDefinition = BeanScopeFactoryImpl.getFactory().getBeanDefinitionOfObject(current);
+		ModelPropertyDiffination getterMeta = getterPropertyDefination(beanDefinition, keyPoint);
 		if(getterMeta!=null) {
-			return getProperty(current, keyPoint, getterMeta);
+			return getProperty(current, keyPoint,beanDefinition, getterMeta);
 		}
 		return PropertyAccessorUtil.getProperty(current, keyPoint, ReflectionAccess.PUBLIC);
 	}
 
-	protected static <T> T  getProperty(Object current, String keyPoint, ModelPropertyDiffination getterMeta) {
+	protected static <T> T  getProperty(Object current, String keyPoint,BeanDefinition beanDefinition , ModelPropertyDiffination getterMeta) {
 		System.out.println(keyPoint+" ==> getterMeta<== "+getterMeta);
 		switch (getterMeta.getAccess()) {
 		case AUTO:
@@ -65,7 +72,7 @@ public class BeanScopeUtil {
 		case READ_WRITE:
 			return PropertyAccessorUtil.getProperty(current, keyPoint);
 		default:
-			Assertion.state(false, "Can't read '"+keyPoint+"'. it's protected to read.");
+			Assertion.state(false, "Can't read '"+keyPoint+"' for bean "+beanDefinition.getId()+" Model '"+getterMeta.getOwner().getId()+"' is protected to read.");
 			return null;
 		}
 	}
@@ -75,16 +82,23 @@ public class BeanScopeUtil {
 		String[] keyArray = _keyPath.split(Constants.SPLIT_DOT);
 		Object current = getPropertyObject(instance, keyArray, isDefault);
 		String keyPoint=keyArray[keyArray.length-1];
+		if(keyPoint.endsWith(BeanScopeUtil.REF_BY_KEY)) {
+			keyPoint=keyPoint.split(BeanScopeUtil.REF_BY_KEY)[0];
+			_val = BeanScopeFactoryImpl.getFactory().getObjectForRef(_val.toString());
+		}else if(_val instanceof Map && ((Map<?,?>) _val).containsKey(BeanScopeUtil.REF_BY_KEY)) {
+			 String ref=(String) ((Map<?,?>) _val).get(BeanScopeUtil.REF_BY_KEY);
+			_val = BeanScopeFactoryImpl.getFactory().getObjectForRef(ref);
+		}
 		Assertion.notNull(current, "Instance should not be null");
-		ModelPropertyDiffination setterMeta = setterPropertyDefination(current, keyPoint);
-		System.out.println(keyPoint+" ==> getterMeta<== "+setterMeta);
+		BeanDefinition beanDefinition = BeanScopeFactoryImpl.getFactory().getBeanDefinitionOfObject(current);
+		ModelPropertyDiffination setterMeta = setterPropertyDefination(beanDefinition, keyPoint);
 		if(setterMeta!=null) {
-			return setProperty(current, keyPoint, _val, setterMeta);
+			return setProperty(current, keyPoint, _val, beanDefinition,setterMeta);
 		}
 		return PropertyAccessorUtil.setProperty(current, keyPoint, ReflectionAccess.PUBLIC, _val);
 	}
 
-	private static <T> T setProperty(Object current, String keyPoint,Object _val, ModelPropertyDiffination setterMeta) {
+	private static <T> T setProperty(Object current, String keyPoint,Object _val, BeanDefinition beanDefinition , ModelPropertyDiffination setterMeta) {
 		switch (setterMeta.getAccess()) {
 		case AUTO:
 			return PropertyAccessorUtil.setProperty(current, keyPoint,_val);
@@ -93,13 +107,12 @@ public class BeanScopeUtil {
 		case READ_WRITE:
 			return PropertyAccessorUtil.setProperty(current, keyPoint,_val);
 		default:
-			Assertion.state(false, "Can't write '"+keyPoint+"'. it's protected to write.");
+			Assertion.state(false, "Can't write '"+keyPoint+"' for bean "+beanDefinition.getId()+". Model '"+setterMeta.getOwner().getId()+"' is protected to write.");
 			return null;
 		}
 	}
 
-	private static ModelPropertyDiffination getterPropertyDefination(Object current, String keyPoint) {
-		BeanDefinition beanDefinition = BeanScopeFactoryImpl.getFactory().getBeanDefinitionOfObject(current);
+	private static ModelPropertyDiffination getterPropertyDefination(BeanDefinition beanDefinition, String keyPoint) {
 		if(beanDefinition==null) {
 			return null;
 		}
@@ -110,8 +123,7 @@ public class BeanScopeUtil {
 		return diffinationGroup.getGetterMeta();
 	}
 	
-	private static ModelPropertyDiffination setterPropertyDefination(Object current, String keyPoint) {
-		BeanDefinition beanDefinition = BeanScopeFactoryImpl.getFactory().getBeanDefinitionOfObject(current);
+	private static ModelPropertyDiffination setterPropertyDefination(BeanDefinition beanDefinition, String keyPoint) {
 		if(beanDefinition==null) {
 			return null;
 		}
@@ -120,6 +132,20 @@ public class BeanScopeUtil {
 			return null;
 		}
 		return diffinationGroup.getSetterMeta();
+	}
+
+	public static void setPropertiesPath(Object instance, Map<String, Object> properties, boolean isDefault) {
+		Assertion.notNull(properties, "Properties should not be null." );
+		for (Entry<String, Object> entry : properties.entrySet()) {
+			setPropertyPath(instance, entry.getKey(), entry.getValue(), isDefault);
+		}
+	}
+	
+	public static void getPropertiesPath(Object instance, Map<String, Object> properties, boolean isDefault) {
+		Assertion.notNull(properties, "Properties should not be null." );
+		for (Entry<String, Object> entry : properties.entrySet()) {
+			properties.put(entry.getKey(),getPropertyPath(instance, entry.getKey(), isDefault));
+		}
 	}
 	
 }

@@ -15,6 +15,8 @@ public interface BeanDefinition extends Initializer{
 	String getName();
 
 	ModelTypeDiffination getOwner();
+	
+	BeanDefinationConstructor getConstructor();
 
 	Map<String, Object> getProperties();
 

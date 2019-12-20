@@ -3,8 +3,6 @@ package org.brijframework.bean.factories.asm;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.brijframework.bean.definition.BeanDefinition;
 import org.brijframework.bean.factories.BeanScopeFactory;
@@ -13,18 +11,17 @@ import org.brijframework.bean.scope.BeanScope;
 import org.brijframework.bean.scope.monitor.factories.PrototypeScopeMonitorFactroy;
 import org.brijframework.bean.scope.monitor.factories.RequestScopeMonitorFactroy;
 import org.brijframework.bean.scope.monitor.factories.SessionScopeMonitorFactroy;
+import org.brijframework.bean.util.BeanScopeUtil;
 import org.brijframework.container.Container;
 import org.brijframework.factories.impl.AbstractFactory;
 import org.brijframework.group.Group;
-import org.brijframework.model.diffination.ModelPropertyDiffinationGroup;
 import org.brijframework.util.accessor.LogicAccessorUtil;
-import org.brijframework.util.accessor.PropertyAccessorUtil;
 import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.reflect.ClassUtil;
 import org.brijframework.util.reflect.InstanceUtil;
 import org.brijframework.util.reflect.MethodUtil;
-import org.brijframework.util.support.ReflectionAccess;
 import org.brijframework.util.support.Constants;
+import org.brijframework.util.support.ReflectionAccess;
 import org.brijframework.util.text.StringUtil;
 
 public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends AbstractFactory<K, T> implements BeanScopeFactory<K, T>{
@@ -35,7 +32,8 @@ public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends A
 	}
 	
 	@SuppressWarnings("unchecked")
-	public T getBeanScopeOfObject(Object object) {
+	@Override
+	public T getBeanScopeForObject(Object object) {
 		for(BeanScope beanScope:getCache().values()) {
 			if(object==beanScope.getScopeObject()) {
 				return (T) beanScope;
@@ -58,8 +56,32 @@ public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends A
 		return null;
 	}
 	
+	@Override
+	public Object getObjectForRef(String key) {
+		for(BeanScope beanScope:getCache().values()) {
+			if(beanScope.getBeanDefinition().getId().equals(key)) {
+				return beanScope.getScopeObject();
+			}
+		}
+		Container container =getContainer();
+		if(container==null) {
+			return null;
+		}
+		for(Group group:container.getCache().values()) {
+			for(Object objectScope:group.getCache().values()) {
+				if(objectScope instanceof BeanScope) {
+					BeanScope beanScope=(BeanScope) objectScope;
+					if(beanScope.getBeanDefinition().getId().equals(key)) {
+						return beanScope.getScopeObject();
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
 	public BeanDefinition getBeanDefinitionOfObject(Object object) {
-		T beanScopeOfObject = getBeanScopeOfObject(object);
+		T beanScopeOfObject = getBeanScopeForObject(object);
 		return beanScopeOfObject!=null ? beanScopeOfObject.getBeanDefinition(): null;
 	}
 	
@@ -84,17 +106,21 @@ public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends A
 	}
 	
 	public BeanScope register(K key, BeanDefinition definition) {
-		T value=find(key);
-		Assertion.isTrue(value!=null,"Bean already exist in cache with : "+key);
-		value=create(definition);
-		value.setBeanDefinition(definition);
-		Object scopeObject=buildScopeObject(key,definition);
-		value.setScopeObject(scopeObject);
-		value.setId(key.toString());
-		return register(key, value);
+		T find=find(key);
+		if(find!=null) {
+			return find;
+		}
+		T beanScope=createBeanScope(definition);
+		beanScope.setBeanDefinition(definition);
+		Object scopeObject=createBean(definition);
+		beanScope.setScopeObject(scopeObject);
+		beanScope.setId(key.toString());
+		register(key, beanScope);
+		BeanScopeUtil.setPropertiesPath(scopeObject,definition.getProperties(),true);
+		return beanScope;
 	}
 	
-	protected abstract T create(BeanDefinition definition);
+	protected abstract T createBeanScope(BeanDefinition definition);
 	
 	public String getUniqueID(BeanDefinition datainfo) {
 		switch (datainfo.getScope()) {
@@ -111,28 +137,6 @@ public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends A
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private Object buildScopeObject(K uniqueID, BeanDefinition datainfo) {
-		Assertion.isTrue(datainfo==null,"BeanMetaData not found in cache with : "+uniqueID);
-		Assertion.isTrue(datainfo.getOwner()==null,"BeanMetaData Owner not found in cache with : "+uniqueID);
-		Object bean=createBean(datainfo);
-		if(bean==null) {
-			return null;
-		}
-		for(Entry<String, Object> entry:datainfo.getProperties().entrySet()){
-			Object value=entry.getValue();
-			ModelPropertyDiffinationGroup fieldGroup=datainfo.getOwner().getProperties().get(entry.getKey());
-			if(value instanceof Map && ((Map) value).containsKey("@ref")) {
-				String ref=(String) ((Map) value).get("@ref");
-				value=getBeanScope((K)ref);
-			}
-			Assertion.notNull(fieldGroup, datainfo.getOwner().getName()+" : No such type of property contains : "+entry.getKey()+" for "+datainfo.getId());
-			Assertion.notNull(fieldGroup.getSetterMeta(), datainfo.getOwner().getName()+" : Not allowed to set such type of property contains : "+entry.getKey());
-			PropertyAccessorUtil.setProperty(bean, fieldGroup.getSetterMeta().getType(), value);
-		};
-		return bean;
-	}
-
 	private Object createBean(BeanDefinition datainfo) {
 		if(StringUtil.isNonEmpty(datainfo.getFactoryClass())) {
 			Class<?> factory=ClassUtil.getClass(datainfo.getFactoryClass());
@@ -143,7 +147,7 @@ public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends A
 			}
 			return current;
 		}else {
-			return InstanceUtil.getInstance(datainfo.getOwner().getType(), datainfo.getOwner().getConstructor().getValues());
+			return InstanceUtil.getInstance(datainfo.getOwner().getType(), datainfo.getConstructor().getValues());
 		}
 	}
 	
