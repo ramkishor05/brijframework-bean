@@ -29,7 +29,7 @@ public class BeanResourceConstructorImpl implements BeanResourceConstructor {
 	}
 
 	@Override
-	public List<BeanResourceParam> getParams() {
+	public List<BeanResourceParam> getParameters() {
 		if (params == null) {
 			params = new ArrayList<>();
 		}

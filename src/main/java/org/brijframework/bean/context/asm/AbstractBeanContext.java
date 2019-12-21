@@ -50,12 +50,13 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getBean(String name) {
-		BeanDefinition beanMetaData = BeanDefinitionFactoryImpl.getFactory().find(name);
-		if(beanMetaData==null) {
+		BeanDefinition definition = BeanDefinitionFactoryImpl.getFactory().find(name);
+		if(definition==null) {
 			return null;
 		}
-		String uniqueID = BeanScopeFactoryImpl.getFactory().getUniqueID(beanMetaData);
-		return (T) BeanScopeFactoryImpl.getFactory().getBeanScope(beanMetaData, uniqueID).getScopeObject();
+		System.out.println("definition= "+definition);
+		String uniqueID = BeanScopeFactoryImpl.getFactory().getUniqueID(definition);
+		return (T) BeanScopeFactoryImpl.getFactory().getBeanScope(definition, uniqueID).getScopeObject();
 	}
 	
 	@SuppressWarnings("unchecked")

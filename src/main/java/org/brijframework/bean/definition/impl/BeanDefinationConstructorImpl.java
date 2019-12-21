@@ -1,5 +1,7 @@
 package org.brijframework.bean.definition.impl;
 
+import java.util.Arrays;
+
 import org.brijframework.bean.definition.BeanDefinationConstructor;
 
 public class BeanDefinationConstructorImpl implements BeanDefinationConstructor {
@@ -44,5 +46,13 @@ public class BeanDefinationConstructorImpl implements BeanDefinationConstructor 
 	public void setValues(Object[] values) {
 		this.values = values;
 	}
+
+	@Override
+	public String toString() {
+		return "BeanDefinationConstructor[id=" + id + ", name=" + name + ", model=" + model + ", values="
+				+ Arrays.toString(values) + "]";
+	}
+	
+	
 
 }

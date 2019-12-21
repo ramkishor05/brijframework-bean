@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.brijframework.model.diffination.ModelPropertyDiffinationGroup;
-import org.brijframework.model.factories.metadata.impl.TypeModelMetaDataFactoryImpl;
+import org.brijframework.model.factories.deffination.impl.DefaultTypeModelDeffinationFactory;
 import org.brijframework.model.util.ModelUtil;
 import org.brijframework.util.accessor.MetaAccessorUtil;
 import org.brijframework.util.accessor.PropertyAccessorUtil;
@@ -32,13 +32,13 @@ public class BeanObjectUtil {
 	@SuppressWarnings("unchecked")
 	private static <T> T findCurrentFromObject(Object instance, String _keyPath, boolean isDefault) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
-		ModelPropertyDiffinationGroup property =TypeModelMetaDataFactoryImpl.getFactory().getPropertyMetaData(instance.getClass().getSimpleName() , _keyPath);
+		ModelPropertyDiffinationGroup property =DefaultTypeModelDeffinationFactory.getFactory().getPropertyMetaData(instance.getClass().getSimpleName() , _keyPath);
 		Field field = property != null ? property.getFieldMeta().getTargetAsField(): FieldUtil.getField(instance.getClass(), _keyPath, ReflectionAccess.PRIVATE);
 		Object _value = PropertyAccessorUtil.getProperty(instance, field, ReflectionAccess.PRIVATE);
 		if (_value == null && isDefault) {
 			Class<?> targetClass = property != null ? CastingUtil.getTargetClass(field,property.getFieldMeta().isField()? property.getFieldMeta().getTargetAsField().getType() : property.getGetterMeta().getTargetAsField().getType() ): CastingUtil.getTargetClass(field, field.getType());
 			_value = InstanceUtil.getInstance(targetClass);
-			PropertyAccessorUtil.setProperty(instance, field, _value);
+			PropertyAccessorUtil.setProperty(instance, field,ReflectionAccess.PRIVATE, _value);
 		}
 		return (T) _value;
 	}
@@ -156,13 +156,13 @@ public class BeanObjectUtil {
 	@SuppressWarnings("unchecked")
 	private static <T> T findCurrentFromList(Object instance, String _keyPath, Integer index, boolean isDefault) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
-		ModelPropertyDiffinationGroup property =TypeModelMetaDataFactoryImpl.getFactory().getPropertyMetaData(instance.getClass().getSimpleName() , _keyPath);
+		ModelPropertyDiffinationGroup property =DefaultTypeModelDeffinationFactory.getFactory().getPropertyMetaData(instance.getClass().getSimpleName() , _keyPath);
 		Field field = property != null ? property.getFieldMeta().getTargetAsField(): FieldUtil.getField(instance.getClass(), _keyPath, ReflectionAccess.PRIVATE);
 		Class<?> targetClass = property != null ? CastingUtil.getTargetClass(field, property.getFieldMeta().isField()? property.getFieldMeta().getTargetAsField().getType() : property.getGetterMeta().getTargetAsField().getType()): CastingUtil.getTargetClass(field, field.getType());
 		Object collection = PropertyAccessorUtil.getProperty(instance, _keyPath, ReflectionAccess.PRIVATE);
 		if (collection == null && targetClass != null && isDefault) {
 			collection = InstanceUtil.getInstance(targetClass);
-			PropertyAccessorUtil.setProperty(instance, field, collection);
+			PropertyAccessorUtil.setProperty(instance, field,ReflectionAccess.PRIVATE, collection);
 		}
 		if (collection == null) {
 			return null;

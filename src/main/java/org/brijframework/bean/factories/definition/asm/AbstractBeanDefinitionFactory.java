@@ -12,10 +12,12 @@ import org.brijframework.bean.factories.definition.BeanDefinitionFactory;
 import org.brijframework.bean.factories.resource.impl.BeanResourceFactoryImpl;
 import org.brijframework.bean.resource.BeanResource;
 import org.brijframework.bean.resource.BeanResourceConstructor;
+import org.brijframework.bean.resource.BeanResourceParam;
 import org.brijframework.factories.impl.AbstractFactory;
 import org.brijframework.group.Group;
-import org.brijframework.model.diffination.ModelTypeDiffination;
-import org.brijframework.model.factories.metadata.impl.TypeModelMetaDataFactoryImpl;
+import org.brijframework.model.diffination.ModelParameterDiffination;
+import org.brijframework.model.diffination.ModelTypeDeffination;
+import org.brijframework.model.factories.deffination.impl.DefaultTypeModelDeffinationFactory;
 import org.brijframework.support.enums.Scope;
 import org.brijframework.util.asserts.Assertion;
 import org.brijframework.util.printer.LoggerConsole;
@@ -23,46 +25,61 @@ import org.brijframework.util.support.Constants;
 
 public abstract class AbstractBeanDefinitionFactory extends AbstractFactory<String,BeanDefinition> implements BeanDefinitionFactory<String,BeanDefinition>{
 
-
 	public boolean contains(String id) {
 		return BeanResourceFactoryImpl.getFactory().find(id)!=null;
 	}
 	
-	public void register(String id, BeanResource metaSetup) {
-		ModelTypeDiffination owner=null;
-		if(metaSetup.getModel() != null && !metaSetup.getModel().isEmpty() ) {
-			owner=TypeModelMetaDataFactoryImpl.getFactory().findById(metaSetup.getModel());
+	public void register(String id, BeanResource beanResource) {
+		ModelTypeDeffination owner=null;
+		if(beanResource.getModel() != null && !beanResource.getModel().isEmpty() ) {
+			owner=DefaultTypeModelDeffinationFactory.getFactory().findById(beanResource.getModel());
 			if(owner==null) {
-				owner=TypeModelMetaDataFactoryImpl.getFactory().findOrCreate(metaSetup.getModel());
+				owner=DefaultTypeModelDeffinationFactory.getFactory().findOrCreate(beanResource.getModel());
 			}
 		}else {
-			owner=TypeModelMetaDataFactoryImpl.getFactory().register(metaSetup.getType());
+			owner=DefaultTypeModelDeffinationFactory.getFactory().register(beanResource.getType());
 		}
-		Assertion.notNull(owner, "Model not found for "+metaSetup.getModel()+" of bean  : "+id);
-		id=Constants.DEFAULT.equals(metaSetup.getId())?owner.getType().getSimpleName():metaSetup.getId();
-		BeanResource bean=BeanResourceFactoryImpl.getFactory().find(id);
-		BeanDefinitionImpl dataSetup=new BeanDefinitionImpl(owner);
-		dataSetup.setId(id);
-		dataSetup.setName(bean.getName());
-		dataSetup.setScope(Scope.valueFor(metaSetup.getScope(),Scope.SINGLETON));
-		dataSetup.setFactoryClass(Constants.DEFAULT.equals(metaSetup.getFactoryClass())?null:metaSetup.getFactoryClass());
-		dataSetup.setFactoryMethod(Constants.DEFAULT.equals(metaSetup.getFactoryMethod())?null:metaSetup.getFactoryMethod());
-		dataSetup.setConstructor(buildConstructor(metaSetup.getConstructor()));
-		dataSetup.setProperties(bean.getProperties());
-		register(id,dataSetup);
+		Assertion.notNull(owner, "Model not found for "+beanResource.getModel()+" of bean  : "+id);
+		id=Constants.DEFAULT.equals(beanResource.getId())?owner.getType().getSimpleName():beanResource.getId();
+		BeanDefinitionImpl beanDefinition=new BeanDefinitionImpl(owner);
+		beanDefinition.setId(id);
+		beanDefinition.setName(beanResource.getName());
+		beanDefinition.setScope(Scope.valueFor(beanResource.getScope(),Scope.SINGLETON));
+		beanDefinition.setFactoryClass(Constants.DEFAULT.equals(beanResource.getFactoryClass())?null:beanResource.getFactoryClass());
+		beanDefinition.setFactoryMethod(Constants.DEFAULT.equals(beanResource.getFactoryMethod())?null:beanResource.getFactoryMethod());
+		beanDefinition.setConstructor(buildConstructor(owner,beanResource.getConstructor()));
+		beanDefinition.setProperties(beanResource.getProperties());
+		register(id,beanDefinition);
 	}
 
-	private BeanDefinationConstructor buildConstructor(BeanResourceConstructor resourceConstructor) {
+	private BeanDefinationConstructor buildConstructor(ModelTypeDeffination owner,BeanResourceConstructor resourceConstructor) {
 		BeanDefinationConstructorImpl definationConstructor=new BeanDefinationConstructorImpl();
-		definationConstructor.setId(resourceConstructor.getId());
-		definationConstructor.setModel(resourceConstructor.getModel());
-		definationConstructor.setName(resourceConstructor.getName());
+		if(resourceConstructor!=null) {
+			definationConstructor.setId(resourceConstructor.getId());
+			definationConstructor.setModel(resourceConstructor.getModel());
+			definationConstructor.setName(resourceConstructor.getName());
+			Object[] values=new Object[resourceConstructor.getParameters().size()];
+			for(BeanResourceParam beanResourceParam: resourceConstructor.getParameters()) {
+				values[beanResourceParam.getIndex()]=beanResourceParam.getValue();
+			}
+			definationConstructor.setValues(values);
+		}else {
+			definationConstructor.setId(owner.getConstructor().getId());
+			definationConstructor.setModel(owner.getId());
+			definationConstructor.setName(owner.getConstructor().getName());
+			Object[] values=new Object[owner.getConstructor().getParameters().size()];
+			for(ModelParameterDiffination<?> beanResourceParam: owner.getConstructor().getParameters()) {
+				values[beanResourceParam.getIndex()]=null;
+			}
+			definationConstructor.setValues(values);
+		}
 		return definationConstructor;
 	}
+	
 
 	public void register(Class<?> target, BeanResource metaSetup) {
 		String id=Constants.DEFAULT.equals(metaSetup.getId())?target.getSimpleName():metaSetup.getId();
-		ModelTypeDiffination owner=TypeModelMetaDataFactoryImpl.getFactory().findById(metaSetup.getModel());
+		ModelTypeDeffination owner=DefaultTypeModelDeffinationFactory.getFactory().findById(metaSetup.getModel());
 		Assertion.notNull(owner, "Model not found for "+metaSetup.getModel()+" of bean  : "+id);
 		BeanResource bean=BeanResourceFactoryImpl.getFactory().find(id);
 		BeanDefinitionImpl dataSetup=new BeanDefinitionImpl(owner);

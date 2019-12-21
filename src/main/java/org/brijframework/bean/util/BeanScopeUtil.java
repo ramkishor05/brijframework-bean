@@ -1,5 +1,6 @@
 package org.brijframework.bean.util;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -63,14 +64,13 @@ public class BeanScopeUtil {
 	}
 
 	protected static <T> T  getProperty(Object current, String keyPoint,BeanDefinition beanDefinition , ModelPropertyDiffination getterMeta) {
-		System.out.println(keyPoint+" ==> getterMeta<== "+getterMeta);
 		switch (getterMeta.getAccess()) {
 		case AUTO:
-			return PropertyAccessorUtil.getProperty(current, keyPoint);
+			return PropertyAccessorUtil.getProperty(current, keyPoint,ReflectionAccess.PRIVATE);
 		case READ_ONLY:
-			return PropertyAccessorUtil.getProperty(current, keyPoint);
+			return PropertyAccessorUtil.getProperty(current, keyPoint,ReflectionAccess.PRIVATE);
 		case READ_WRITE:
-			return PropertyAccessorUtil.getProperty(current, keyPoint);
+			return PropertyAccessorUtil.getProperty(current, keyPoint,ReflectionAccess.PRIVATE);
 		default:
 			Assertion.state(false, "Can't read '"+keyPoint+"' for bean "+beanDefinition.getId()+" Model '"+getterMeta.getOwner().getId()+"' is protected to read.");
 			return null;
@@ -101,11 +101,11 @@ public class BeanScopeUtil {
 	private static <T> T setProperty(Object current, String keyPoint,Object _val, BeanDefinition beanDefinition , ModelPropertyDiffination setterMeta) {
 		switch (setterMeta.getAccess()) {
 		case AUTO:
-			return PropertyAccessorUtil.setProperty(current, keyPoint,_val);
+			return PropertyAccessorUtil.setProperty(current, keyPoint,ReflectionAccess.PRIVATE,_val);
 		case WRITE_ONLY:
-			return PropertyAccessorUtil.setProperty(current, keyPoint,_val);
+			return PropertyAccessorUtil.setProperty(current, keyPoint,ReflectionAccess.PRIVATE,_val);
 		case READ_WRITE:
-			return PropertyAccessorUtil.setProperty(current, keyPoint,_val);
+			return PropertyAccessorUtil.setProperty(current, keyPoint,ReflectionAccess.PRIVATE,_val);
 		default:
 			Assertion.state(false, "Can't write '"+keyPoint+"' for bean "+beanDefinition.getId()+". Model '"+setterMeta.getOwner().getId()+"' is protected to write.");
 			return null;
@@ -134,11 +134,12 @@ public class BeanScopeUtil {
 		return diffinationGroup.getSetterMeta();
 	}
 
-	public static void setPropertiesPath(Object instance, Map<String, Object> properties, boolean isDefault) {
+	public static Map<String, ?> setPropertiesPath(Object instance, Map<String, Object> properties, boolean isDefault) {
 		Assertion.notNull(properties, "Properties should not be null." );
 		for (Entry<String, Object> entry : properties.entrySet()) {
 			setPropertyPath(instance, entry.getKey(), entry.getValue(), isDefault);
 		}
+		return properties;
 	}
 	
 	public static void getPropertiesPath(Object instance, Map<String, Object> properties, boolean isDefault) {
@@ -146,6 +147,58 @@ public class BeanScopeUtil {
 		for (Entry<String, Object> entry : properties.entrySet()) {
 			properties.put(entry.getKey(),getPropertyPath(instance, entry.getKey(), isDefault));
 		}
+	}
+
+	public static Map<String, ?> getPropertiesPath(Object current, boolean isDefault) {
+		Map<String, Object> properties =new HashMap<String, Object>();
+		BeanDefinition beanDefinition = BeanScopeFactoryImpl.getFactory().getBeanDefinitionOfObject(current);
+		return null;
+	}
+
+	public static Map<String, ?> setSafePropertiesPath(Object currentInstance, String _keyPath, Object[] _values,
+			boolean b) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Map<String, ?> setPropertiesPath(Object currentInstance, String _keys, Object[] _values, boolean b) {
+		return null;
+	}
+
+	public static Map<String, ?> getPropertiesPath(Object currentInstance, String[] _keyPath, boolean isDefault) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Map<String, ?> getSafeProperties(Object currentInstance, String[] _keyPath, boolean b) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Map<String, Boolean> containsPropertiesPath(Object currentInstance, String _keyPath, boolean b) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Map<String, ?> setPropertiesPath(Object currentInstance, String[] _keyPaths, Object[] _values,
+			boolean b) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Class<?> typeOfPropertyPath(Object currentInstance, String _keyPath, boolean b) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Boolean containsPathValue(Object currentInstance, String _keyPath, boolean b) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Boolean containsPathKey(Object currentInstance, String _keyPath, boolean b) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

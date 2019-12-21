@@ -10,7 +10,7 @@ import org.brijframework.bean.config.impl.BeanConfigration;
 import org.brijframework.bean.constant.BeanConstants;
 import org.brijframework.bean.factories.resource.asm.AbstractBeanResourceFactory;
 import org.brijframework.bean.resource.impl.BeanResourceImpl;
-import org.brijframework.model.factories.resource.impl.TypeModelResourceFactoryImpl;
+import org.brijframework.model.factories.resource.impl.DefaultTypeModelResourceFactory;
 import org.brijframework.resources.factory.json.JsonResourceFactory;
 import org.brijframework.resources.files.json.JsonResource;
 import org.brijframework.support.enums.Scope;
@@ -140,7 +140,7 @@ public class JsonBeanResourceFactory  extends AbstractBeanResourceFactory{
 			}
 			if(StringUtil.isEmpty(model)) {
 				model=typeClass.getSimpleName();
-				TypeModelResourceFactoryImpl.getFactory().createOrload(typeClass);
+				DefaultTypeModelResourceFactory.getFactory().createOrload(typeClass);
 			}
 		}
 		Assertion.notEmpty(id, "Invalid id for BeanResource");

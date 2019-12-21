@@ -4,6 +4,7 @@ import org.brijframework.bean.definition.BeanDefinition;
 import org.brijframework.bean.factories.asm.AbstractBeanScopeFactory;
 import org.brijframework.bean.scope.monitor.GlobelScope;
 import org.brijframework.bean.scope.monitor.threads.GlobelThreadLocal;
+import org.brijframework.util.printer.LoggerConsole;
 import org.brijframework.util.reflect.InstanceUtil;
 
 public class GlobelScopeMonitorFactroy extends AbstractBeanScopeFactory<String, GlobelScope>{
@@ -33,7 +34,7 @@ public class GlobelScopeMonitorFactroy extends AbstractBeanScopeFactory<String, 
 
 	@Override
 	protected void preregister(String key, GlobelScope value) {
-		System.err.println("Registering global scope :"+key);
+		LoggerConsole.screen("GlobelBean : ", "GlobelScope :"+key);
 	}
 
 	@Override

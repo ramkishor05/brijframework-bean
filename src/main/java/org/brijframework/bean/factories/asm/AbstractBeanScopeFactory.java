@@ -17,6 +17,7 @@ import org.brijframework.factories.impl.AbstractFactory;
 import org.brijframework.group.Group;
 import org.brijframework.util.accessor.LogicAccessorUtil;
 import org.brijframework.util.asserts.Assertion;
+import org.brijframework.util.printer.LoggerConsole;
 import org.brijframework.util.reflect.ClassUtil;
 import org.brijframework.util.reflect.InstanceUtil;
 import org.brijframework.util.reflect.MethodUtil;
@@ -116,6 +117,7 @@ public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends A
 		beanScope.setScopeObject(scopeObject);
 		beanScope.setId(key.toString());
 		register(key, beanScope);
+		System.out.println(key+"=Properties="+definition.getProperties());
 		BeanScopeUtil.setPropertiesPath(scopeObject,definition.getProperties(),true);
 		return beanScope;
 	}
@@ -187,10 +189,11 @@ public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends A
 	
 	@Override
 	protected void preregister(K key, T value) {
+		LoggerConsole.screen("Bean : ", "BeanScope :"+key);
 	}
 
 	@Override
 	protected void postregister(K key, T value) {
+		
 	}
-
 }

@@ -67,7 +67,7 @@ public class AnnotationBeanResourceFactory extends AbstractBeanResourceFactory{
 			constructor.setId(beanResource.constructor().id());
 			if(beanResource.constructor().params()!=null) {
 				for(BeanParam beanParam: beanResource.constructor().params() ) {
-				   constructor.getParams().add(new BeanResourceParamImpl(beanParam.index(), beanParam.type(), beanParam.name(), beanParam.value()));
+				   constructor.getParameters().add(new BeanResourceParamImpl(beanParam.index(), beanParam.name(), beanParam.value()));
 				}
 			}
 			dataSetup.setConstructor(constructor);

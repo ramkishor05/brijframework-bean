@@ -1,4 +1,4 @@
-package org.brijframework.bean.factories.definition.json;
+package org.brijframework.bean.factories.definition.impl;
 
 import org.brijframework.bean.factories.definition.asm.AbstractBeanDefinitionFactory;
 import org.brijframework.bean.factories.resource.json.JsonBeanResourceFactory;

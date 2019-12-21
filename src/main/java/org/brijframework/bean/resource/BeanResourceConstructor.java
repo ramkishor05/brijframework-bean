@@ -10,5 +10,5 @@ public interface BeanResourceConstructor {
 
 	String getModel();
 	
-	List<BeanResourceParam> getParams();
+	List<BeanResourceParam> getParameters();
 }
