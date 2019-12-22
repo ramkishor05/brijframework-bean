@@ -41,7 +41,7 @@ public interface BeanObject extends GenericBean {
 	 * @return
 	 */
 	public default Boolean containsKey(String _keyPath) {
-		return BeanScopeUtil.containsPathKey(getCurrentInstance(),_keyPath,false);
+		return BeanScopeUtil.containsKeyPath(getCurrentInstance(),_keyPath,false);
 	}
 
 	/****
