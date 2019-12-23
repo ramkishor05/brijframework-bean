@@ -117,8 +117,7 @@ public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends A
 		beanScope.setScopeObject(scopeObject);
 		beanScope.setId(key.toString());
 		register(key, beanScope);
-		System.out.println(key+"=Properties="+definition.getProperties());
-		BeanScopeUtil.setPropertiesPath(scopeObject,definition.getProperties(),true);
+		BeanScopeUtil.setPropertiesPath(scopeObject,definition.getProperties(),true,true);
 		return beanScope;
 	}
 	

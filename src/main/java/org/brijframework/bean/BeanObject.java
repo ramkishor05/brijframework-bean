@@ -23,7 +23,7 @@ public interface BeanObject extends GenericBean {
 	 * @return
 	 */
 	public default <T> T setProperty(String _keyPath, T _value) {
-		return BeanScopeUtil.setPropertyPath(getCurrentInstance(),_keyPath, _value,true);
+		return BeanScopeUtil.setPropertyPath(getCurrentInstance(),_keyPath, _value,true, true);
 	};
 
 	/****
@@ -32,7 +32,7 @@ public interface BeanObject extends GenericBean {
 	 * @return
 	 */
 	public  default <T> T getProperty(String _keyPath) {
-		return BeanScopeUtil.getPropertyPath(getCurrentInstance(),_keyPath,false);
+		return BeanScopeUtil.getPropertyPath(getCurrentInstance(),_keyPath,false, false);
 	}
 	
 	/***
@@ -41,7 +41,7 @@ public interface BeanObject extends GenericBean {
 	 * @return
 	 */
 	public default Boolean containsKey(String _keyPath) {
-		return BeanScopeUtil.containsKeyPath(getCurrentInstance(),_keyPath,false);
+		return BeanScopeUtil.containsKeyPath(getCurrentInstance(),_keyPath,false, false);
 	}
 
 	/****
@@ -50,7 +50,7 @@ public interface BeanObject extends GenericBean {
 	 * @return
 	 */
 	public default Boolean containsValue(String _keyPath) {
-		return BeanScopeUtil.containsPathValue(getCurrentInstance(),_keyPath,false);
+		return BeanScopeUtil.containsPathValue(getCurrentInstance(),_keyPath,false, false);
 	}
 	
 	/***
@@ -59,7 +59,7 @@ public interface BeanObject extends GenericBean {
 	 * @return
 	 */
 	public default Class<?> typeOfProperty(String _keyPath){
-		return BeanScopeUtil.typeOfPropertyPath(getCurrentInstance(),_keyPath,false);
+		return BeanScopeUtil.typeOfPropertyPath(getCurrentInstance(),_keyPath,false, false);
 	}
 	
 	/***
@@ -70,7 +70,7 @@ public interface BeanObject extends GenericBean {
 	 * @return
 	 */
 	public default Map<String, ?> setProperties(String[] _keyPaths, Object... _values){
-		return BeanScopeUtil.setPropertiesPath(getCurrentInstance(),_keyPaths,_values,false);
+		return BeanScopeUtil.setPropertiesPath(getCurrentInstance(),_keyPaths,_values,true, true);
 	}
 
 	/***
@@ -81,7 +81,7 @@ public interface BeanObject extends GenericBean {
 	 * @return
 	 */
 	public default Map<String, ?> setProperties(String _keys, Object... _values){
-		return BeanScopeUtil.setPropertiesPath(getCurrentInstance(),_keys,_values,true);
+		return BeanScopeUtil.setPropertiesPath(getCurrentInstance(),_keys,_values,false, false);
 	}
 
 	/***
@@ -92,7 +92,7 @@ public interface BeanObject extends GenericBean {
 	 * @return
 	 */
 	public default Map<String, ?> setSafeProperties(String _keyPath, Object... _values){
-		return BeanScopeUtil.setSafePropertiesPath(getCurrentInstance(),_keyPath,_values,true);
+		return BeanScopeUtil.setSafePropertiesPath(getCurrentInstance(),_keyPath,_values,false, false);
 	}
 
 	/***
@@ -102,7 +102,7 @@ public interface BeanObject extends GenericBean {
 	 * @return
 	 */
 	public default Map<String, ?> setProperties(Map<String, Object> _properties){
-		return BeanScopeUtil.setPropertiesPath(getCurrentInstance(),_properties,true);
+		return BeanScopeUtil.setPropertiesPath(getCurrentInstance(),_properties,false, false);
 	}
 	
 	/***
@@ -112,7 +112,7 @@ public interface BeanObject extends GenericBean {
 	 * @return
 	 */
 	public default void fillProperties(Map<String, Object> _properties) {
-		BeanScopeUtil.setPropertiesPath(getCurrentInstance(),_properties,true);
+		BeanScopeUtil.setPropertiesPath(getCurrentInstance(),_properties,false, false);
 	}
 
 	/***
@@ -120,7 +120,7 @@ public interface BeanObject extends GenericBean {
 	 * @return
 	 */
 	public default Map<String, ?> getProperties(){
-		return BeanScopeUtil.getPropertiesPath(getCurrentInstance(),false);
+		return BeanScopeUtil.getPropertiesPath(getCurrentInstance(),false, false);
 	}
 
 	/***
@@ -129,7 +129,7 @@ public interface BeanObject extends GenericBean {
 	 * @return
 	 */
 	public default Map<String, ?> getProperties(String... _keyPath){
-		return BeanScopeUtil.getPropertiesPath(getCurrentInstance(),_keyPath,false);
+		return BeanScopeUtil.getPropertiesPath(getCurrentInstance(),_keyPath,false, false);
 	}
 
 	/***
@@ -138,7 +138,7 @@ public interface BeanObject extends GenericBean {
 	 * @return
 	 */
 	public default Map<String, ?> getSafeProperties(String... _keyPath){
-		return BeanScopeUtil.getSafeProperties(getCurrentInstance(),_keyPath,false);
+		return BeanScopeUtil.getSafeProperties(getCurrentInstance(),_keyPath,false, false);
 	}
 
 	/***
@@ -147,7 +147,7 @@ public interface BeanObject extends GenericBean {
 	 * @return
 	 */
 	public default Map<String, Boolean> containsProperties(String _keyPath){
-		return BeanScopeUtil.containsPropertiesPath(getCurrentInstance(),_keyPath,false);
+		return BeanScopeUtil.containsPropertiesPath(getCurrentInstance(),_keyPath,false, false);
 	}
 	
 	public default void printObject() {

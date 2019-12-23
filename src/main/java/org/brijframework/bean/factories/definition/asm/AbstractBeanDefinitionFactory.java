@@ -77,16 +77,15 @@ public abstract class AbstractBeanDefinitionFactory extends AbstractFactory<Stri
 	}
 	
 
-	public void register(Class<?> target, BeanResource metaSetup) {
-		String id=Constants.DEFAULT.equals(metaSetup.getId())?target.getSimpleName():metaSetup.getId();
-		ModelTypeDeffination owner=DefaultTypeModelDeffinationFactory.getFactory().findById(metaSetup.getModel());
-		Assertion.notNull(owner, "Model not found for "+metaSetup.getModel()+" of bean  : "+id);
-		BeanResource bean=BeanResourceFactoryImpl.getFactory().find(id);
+	public void register(Class<?> target, BeanResource beanResource) {
+		String id=Constants.DEFAULT.equals(beanResource.getId())?target.getSimpleName():beanResource.getId();
+		ModelTypeDeffination owner=DefaultTypeModelDeffinationFactory.getFactory().findById(beanResource.getModel());
+		Assertion.notNull(owner, "Model not found for "+beanResource.getModel()+" of bean  : "+id);
 		BeanDefinitionImpl dataSetup=new BeanDefinitionImpl(owner);
 		dataSetup.setId(id);
-		dataSetup.setName(bean.getName());
-		dataSetup.setScope(Scope.valueFor(metaSetup.getScope()));
-		dataSetup.setProperties(bean.getProperties());
+		dataSetup.setName(beanResource.getName());
+		dataSetup.setScope(Scope.valueFor(beanResource.getScope()));
+		dataSetup.setProperties(beanResource.getProperties());
 		register(id,dataSetup);
 	}
 	
@@ -117,9 +116,9 @@ public abstract class AbstractBeanDefinitionFactory extends AbstractFactory<Stri
 	@Override
 	public List<BeanDefinition> findAll(Class<?> cls) {
 		List<BeanDefinition> list=new ArrayList<>();
-		for (BeanDefinition beanInfo : getCache().values()) {
-			if(cls.isAssignableFrom(beanInfo.getOwner().getType())) {
-				list.add(beanInfo);
+		for (BeanDefinition definition : getCache().values()) {
+			if(cls.isAssignableFrom(definition.getOwner().getType())) {
+				list.add(definition);
 			}
 		}
 		return list;

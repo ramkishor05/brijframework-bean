@@ -54,7 +54,6 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 		if(definition==null) {
 			return null;
 		}
-		System.out.println("definition= "+definition);
 		String uniqueID = BeanScopeFactoryImpl.getFactory().getUniqueID(definition);
 		return (T) BeanScopeFactoryImpl.getFactory().getBeanScope(definition, uniqueID).getScopeObject();
 	}
