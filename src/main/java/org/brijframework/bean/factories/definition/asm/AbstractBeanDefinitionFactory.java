@@ -174,12 +174,12 @@ public abstract class AbstractBeanDefinitionFactory extends AbstractFactory<Stri
 
 	@Override
 	protected void preregister(String key, BeanDefinition value) {
-		LoggerConsole.screen("BeanMeta", "Registering for bean data with id :"+value.getId());
+		LoggerConsole.screen("BeanDefinition", "Registering for bean data with id :"+value.getId());
 	}
 
 	@Override
 	protected void postregister(String key, BeanDefinition value) {
-		LoggerConsole.screen("BeanMeta", "Registered for bean data with id :"+value.getId());
+		LoggerConsole.screen("BeanDefinition", "Registered for bean data with id :"+value.getId());
 	}
 
 }

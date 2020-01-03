@@ -26,7 +26,7 @@ public class BeanContextFactory extends AbstractBootstrapFactory<String, BeanCon
 	public BeanContextFactory loadFactory() {
 		try {
 			LoggerConsole.screen("BootstrapFactory -> "+this.getClass().getSimpleName(), "Lunching the factory to bean context");
-			ReflectionFactory.getFactory().getClassListFromExternal().forEach(cls->{
+			ReflectionFactory.getFactory().getExternalClassList().forEach(cls->{
 				if(BeanContext.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					BeanContext beanContext = (BeanContext) InstanceUtil.getInstance(cls);
 					beanContext.start();
@@ -34,7 +34,7 @@ public class BeanContextFactory extends AbstractBootstrapFactory<String, BeanCon
 					this.register(beanContext.getClass().getName().equals(BeanContext.class.getName()+"Impl")? BeanContext.class.getName(): beanContext.getClass().getName(), beanContext);
 			    }
 			});
-			ReflectionFactory.getFactory().getClassListFromInternal().forEach(cls->{
+			ReflectionFactory.getFactory().getInternalClassList().forEach(cls->{
 				if(BeanContext.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					BeanContext beanContext = (BeanContext) InstanceUtil.getInstance(cls);
 					beanContext.start();

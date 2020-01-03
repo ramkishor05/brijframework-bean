@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.brijframework.Access;
 import org.brijframework.bean.definition.BeanDefinition;
+import org.brijframework.bean.factories.BeanScopeFactory;
 import org.brijframework.bean.factories.impl.BeanScopeFactoryImpl;
 import org.brijframework.model.diffination.ModelPropertyDiffination;
 import org.brijframework.model.diffination.ModelPropertyDiffinationGroup;
@@ -193,19 +194,23 @@ public class BeanScopeUtil {
 	}
 	
 	public static <T> T setPropertyPath(Object instance, String _keyPath,Object _val, boolean isDefault, boolean isLogger) {
+		return setPropertyPath(BeanScopeFactoryImpl.getFactory(), instance, _keyPath, _val, isDefault, isLogger);
+	}
+	
+	public static <T> T setPropertyPath(BeanScopeFactory<?, ?> beanScopeFactory, Object instance, String _keyPath,Object _val, boolean isDefault, boolean isLogger) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
 		String[] keyArray = _keyPath.split(Constants.SPLIT_DOT);
 		Object current = getPropertyObject(instance, keyArray, isDefault, isLogger);
 		String keyPoint=keyArray[keyArray.length-1];
 		if(keyPoint.endsWith(BeanScopeUtil.REF_BY_KEY)) {
 			keyPoint=keyPoint.split(BeanScopeUtil.REF_BY_KEY)[0];
-			_val = BeanScopeFactoryImpl.getFactory().getObjectForRef(_val.toString());
+			_val = beanScopeFactory.getBeanObject(_val.toString());
 		}else if(_val instanceof Map && ((Map<?,?>) _val).containsKey(BeanScopeUtil.REF_BY_KEY)) {
 			 String ref=(String) ((Map<?,?>) _val).get(BeanScopeUtil.REF_BY_KEY);
-			_val = BeanScopeFactoryImpl.getFactory().getObjectForRef(ref);
+			_val = beanScopeFactory.getBeanObject(ref);
 		}
 		Assertion.notNull(current, "Instance should not be null");
-		BeanDefinition beanDefinition = BeanScopeFactoryImpl.getFactory().getBeanDefinitionOfObject(current);
+		BeanDefinition beanDefinition = beanScopeFactory.getBeanDefinitionOfObject(current);
 		ModelPropertyDiffination setterMeta = setterPropertyDefination(beanDefinition, keyPoint);
 		if(setterMeta!=null) {
 			return setPropertyPath(current, keyPoint, _val, beanDefinition,setterMeta);
@@ -236,6 +241,17 @@ public class BeanScopeUtil {
 		}
 		return returnMap;
 	}
+	
+	public static Map<String, ?> setPropertiesPath(BeanScopeFactory<?, ?> beanScopeFactory,Object instance, Map<String, Object> _properties,
+			boolean isDefault, boolean isLogger) {
+		Assertion.notNull(_properties, "Properties should not be null." );
+		Map<String, ?> returnMap = new LinkedHashMap<String, Object>();
+		for (String _key : _properties.keySet()) {
+			returnMap.put(_key, setPropertyPath(beanScopeFactory,instance, _key, _properties.get(_key),isDefault, isLogger));
+		}
+		return returnMap;
+	}
+	
 	
 	public static Map<String, ?> setPropertiesPath(Object instance, String[] _keyPaths, Object[] _values,
 			boolean isDefault, boolean isLogger) {

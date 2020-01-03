@@ -24,7 +24,7 @@ public class BeanResourceContainer extends AbstractModuleContainer{
 	@Override
 	public void init() {
 		try {
-			ReflectionFactory.getFactory().getClassListFromExternal().forEach(cls -> {
+			ReflectionFactory.getFactory().getExternalClassList().forEach(cls -> {
 				if (BeanResourceFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					register((Class<? extends BeanResourceFactory<?,?>>) cls);
 				}
@@ -33,7 +33,7 @@ public class BeanResourceContainer extends AbstractModuleContainer{
 			e.printStackTrace();
 		}
 		try {
-			ReflectionFactory.getFactory().getClassListFromInternal().forEach(cls -> {
+			ReflectionFactory.getFactory().getInternalClassList().forEach(cls -> {
 				if (BeanResourceFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					register((Class<? extends BeanResourceFactory<?,?>>) cls);
 				}

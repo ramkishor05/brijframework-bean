@@ -25,7 +25,7 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	@SuppressWarnings("unchecked")
 	public void init() {
 		try {
-			ReflectionFactory.getFactory().getClassListFromExternal().forEach(cls->{
+			ReflectionFactory.getFactory().getExternalClassList().forEach(cls->{
 				if(BeanContainer.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					register((Class<? extends BeanContainer>) cls);
 				}
@@ -34,7 +34,7 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 			e.printStackTrace();
 		}
 		try {
-			ReflectionFactory.getFactory().getClassListFromInternal().forEach(cls->{
+			ReflectionFactory.getFactory().getInternalClassList().forEach(cls->{
 				if(BeanContainer.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					register((Class<? extends BeanContainer>) cls);
 				}

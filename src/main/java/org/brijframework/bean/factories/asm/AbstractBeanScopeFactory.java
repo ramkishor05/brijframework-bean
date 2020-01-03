@@ -57,26 +57,12 @@ public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends A
 		return null;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
-	public Object getObjectForRef(String key) {
-		for(BeanScope beanScope:getCache().values()) {
-			if(beanScope.getBeanDefinition().getId().equals(key)) {
-				return beanScope.getScopeObject();
-			}
-		}
-		Container container =getContainer();
-		if(container==null) {
-			return null;
-		}
-		for(Group group:container.getCache().values()) {
-			for(Object objectScope:group.getCache().values()) {
-				if(objectScope instanceof BeanScope) {
-					BeanScope beanScope=(BeanScope) objectScope;
-					if(beanScope.getBeanDefinition().getId().equals(key)) {
-						return beanScope.getScopeObject();
-					}
-				}
-			}
+	public Object getBeanObject(String key) {
+		T beanScope = getBeanScope((K)key);
+		if(beanScope!=null) {
+			return beanScope.getScopeObject();
 		}
 		return null;
 	}
@@ -117,7 +103,7 @@ public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends A
 		beanScope.setScopeObject(scopeObject);
 		beanScope.setId(key.toString());
 		register(key, beanScope);
-		BeanScopeUtil.setPropertiesPath(scopeObject,definition.getProperties(),true,true);
+		BeanScopeUtil.setPropertiesPath(this,scopeObject,definition.getProperties(),true,true);
 		return beanScope;
 	}
 	

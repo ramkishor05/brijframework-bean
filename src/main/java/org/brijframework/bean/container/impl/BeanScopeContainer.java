@@ -10,7 +10,7 @@ import org.brijframework.support.ordering.DepandOn;
 import org.brijframework.util.factories.ReflectionFactory;
 import org.brijframework.util.reflect.InstanceUtil;
 
-@DepandOn(depand=BeanMetaDataContainer.class)
+@DepandOn(depand=BeanDefinitionContainer.class)
 public class BeanScopeContainer extends AbstractModuleContainer implements BeanContainer{
 
 	private static BeanScopeContainer container;
@@ -38,7 +38,7 @@ public class BeanScopeContainer extends AbstractModuleContainer implements BeanC
 	@Override
 	public void init() {
 		try {
-			ReflectionFactory.getFactory().getClassListFromExternal().forEach(cls -> {
+			ReflectionFactory.getFactory().getExternalClassList().forEach(cls -> {
 				if (BeanScopeFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					register((Class<? extends BeanScopeFactory<?, ?>>) cls);
 				}
@@ -47,7 +47,7 @@ public class BeanScopeContainer extends AbstractModuleContainer implements BeanC
 			e.printStackTrace();
 		}
 		try {
-			ReflectionFactory.getFactory().getClassListFromInternal().forEach(cls -> {
+			ReflectionFactory.getFactory().getInternalClassList().forEach(cls -> {
 				if (BeanScopeFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					register((Class<? extends BeanScopeFactory<?, ?>>) cls);
 				}

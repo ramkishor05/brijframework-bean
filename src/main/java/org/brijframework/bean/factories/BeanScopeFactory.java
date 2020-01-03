@@ -2,6 +2,7 @@ package org.brijframework.bean.factories;
 
 import java.util.List;
 
+import org.brijframework.bean.definition.BeanDefinition;
 import org.brijframework.factories.module.ModuleFactory;
 
 public interface BeanScopeFactory<K, T> extends ModuleFactory<K, T>{
@@ -14,5 +15,7 @@ public interface BeanScopeFactory<K, T> extends ModuleFactory<K, T>{
 
 	T getBeanScopeForObject(Object object);
 	
-	Object getObjectForRef(String object);
+	Object getBeanObject(String object);
+
+	BeanDefinition getBeanDefinitionOfObject(Object current);
 }

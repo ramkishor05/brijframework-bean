@@ -11,14 +11,14 @@ import org.brijframework.util.factories.ReflectionFactory;
 import org.brijframework.util.reflect.InstanceUtil;
 
 @DepandOn(depand=BeanResourceContainer.class)
-public class BeanMetaDataContainer extends AbstractModuleContainer implements BeanContainer{
+public class BeanDefinitionContainer extends AbstractModuleContainer implements BeanContainer{
 
-	private static BeanMetaDataContainer container;
+	private static BeanDefinitionContainer container;
 
 	@SingletonFactory
-	public static BeanMetaDataContainer getContainer() {
+	public static BeanDefinitionContainer getContainer() {
 		if (container == null) {
-			container = new BeanMetaDataContainer();
+			container = new BeanDefinitionContainer();
 		}
 		return container;
 	}
@@ -27,7 +27,7 @@ public class BeanMetaDataContainer extends AbstractModuleContainer implements Be
 	@Override
 	public void init() {
 		try {
-			ReflectionFactory.getFactory().getClassListFromExternal().forEach(cls -> {
+			ReflectionFactory.getFactory().getExternalClassList().forEach(cls -> {
 				if (BeanDefinitionFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					register((Class<? extends BeanDefinitionFactory<?,?>>) cls);
 				}
@@ -36,7 +36,7 @@ public class BeanMetaDataContainer extends AbstractModuleContainer implements Be
 			e.printStackTrace();
 		}
 		try {
-			ReflectionFactory.getFactory().getClassListFromInternal().forEach(cls -> {
+			ReflectionFactory.getFactory().getInternalClassList().forEach(cls -> {
 				if (BeanDefinitionFactory.class.isAssignableFrom(cls) && InstanceUtil.isAssignable(cls)) {
 					register((Class<? extends BeanDefinitionFactory<?,?>>) cls);
 				}

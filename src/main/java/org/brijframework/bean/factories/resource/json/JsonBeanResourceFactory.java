@@ -43,7 +43,7 @@ public class JsonBeanResourceFactory  extends AbstractBeanResourceFactory{
 			LoggerConsole.screen("BeanConfigration","Bean configration not found :"+BeanConstants.APPLICATION_CONFIG_BEANS);
 			return null;
 		}
-		LoggerConsole.screen("BeanConfigration","Bean configration found :"+BeanConstants.APPLICATION_CONFIG_BEANS);
+		LoggerConsole.screen("BeanConfigration","Bean configration found :"+BeanConstants.APPLICATION_CONFIG_BEANS+" | "+resources);
 		if(resources instanceof List) {
 			return build((List<Map<String, Object>>)resources);
 		}else if(resources instanceof Map) {
@@ -83,8 +83,10 @@ public class JsonBeanResourceFactory  extends AbstractBeanResourceFactory{
 				LoggerConsole.screen("BeanConfigration","Bean configration disabled found :"+modelConfig.getLocation());
 			}
 			Collection<JsonResource> resources=JsonResourceFactory.factory().getResources(modelConfig.getLocation());
+			System.out.println(modelConfig.getLocation()+"==resources="+resources);
 			registerResource(resources);
 		}
+		
 		return this;
 	}
 

@@ -9,7 +9,7 @@ import org.brijframework.container.Container;
 import org.brijframework.support.factories.SingletonFactory;
 import org.brijframework.support.ordering.OrderOn;
 
-@OrderOn(0)
+@OrderOn(3)
 public final class BeanScopeFactoryImpl extends AbstractBeanScopeFactory<String, BeanScope>{
 	
 	private static BeanScopeFactoryImpl factory;

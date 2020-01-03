@@ -22,7 +22,7 @@ public interface BeanContext extends ModuleContext {
 
 	public <T> T getBean(String name, Class<T> beanClass);
 
-	public List<?> getBeanList(Class<? extends Object> beanClass);
+	public List<? extends Object> getBeanList(Class<? extends Object> beanClass);
 	
 	public List<String> getBeanNameList();
 
