@@ -1,7 +1,5 @@
 package org.brijframework.bean.scope.monitor.factories;
 
-import javax.annotation.PreDestroy;
-
 import org.brijframework.bean.scope.monitor.PrototypeScope;
 import org.brijframework.bean.scope.monitor.threads.PrototypeThreadLocal;
 import org.brijframework.factories.impl.AbstractFactory;
@@ -48,8 +46,6 @@ public class PrototypeScopeMonitorFactroy extends AbstractFactory<String, Protot
 	}
 
 	@Override
-	
-	@PreDestroy
 	protected void postregister(String key, PrototypeScope value) {
 	}
 
