@@ -2,14 +2,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>io.github.github-brijframework</groupId>
-		<artifactId>github-brijframework-boot</artifactId>
-		<version>1.1</version>
-	</parent>
-
+	<groupId>io.github.github-brijframework</groupId>
 	<artifactId>github-brijframework-bean</artifactId>
 	<packaging>jar</packaging>
+	<version>1.1</version>
 	
 	<name>${project.groupId}:${project.artifactId}</name>
 	<url>https://github.com/github-brijframework/github-brijframework-bean</url>
@@ -28,11 +24,17 @@
 			<version>3.8.1</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>io.github.github-brijframework</groupId>
+			<artifactId>github-brijframework-boot</artifactId>
+			<version>1.1</version>
+		</dependency>
 
 		<dependency>
 			<groupId>io.github.github-brijframework</groupId>
 			<artifactId>github-brijframework-model</artifactId>
-			<version>0.0.1</version>
+			<version>1.1</version>
 		</dependency>
 		
 	</dependencies>

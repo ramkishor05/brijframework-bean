@@ -1,6 +1,7 @@
 package org.brijframework.bean.context.factories;
 
 import org.brijframework.bean.context.BeanContext;
+import org.brijframework.boot.runner.ApplicationContextRunner;
 import org.brijframework.factories.impl.bootstrap.AbstractBootstrapFactory;
 import org.brijframework.group.Group;
 import org.brijframework.support.factories.SingletonFactory;
@@ -14,16 +15,23 @@ public class BeanContextFactory extends AbstractBootstrapFactory<String, BeanCon
 	
 	private static BeanContextFactory factory ;
 	
+	private static boolean isLoaded= false;
+	
 	@SingletonFactory
 	public static BeanContextFactory getFactory() {
 		if(factory==null) {
 		    factory=new BeanContextFactory();
+		    ApplicationContextRunner.run();
 		}
 		return factory;
 	}
 
 	@Override
 	public BeanContextFactory loadFactory() {
+		if(isLoaded) {
+			return this;
+		}
+		isLoaded=true;
 		try {
 			LoggerConsole.screen("BootstrapFactory -> "+this.getClass().getSimpleName(), "Lunching the factory to bean context");
 			ReflectionFactory.getFactory().getExternalClassList().forEach(cls->{
