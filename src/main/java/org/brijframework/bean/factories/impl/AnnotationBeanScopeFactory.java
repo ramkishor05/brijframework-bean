@@ -4,7 +4,6 @@ import org.brijframework.bean.definition.BeanDefinition;
 import org.brijframework.bean.factories.asm.AbstractBeanScopeFactory;
 import org.brijframework.bean.factories.definition.impl.AnnotationBeanDefinitionFactory;
 import org.brijframework.bean.scope.BeanScope;
-import org.brijframework.factories.Factory;
 import org.brijframework.support.enums.Scope;
 import org.brijframework.support.factories.SingletonFactory;
 import org.brijframework.support.ordering.OrderOn;
@@ -23,7 +22,7 @@ public final class AnnotationBeanScopeFactory extends AbstractBeanScopeFactory<S
 	}
 	
 	@Override
-	public Factory<String, BeanScope> loadFactory() {
+	public AnnotationBeanScopeFactory loadFactory() {
 		AnnotationBeanDefinitionFactory.getFactory().getCache().forEach((key,datainfo)->{
 			try {
 			String uniqueID=(String) key;
@@ -39,6 +38,8 @@ public final class AnnotationBeanScopeFactory extends AbstractBeanScopeFactory<S
 
 	@Override
 	protected BeanScope createBeanScope(BeanDefinition definition) {
-		return new BeanScope();
+		BeanScope beanScope = new BeanScope();
+		beanScope.setBeanDefinition(definition);
+		return beanScope;
 	}
 }

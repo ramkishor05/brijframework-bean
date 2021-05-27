@@ -6,6 +6,8 @@ import org.brijframework.bean.definition.BeanDefinition;
 import org.brijframework.factories.module.ModuleFactory;
 
 public interface BeanScopeFactory<K, T> extends ModuleFactory<K, T>{
+	
+	T find(K key);
 
 	T find(Class<? extends Object> beanClass);
 

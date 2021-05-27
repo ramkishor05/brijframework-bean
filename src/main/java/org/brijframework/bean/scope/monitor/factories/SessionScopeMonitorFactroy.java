@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.brijframework.bean.scope.monitor.SessionScope;
 import org.brijframework.bean.scope.monitor.threads.SessionThreadLocal;
 import org.brijframework.factories.impl.AbstractFactory;
-import org.brijframework.util.reflect.InstanceUtil;
+import org.brijframework.support.factories.SingletonFactory;
 
 public class SessionScopeMonitorFactroy extends AbstractFactory<String, SessionScope>{
 	
@@ -15,9 +15,10 @@ public class SessionScopeMonitorFactroy extends AbstractFactory<String, SessionS
 	private SessionScope service;
 	private static ConcurrentHashMap<Object, SessionScope> container = new ConcurrentHashMap<>();
 
+	@SingletonFactory
 	public static SessionScopeMonitorFactroy factory() {
 		if (factory == null) {
-			factory = InstanceUtil.getSingletonInstance(SessionScopeMonitorFactroy.class);
+			factory = new SessionScopeMonitorFactroy();
 		}
 		return factory;
 	}

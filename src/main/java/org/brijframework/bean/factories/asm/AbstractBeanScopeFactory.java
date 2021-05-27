@@ -79,6 +79,7 @@ public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends A
 			return null;
 		}
 		K uniqueID = (K) getUniqueID(beanMetaData);
+		
 		return getBeanScope(beanMetaData, uniqueID);
 	}
 
@@ -92,6 +93,7 @@ public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends A
 		return (T) register;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public BeanScope register(K key, BeanDefinition definition) {
 		T find=find(key);
 		if(find!=null) {
@@ -103,7 +105,7 @@ public abstract class AbstractBeanScopeFactory<K, T extends BeanScope> extends A
 		beanScope.setScopeObject(scopeObject);
 		beanScope.setId(key.toString());
 		register(key, beanScope);
-		BeanScopeUtil.setPropertiesPath(this,scopeObject,definition.getProperties(),true,true);
+		BeanScopeUtil.setPropertiesPath((BeanScopeFactory<String, BeanScope>) this,scopeObject,definition.getProperties(),true,true);
 		return beanScope;
 	}
 	

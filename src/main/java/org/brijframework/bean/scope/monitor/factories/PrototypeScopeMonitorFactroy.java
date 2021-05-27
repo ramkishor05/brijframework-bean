@@ -3,7 +3,7 @@ package org.brijframework.bean.scope.monitor.factories;
 import org.brijframework.bean.scope.monitor.PrototypeScope;
 import org.brijframework.bean.scope.monitor.threads.PrototypeThreadLocal;
 import org.brijframework.factories.impl.AbstractFactory;
-import org.brijframework.util.reflect.InstanceUtil;
+import org.brijframework.support.factories.SingletonFactory;
 
 public class PrototypeScopeMonitorFactroy extends AbstractFactory<String, PrototypeScope>{
 	
@@ -15,9 +15,10 @@ public class PrototypeScopeMonitorFactroy extends AbstractFactory<String, Protot
 	
 	private static PrototypeScopeMonitorFactroy factory;
 
+	@SingletonFactory
 	public static PrototypeScopeMonitorFactroy factory() {
 		if (factory == null) {
-			factory = InstanceUtil.getSingletonInstance(PrototypeScopeMonitorFactroy.class);
+			factory = new PrototypeScopeMonitorFactroy();
 		}
 		return factory;
 	}

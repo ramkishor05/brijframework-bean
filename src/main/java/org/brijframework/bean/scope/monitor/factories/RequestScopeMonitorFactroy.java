@@ -3,7 +3,6 @@ package org.brijframework.bean.scope.monitor.factories;
 import org.brijframework.bean.scope.monitor.RequestScope;
 import org.brijframework.bean.scope.monitor.threads.RequestThreadLocal;
 import org.brijframework.factories.impl.AbstractFactory;
-import org.brijframework.util.reflect.InstanceUtil;
 
 public class RequestScopeMonitorFactroy extends AbstractFactory<String, RequestScope>{
 	
@@ -14,7 +13,7 @@ public class RequestScopeMonitorFactroy extends AbstractFactory<String, RequestS
 
 	public static RequestScopeMonitorFactroy factory() {
 		if (factory == null) {
-			factory = InstanceUtil.getSingletonInstance(RequestScopeMonitorFactroy.class);
+			factory = new RequestScopeMonitorFactroy();
 		}
 		return factory;
 	}
@@ -38,7 +37,7 @@ public class RequestScopeMonitorFactroy extends AbstractFactory<String, RequestS
 
 	@Override
 	public RequestScopeMonitorFactroy loadFactory() {
-		return null;
+		return this;
 	}
 
 	@Override

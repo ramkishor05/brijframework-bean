@@ -38,7 +38,9 @@ public final class BeanScopeFactoryImpl extends AbstractBeanScopeFactory<String,
 
 	@Override
 	protected BeanScope createBeanScope(BeanDefinition definition) {
-		return new BeanScope();
+		BeanScope beanScope = new BeanScope();
+		beanScope.setBeanDefinition(definition);
+		return beanScope;
 	}
 
 	

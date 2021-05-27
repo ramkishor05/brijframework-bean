@@ -4,8 +4,8 @@ import org.brijframework.bean.definition.BeanDefinition;
 import org.brijframework.bean.factories.asm.AbstractBeanScopeFactory;
 import org.brijframework.bean.scope.monitor.GlobelScope;
 import org.brijframework.bean.scope.monitor.threads.GlobelThreadLocal;
+import org.brijframework.support.factories.SingletonFactory;
 import org.brijframework.util.printer.LoggerConsole;
-import org.brijframework.util.reflect.InstanceUtil;
 
 public class GlobelScopeMonitorFactroy extends AbstractBeanScopeFactory<String, GlobelScope>{
 	
@@ -13,9 +13,10 @@ public class GlobelScopeMonitorFactroy extends AbstractBeanScopeFactory<String, 
 	private static GlobelScopeMonitorFactroy factory;
 	private GlobelThreadLocal thread;
 
+	@SingletonFactory
 	public static GlobelScopeMonitorFactroy factory() {
 		if (factory == null) {
-			factory = InstanceUtil.getSingletonInstance(GlobelScopeMonitorFactroy.class);
+			factory = new GlobelScopeMonitorFactroy();
 		}
 		return factory;
 	}

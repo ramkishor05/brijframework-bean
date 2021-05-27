@@ -56,8 +56,5 @@ public class BeanDefinitionContainer extends AbstractModuleContainer implements 
 		return group;
 	}
 
-	@Override
-	public boolean containsObject(Object key) {
-		return false;
-	}
+	
 }
