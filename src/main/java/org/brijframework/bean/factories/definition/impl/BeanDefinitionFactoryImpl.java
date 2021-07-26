@@ -1,5 +1,6 @@
 package org.brijframework.bean.factories.definition.impl;
 
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,6 +35,14 @@ public final class BeanDefinitionFactoryImpl extends AbstractBeanDefinitionFacto
 			}
 		}
 		return this;
+	}
+
+	public BeanDefinition find(Class<? extends Object> beanClass) {
+		List<BeanDefinition> findAll = findAll(beanClass);
+		if(findAll.size()==1) {
+			return findAll.get(0);
+		}
+		throw new RuntimeException(beanClass.getName()+" have multiple beans (size) : "+findAll.size());
 	}
 	
 }

@@ -39,7 +39,7 @@ public class BeanScopeUtil {
 	 */
 
 	public static Boolean containsKeyPath(Object instance, String _keyPath, boolean isDefault, boolean isLogger) {
-		Object current = getPropertyObject(instance, _keyPath, isDefault, isLogger);
+		Object current = getCurrentObjectForGetter(instance, _keyPath, isDefault, isLogger);
 		if (current == null) {
 			return false;
 		}
@@ -53,6 +53,10 @@ public class BeanScopeUtil {
 	}
 
 	public static Boolean containsPathValue(Object instance, String _keyPath, boolean isDefault, boolean isLogger) {
+		Object current = getCurrentObjectForGetter(instance, _keyPath, isDefault, isLogger);
+		if (current == null) {
+			return false;
+		}
 		return null;
 	}
 
@@ -94,14 +98,21 @@ public class BeanScopeUtil {
 		return diffinationGroup.getGetterMeta();
 	}
 
-	public static PropertyObject getPropertyObject(Object instance, String _keyPath, boolean isDefault,
+	public static PropertyObject get1PropertyObject(Object instance, String _keyPath, boolean isDefault,
 			boolean isLogger) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
 		String[] keyArray = _keyPath.split(Constants.SPLIT_DOT);
-		return getPropertyObject(instance, keyArray, isDefault, isLogger);
+		return getCurrentObjectForGetter(instance, keyArray, isDefault, isLogger);
 	}
-
-	public static PropertyObject getPropertyObject(Object instance, String[] keyArray, boolean isDefault,
+	
+	public static PropertyObject getCurrentObjectForGetter(Object instance, String _keyPath, boolean isDefault,
+			boolean isLogger) {
+		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
+		String[] keyArray = _keyPath.split(Constants.SPLIT_DOT);
+		return getCurrentObjectForSetter(instance, keyArray, isDefault, isLogger);
+	}
+	
+	public static PropertyObject getCurrentObjectForSetter(Object instance, String[] keyArray, boolean isDefault,
 			boolean isLogger) {
 		Object current = instance;
 		for (int i = 0; i < keyArray.length - 1; i++) {
@@ -110,7 +121,27 @@ public class BeanScopeUtil {
 			}
 			String keyPoint = keyArray[i];
 			if (isArray(keyPoint)) {
-				current = getPropertyPathFromArray(current, keyPoint, isDefault, isLogger);
+				current = getPropertyPathFromArray(current, keyPoint, isDefault, isLogger, true);
+			} else {
+				current = getPropertyPath(current, keyPoint, isDefault, isLogger);
+			}
+		}
+		PropertyObject propertyObject = new PropertyObject();
+		propertyObject.setObject(current);
+		propertyObject.setProperty(keyArray[keyArray.length - 1]);
+		return propertyObject;
+	}
+
+	public static PropertyObject getCurrentObjectForGetter(Object instance, String[] keyArray, boolean isDefault,
+			boolean isLogger) {
+		Object current = instance;
+		for (int i = 0; i < keyArray.length - 1; i++) {
+			if (current == null) {
+				return null;
+			}
+			String keyPoint = keyArray[i];
+			if (isArray(keyPoint)) {
+				current = getPropertyPathFromArray(current, keyPoint, isDefault, isLogger ,true);
 			} else {
 				Object refPoint = getPropertyPath(current, keyPoint, isDefault, isLogger);
 				if(refPoint==null) {
@@ -148,58 +179,66 @@ public class BeanScopeUtil {
 
 	public static <T> T getPropertyPath(Object instance, String _keyPath, boolean isDefault, boolean isLogger) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
-		PropertyObject propertyObject = getPropertyObject(instance, _keyPath, isDefault, isLogger);
+		PropertyObject propertyObject = getCurrentObjectForGetter(instance, _keyPath, isDefault, isLogger);
 		if (isArray(propertyObject.getProperty())) {
-			return getPropertyPathFromArray(propertyObject.getObject(), propertyObject.getProperty(), isDefault,
-					isLogger);
+			return getPropertyPathFromArray(propertyObject.getObject(), propertyObject.getProperty(), isDefault, isLogger, true);
 		}
 		return PropertyAccessorUtil.getProperty(propertyObject.getObject(), propertyObject.getProperty(), ReflectionAccess.PRIVATE);
 	}
 	
 	public static <T> T getPropertyPath(Map<?,?> instance, String _keyPath, boolean isDefault, boolean isLogger) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
-		PropertyObject propertyObject = getPropertyObject(instance, _keyPath, isDefault, isLogger);
+		PropertyObject propertyObject = getCurrentObjectForGetter(instance, _keyPath, isDefault, isLogger);
 		if (isArray(propertyObject.getProperty())) {
-			return getPropertyPathFromArray(propertyObject.getObject(), propertyObject.getProperty(), isDefault,
-					isLogger);
+			return getPropertyPathFromArray(propertyObject.getObject(), propertyObject.getProperty(), isDefault, isLogger, true);
 		}
 		return PropertyAccessorUtil.getProperty(propertyObject.getObject(), propertyObject.getProperty(), ReflectionAccess.PRIVATE);
 	}
 	
 	public static <T> T getPropertyPath(Collection<?> instance, String _keyPath, boolean isDefault, boolean isLogger) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
-		PropertyObject propertyObject = getPropertyObject(instance, _keyPath, isDefault, isLogger);
+		PropertyObject propertyObject = getCurrentObjectForGetter(instance, _keyPath, isDefault, isLogger);
 		if (isArray(propertyObject.getProperty())) {
-			return getPropertyPathFromArray(propertyObject.getObject(), propertyObject.getProperty(), isDefault,
-					isLogger);
+			return getPropertyPathFromArray(propertyObject.getObject(), propertyObject.getProperty(), isDefault, isLogger, true);
 		}
 		return PropertyAccessorUtil.getProperty(propertyObject.getObject(), propertyObject.getProperty(), ReflectionAccess.PRIVATE);
 	}
+	
+	private static Collection<?> getPropertyCollection(Object object, String key, boolean isDefault, boolean isLogger, Boolean setter) {
+		AccessibleObject colling = MetaAccessorUtil.findGetterMeta(object.getClass(), key, ReflectionAccess.PRIVATE);
+		Collection<?> collection = getPropertyPath(object, key, isDefault, isLogger);
+		if(!setter) {
+			return collection;
+		}
+		if(collection==null) {
+			collection=(Collection<?>) InstanceUtil.getImpletationInstanse(colling instanceof Method ? ((Method) colling).getReturnType() : ((Field) colling).getType());
+			PropertyAccessorUtil.setSafeProperty(object, colling, collection);
+			return  collection;
+		}
+		return collection;
+	
+	}
 
 	@SuppressWarnings("unchecked")
-	private static <T> T getPropertyPathFromArray(Object object, String _keyPath, boolean isDefault, boolean isLogger) {
-		int index = Integer.valueOf(_keyPath.substring(_keyPath.indexOf("[") + 1, _keyPath.indexOf("]")).trim());
+	private static <T> T getPropertyPathFromArray(Object object, String _keyPath, boolean isDefault, boolean isLogger, Boolean setter) {
 		String key = _keyPath.substring(0, _keyPath.indexOf("["));
-		AccessibleObject colling = MetaAccessorUtil.findGetterMeta(object.getClass(), key, ReflectionAccess.PRIVATE);
-		Object refPoint = getPropertyPath(object, key, isDefault, isLogger);
-		if(refPoint==null) {
-			refPoint=InstanceUtil.getImpletationInstanse(colling instanceof Method ? ((Method) colling).getReturnType() : ((Field) colling).getType());
-			PropertyAccessorUtil.setSafeProperty(object, colling, refPoint);
-		}
-		if (refPoint instanceof List<?>) {
+		int index = Integer.valueOf(_keyPath.substring(_keyPath.indexOf("[") + 1, _keyPath.indexOf("]")).trim());
+		AccessibleObject colling = MetaAccessorUtil.findSetterMeta(object.getClass(), key, ReflectionAccess.PRIVATE);
+		Collection<?> propertyCollection = getPropertyCollection(object, key, isDefault, isLogger, setter);
+		if (propertyCollection instanceof List<?>) {
 			Class<?> cls=ClassUtil.collectionParamType(colling);
 			Constructor<?> constructor = ConstructUtil.getConstructors(cls).get(0);
 			Object obj=InstanceUtil.getInstance(constructor,ParamUtil.getDefaultDgruments(constructor));
-			((List<Object>) refPoint).add(index, obj);
-			return (T) ((List<?>) refPoint).get(index);
-		} else if (refPoint instanceof Set<?>) {
-			int size=((Set<Object>) refPoint).size();
+			((List<Object>) propertyCollection).add(index, obj);
+			return (T) ((List<?>) propertyCollection).get(index);
+		} else if (propertyCollection instanceof Set<?>) {
+			int size=((Set<Object>) propertyCollection).size();
 			if(size>index) {
-				return (T) ((Set<?>) refPoint).toArray()[index];
+				return (T) ((Set<?>) propertyCollection).toArray()[index];
 			}else {
 				int idx=0;
 				Map<Integer, Object> map=new LinkedHashMap<>();
-				for(Object inObj: ((Set<Object>) refPoint)) {
+				for(Object inObj: ((Set<Object>) propertyCollection)) {
 					map.put(idx++, inObj);
 				}
 				if(map.containsKey(index)) {
@@ -209,63 +248,16 @@ public class BeanScopeUtil {
 					Class<?> cls=ClassUtil.collectionParamType(colling);
 					Constructor<?> constructor = ConstructUtil.getConstructors(cls).get(0);
 					Object obj=InstanceUtil.getInstance(constructor,ParamUtil.getDefaultDgruments(constructor));
-					((Set<Object>) refPoint).add(obj);
+					((Set<Object>) propertyCollection).add(obj);
 				}
 			}
-			return (T) ((Set<?>) refPoint).toArray()[index];
-		} else if (refPoint.getClass().isArray()) {
-			return (T) ((Object[]) refPoint)[index];
-		} else {
+			return (T) ((Set<?>) propertyCollection).toArray()[index];
+		}  else {
 			return null;
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	private static <T> T setPropertyPathToCollection(BeanScopeFactory<?, ?> beanScopeFactory, Object object, String _keyPath, Object _val, boolean isDefault, boolean isLogger) {
-		Integer index = getArrayIndex(_keyPath);
-		String key = getArrayKey(_keyPath);
-		AccessibleObject colling = MetaAccessorUtil.findGetterMeta(object.getClass(), key, ReflectionAccess.PRIVATE);
-		Object refPoint = getPropertyPath(object, key, isDefault, isLogger);
-		if(refPoint==null) {
-			refPoint=InstanceUtil.getImpletationInstanse(colling instanceof Method ? ((Method) colling).getReturnType() : ((Field) colling).getType());
-			PropertyAccessorUtil.setSafeProperty(object, colling, refPoint);
-		}
-		if (refPoint instanceof List<?>) {
-			Object obj=InstanceUtil.getInstance(ClassUtil.collectionParamType(colling));
-			((List<Object>) refPoint).add(index, obj);
-			return (T) ((List<?>) refPoint).get(index);
-		} else if (refPoint instanceof Set<?>) {
-			Object obj=InstanceUtil.getInstance(ClassUtil.collectionParamType(colling));
-			((Set<Object>) refPoint).add(obj);
-			return (T) ((Set<?>) refPoint).toArray()[index];
-		}else {
-			return null;
-		}
-	}
 	
-	@SuppressWarnings("unchecked")
-	private static <T> T setPropertyPathToArray(BeanScopeFactory<?, ?> beanScopeFactory, Object object, String _keyPath, Object _val, boolean isDefault, boolean isLogger) {
-		int index = Integer.valueOf(_keyPath.substring(_keyPath.indexOf("[") + 1, _keyPath.indexOf("]")).trim());
-		String key = _keyPath.substring(0, _keyPath.indexOf("["));
-		AccessibleObject colling = MetaAccessorUtil.findGetterMeta(object.getClass(), key, ReflectionAccess.PRIVATE);
-		Object refPoint = getPropertyPath(object, key, isDefault, isLogger);
-		if(refPoint==null) {
-			refPoint=InstanceUtil.getImpletationInstanse(colling instanceof Method ? ((Method) colling).getReturnType() : ((Field) colling).getType());
-			PropertyAccessorUtil.setSafeProperty(object, colling, refPoint);
-		}
-		if (refPoint instanceof List<?>) {
-			Object obj=InstanceUtil.getInstance(ClassUtil.collectionParamType(colling));
-			((List<Object>) refPoint).add(index, obj);
-			return (T) ((List<?>) refPoint).get(index);
-		} else if (refPoint instanceof Set<?>) {
-			Object obj=InstanceUtil.getInstance(ClassUtil.collectionParamType(colling));
-			((Set<Object>) refPoint).add(obj);
-			return (T) ((Set<?>) refPoint).toArray()[index];
-		}else {
-			return null;
-		}
-	}
-
 	public static <T> T getPropertyPath(Object instance, String keyPoint, BeanDefinition beanDefinition,
 			ModelPropertyDiffination getterMeta, boolean isLogger) {
 		switch (getterMeta.getAccess()) {
@@ -323,6 +315,30 @@ public class BeanScopeUtil {
 	/*
 	 * Setting properties
 	 */
+	
+
+	@SuppressWarnings("unchecked")
+	private static <T> T setPropertyPathToCollection(BeanScopeFactory<?, ?> beanScopeFactory, Object object, String _keyPath, Object _val, boolean isDefault, boolean isLogger) {
+		Integer index = getArrayIndex(_keyPath);
+		String key = getArrayKey(_keyPath);
+		AccessibleObject colling = MetaAccessorUtil.findGetterMeta(object.getClass(), key, ReflectionAccess.PRIVATE);
+		Object refPoint = getPropertyPath(object, key, isDefault, isLogger);
+		if(refPoint==null) {
+			refPoint=InstanceUtil.getImpletationInstanse(colling instanceof Method ? ((Method) colling).getReturnType() : ((Field) colling).getType());
+			PropertyAccessorUtil.setSafeProperty(object, colling, refPoint);
+		}
+		if (refPoint instanceof List<?>) {
+			Object obj=InstanceUtil.getInstance(ClassUtil.collectionParamType(colling));
+			((List<Object>) refPoint).add(index, obj);
+			return (T) ((List<?>) refPoint).get(index);
+		} else if (refPoint instanceof Set<?>) {
+			Object obj=InstanceUtil.getInstance(ClassUtil.collectionParamType(colling));
+			((Set<Object>) refPoint).add(obj);
+			return (T) ((Set<?>) refPoint).toArray()[index];
+		}else {
+			return null;
+		}
+	}
 
 	public static ModelPropertyDiffination setterPropertyDefination(BeanDefinition beanDefinition, String keyPoint) {
 		if (beanDefinition == null) {
@@ -339,10 +355,11 @@ public class BeanScopeUtil {
 			boolean isLogger) {
 		return setPropertyPath(BeanScopeFactoryImpl.getFactory(), instance, _keyPath, _val, isDefault, isLogger);
 	}
+	
 
 	public static <T> T setPropertyPath(BeanScopeFactory<String, BeanScope> beanScopeFactory, Object instance, String _keyPath, Object _val, boolean isDefault, boolean isLogger) {
 		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
-		PropertyObject propertyObject = getPropertyObject(instance, _keyPath, isDefault, isLogger);
+		PropertyObject propertyObject = getCurrentObjectForSetter(instance, _keyPath, isDefault, isLogger);
 		Assertion.state(propertyObject.getObject() != null,"Can't write '" + propertyObject.getProperty() + "' for bean : "+propertyObject.getObject());
 		if(isArray(propertyObject.getProperty())) {
 			return setPropertyPathToCollection(beanScopeFactory, propertyObject.getObject(), propertyObject.getProperty(), _val, isDefault, isLogger);
@@ -352,6 +369,15 @@ public class BeanScopeUtil {
 		}
 		return PropertyAccessorUtil.setProperty(propertyObject.getObject(), propertyObject.getProperty(),ReflectionAccess.PRIVATE, _val);
 	}
+	
+
+	public static PropertyObject getCurrentObjectForSetter(Object instance, String _keyPath, boolean isDefault,
+			boolean isLogger) {
+		Assertion.notEmpty(_keyPath, "Key should not be null or empty");
+		String[] keyArray = _keyPath.split(Constants.SPLIT_DOT);
+		return getCurrentObjectForGetter(instance, keyArray, isDefault, isLogger);
+	}
+	
 
 	@SuppressWarnings("unchecked")
 	private static <T> T setPropertyPathFromRef(BeanScopeFactory<String, BeanScope> beanScopeFactory, Object object, String property, Object _val, boolean isDefault, boolean isLogger) {

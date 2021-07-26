@@ -42,7 +42,5 @@ public final class BeanScopeFactoryImpl extends AbstractBeanScopeFactory<String,
 		beanScope.setBeanDefinition(definition);
 		return beanScope;
 	}
-
-	
 	
 }

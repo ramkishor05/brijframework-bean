@@ -61,7 +61,7 @@ public abstract class AbstractBeanContext extends AbstractModuleContext implemen
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getBean(Class<? extends Object> beanClass) {
-		BeanDefinition beanMetaData = BeanDefinitionFactoryImpl.getFactory().find(beanClass.getSimpleName());
+		BeanDefinition beanMetaData = BeanDefinitionFactoryImpl.getFactory().find(beanClass);
 		if(beanMetaData==null) {
 			return null;
 		}
